@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tareas - Portal Docente - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/tareas_docente.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">D</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Docente</span>
+          <span class="nav-rol">Docente</span>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="notas.html">Notas</a></li>
+        <li><a href="horario.html">Horario</a></li>
+        <li><a href="tareas.html" class="activo">Tareas</a></li>
+      </ul>
+
+      <div class="nav-acciones">
+        <button class="btn-nav-icon" title="Mensajes">&#128172;</button>
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Mis Clases</h3>
+        <!-- Lo llena tareas_docente.js con los salones reales -->
+        <ul id="lista-clases"></ul>
+      </section>
+      <section class="sidebar-seccion">
+        <h3>Accesos Rápidos</h3>
+        <ul>
+          <li><a href="notas.html"   class="acceso-link"><span>&#128203;</span> Ingresar Notas</a></li>
+          <li><a href="tareas.html"  class="acceso-link"><span>&#128218;</span> Ver Tareas</a></li>
+          <li><a href="horario.html" class="acceso-link"><span>&#128197;</span> Mi Horario</a></li>
+        </ul>
+      </section>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+      <!-- Encabezado -->
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Gestión de Tareas</h1>
+          <p>Crea y revisa las tareas de tus salones</p>
+        </div>
+        <div class="encabezado-acciones">
+          <button class="btn-nueva-tarea" id="btn-nueva-tarea">+ Nueva Tarea</button>
+        </div>
+      </div>
+
+      <!-- ALERTA -->
+      <div class="alerta" id="alerta"></div>
+
+      <!-- FILTROS -->
+      <section class="card-seccion filtros-wrap">
+        <div class="filtros">
+          <button class="btn-filtro activo" data-filtro="todas">Todas</button>
+          <button class="btn-filtro" data-filtro="activa">Activas</button>
+          <button class="btn-filtro" data-filtro="cerrada">Cerradas</button>
+        </div>
+        <div class="filtro-salon">
+          <select id="select-salon" class="select-salon">
+            <option value="todos">Todos los salones</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- LISTA DE TAREAS -->
+      <section class="card-seccion">
+        <div class="card-header">
+          <h2>Tareas</h2>
+          <span class="badge-conteo" id="conteo-tareas">—</span>
+        </div>
+
+        <div class="lista-tareas" id="lista-tareas-activas">
+          <p style="padding:24px;text-align:center;">Cargando tareas...</p>
+        </div>
+      </section>
+
+      <!-- ENTREGAS RECIENTES (las llena tareas_docente.js con las entregas reales) -->
+      <section class="card-seccion">
+        <div class="card-header">
+          <h2>Entregas Recientes</h2>
+          <span class="badge-conteo" id="conteo-entregas">—</span>
+        </div>
+
+        <table class="tabla-entregas">
+          <thead>
+            <tr>
+              <th>Estudiante</th>
+              <th>Tarea</th>
+              <th>Salón</th>
+              <th>Fecha entrega</th>
+              <th>Estado</th>
+              <th>Nota</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-entregas">
+            <tr>
+              <td colspan="7" style="padding:24px;text-align:center;">Cargando entregas...</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- MATERIAL DE APOYO (lo llena tareas_docente.js con el material real) -->
+      <section class="card-seccion">
+        <div class="card-header">
+          <h2>Material de Apoyo</h2>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span class="badge-conteo" id="conteo-material">—</span>
+            <button class="btn-nueva-tarea" id="btn-subir-material">+ Subir Material</button>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="tabla-entregas">
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Salón</th>
+                <th>Ciclo</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+                <th>Visibilidad</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-material">
+              <tr>
+                <td colspan="7" style="padding:24px;text-align:center;">Cargando material...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===== MODAL NUEVA TAREA ===== -->
+  <div class="modal-overlay oculto" id="modal-nueva-tarea" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <div class="modal-caja">
+      <div class="modal-header">
+        <h2 id="modal-titulo">Nueva Tarea</h2>
+        <button class="btn-cerrar-modal" id="btn-cerrar-modal" aria-label="Cerrar modal">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+
+        <div class="campo-modal">
+          <label for="m-titulo">Título de la tarea <span class="oblig">*</span></label>
+          <input type="text" id="m-titulo" placeholder="Ej. Reading: Unit 3" />
+          <span class="m-error" id="e-titulo"></span>
+        </div>
+
+        <div class="campo-modal">
+          <label for="m-salon">Salón <span class="oblig">*</span></label>
+          <select id="m-salon">
+            <option value="">Selecciona un salón</option>
+          </select>
+          <span class="m-error" id="e-salon"></span>
+        </div>
+
+        <div class="grid-modal-2">
+          <div class="campo-modal">
+            <label for="m-ciclo">Ciclo <span class="oblig">*</span></label>
+            <select id="m-ciclo">
+              <option value="">Selecciona primero un salón</option>
+            </select>
+            <span class="m-error" id="e-ciclo"></span>
+          </div>
+          <div class="campo-modal">
+            <label for="m-porcentaje">Valor (%)</label>
+            <input type="number" id="m-porcentaje" min="0" max="100" step="1" placeholder="Ej. 20" />
+            <span class="m-error" id="e-porcentaje"></span>
+          </div>
+        </div>
+
+        <div class="grid-modal-2">
+          <div class="campo-modal">
+            <label for="m-fecha">Fecha de vencimiento <span class="oblig">*</span></label>
+            <input type="date" id="m-fecha" />
+            <span class="m-error" id="e-fecha"></span>
+          </div>
+          <div class="campo-modal">
+            <label for="m-tipo">Tipo</label>
+            <select id="m-tipo">
+              <option value="tarea">Tarea</option>
+              <option value="quiz">Quiz</option>
+              <option value="proyecto">Proyecto</option>
+              <option value="lectura">Lectura</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="campo-modal">
+          <label for="m-descripcion">Descripción <span class="oblig">*</span></label>
+          <textarea id="m-descripcion" rows="4" placeholder="Describe la actividad y los criterios de evaluación..."></textarea>
+          <span class="m-error" id="e-descripcion"></span>
+        </div>
+
+        <div class="campo-modal">
+          <label for="m-archivo">Adjuntar material (opcional)</label>
+          <input type="file" id="m-archivo" accept=".pdf,.doc,.docx,.pptx" disabled />
+          <small class="texto-ayuda">Próximamente: la subida de archivos aún no está disponible.</small>
+        </div>
+
+        <span class="m-error" id="e-general"></span>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancelar" id="btn-cancelar-modal">Cancelar</button>
+        <button class="btn-modal-guardar" id="btn-guardar-modal">Crear Tarea</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL ENTREGAS DE UNA TAREA ===== -->
+  <div class="modal-overlay oculto" id="modal-entregas" role="dialog" aria-modal="true" aria-labelledby="entregas-titulo">
+    <div class="modal-caja" style="max-width:920px;">
+      <div class="modal-header">
+        <h2 id="entregas-titulo">Entregas</h2>
+        <button class="btn-cerrar-modal" id="btn-cerrar-entregas" aria-label="Cerrar modal">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <p class="tarea-salon" id="entregas-subtitulo"></p>
+        <div style="overflow-x:auto;">
+          <table class="tabla-entregas">
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Fecha entrega</th>
+                <th>Estado</th>
+                <th>Nota (0 - 5)</th>
+                <th>Comentario</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-modal-entregas"></tbody>
+          </table>
+        </div>
+        <span class="m-error" id="e-entregas"></span>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancelar" id="btn-cerrar-entregas-pie">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL SUBIR MATERIAL ===== -->
+  <div class="modal-overlay oculto" id="modal-material" role="dialog" aria-modal="true" aria-labelledby="material-titulo">
+    <div class="modal-caja">
+      <div class="modal-header">
+        <h2 id="material-titulo">Subir Material de Apoyo</h2>
+        <button class="btn-cerrar-modal" id="btn-cerrar-material" aria-label="Cerrar modal">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+
+        <div class="campo-modal">
+          <label for="mat-titulo">Título <span class="oblig">*</span></label>
+          <input type="text" id="mat-titulo" maxlength="150" placeholder="Ej. Guía de verbos irregulares" />
+          <span class="m-error" id="e-mat-titulo"></span>
+        </div>
+
+        <div class="grid-modal-2">
+          <div class="campo-modal">
+            <label for="mat-salon">Salón <span class="oblig">*</span></label>
+            <select id="mat-salon">
+              <option value="">Selecciona un salón</option>
+            </select>
+            <span class="m-error" id="e-mat-salon"></span>
+          </div>
+          <div class="campo-modal">
+            <label for="mat-ciclo">Ciclo <span class="oblig">*</span></label>
+            <select id="mat-ciclo">
+              <option value="">Selecciona primero un salón</option>
+            </select>
+            <span class="m-error" id="e-mat-ciclo"></span>
+          </div>
+        </div>
+
+        <div class="campo-modal">
+          <label for="mat-archivo">Archivo <span class="oblig">*</span></label>
+          <input type="file" id="mat-archivo" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.mp3" />
+          <small class="texto-ayuda">PDF, Word, PowerPoint, Excel, JPG, PNG o MP3. Máximo 20 MB.</small>
+          <span class="m-error" id="e-mat-archivo"></span>
+        </div>
+
+        <span class="m-error" id="e-mat-general"></span>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancelar" id="btn-cancelar-material">Cancelar</button>
+        <button class="btn-modal-guardar" id="btn-guardar-material">Subir Material</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/tareas_docente.js"></script>
+</body>
+</html>

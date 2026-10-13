@@ -1,0 +1,421 @@
+/* ============================================================
+   admisiones_inicio.css — Estilos de la página de admisiones
+   Instituto American Land
+   Ubicación: assets/css/admisiones_inicio.css
+============================================================ */
+
+/* ── Reset y base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+
+/* ── Variables globales (mismas que index.css) ── */
+:root {
+  --morado:       #4B0082;
+  --morado-nav:   #3B0072;
+  --morado-claro: #6A0DAD;
+  --rojo:         #C0392B;
+  --verde:        #27AE60;
+  --blanco:       #FFFFFF;
+  --gris-claro:   #F5F5F5;
+  --gris-texto:   #555555;
+  --negro:        #1A1A1A;
+  --font-titulo:  'Georgia', serif;
+  --font-cuerpo:  'Segoe UI', Arial, sans-serif;
+  --radio:        8px;
+  --sombra:       0 4px 16px rgba(0,0,0,0.12);
+}
+
+body {
+  font-family: var(--font-cuerpo);
+  color: var(--negro);
+  background: var(--blanco);
+}
+
+/* ============================================================
+   NAVBAR (idéntico al de index.css para mantener consistencia)
+============================================================ */
+header {
+  background: var(--morado-nav);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+}
+
+header::after {
+  content: '';
+  display: block;
+  height: 3px;
+  background: linear-gradient(90deg, var(--rojo) 0%, #e74c3c 50%, var(--rojo) 100%);
+}
+
+nav {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+}
+
+.nav-marca { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.nav-marca-logo { width: 100px; height: 100px; object-fit: contain; border-radius: 50%; }
+.nav-marca-texto { display: flex; flex-direction: column; line-height: 1.2; }
+.nav-marca-texto strong { color: var(--blanco); font-family: var(--font-titulo); font-size: 1rem; letter-spacing: 0.2px; }
+.nav-marca-texto span { color: rgba(255,255,255,0.55); font-size: 0.65rem; letter-spacing: 2px; text-transform: uppercase; }
+
+.nav-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.18); margin: 0 28px; flex-shrink: 0; }
+
+.nav-links { display: flex; align-items: center; flex: 1; }
+.nav-links a {
+  color: rgba(255,255,255,0.78);
+  padding: 10px 18px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.4px;
+  position: relative;
+  transition: color 0.2s;
+  white-space: nowrap;
+}
+.nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: 6px;
+  left: 18px;
+  right: 18px;
+  height: 2px;
+  background: var(--rojo);
+  border-radius: 2px;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.25s ease;
+}
+.nav-links a:hover { color: var(--blanco); }
+.nav-links a:hover::after { transform: scaleX(1); }
+.nav-links a.activo { color: var(--blanco); font-weight: 700; }
+.nav-links a.activo::after { transform: scaleX(1); }
+
+.nav-auth { display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: 20px; }
+.btn-login {
+  color: rgba(255,255,255,0.88);
+  border: 1.5px solid rgba(255,255,255,0.38);
+  padding: 8px 24px;
+  border-radius: 50px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  white-space: nowrap;
+}
+.btn-login:hover { border-color: rgba(255,255,255,0.85); color: var(--blanco); background: rgba(255,255,255,0.07); }
+
+.btn-signup {
+  background: var(--rojo);
+  color: var(--blanco);
+  padding: 9px 24px;
+  border-radius: 50px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: 0 3px 12px rgba(192,57,43,0.5);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+  white-space: nowrap;
+}
+.btn-signup:hover { background: #a93226; box-shadow: 0 5px 16px rgba(192,57,43,0.6); transform: translateY(-1px); }
+
+.btn-hamburguesa {
+  display: none;
+  background: none;
+  border: 1.5px solid rgba(255,255,255,0.4);
+  color: var(--blanco);
+  padding: 7px 13px;
+  border-radius: var(--radio);
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: background 0.2s;
+}
+.btn-hamburguesa:hover { background: rgba(255,255,255,0.08); }
+
+/* ============================================================
+   HERO ADMISIONES
+============================================================ */
+.hero-admision {
+  background: linear-gradient(135deg, var(--morado) 0%, var(--morado-claro) 100%);
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.hero-admision-inner { max-width: 720px; margin: 0 auto; color: var(--blanco); }
+
+.hero-etiqueta {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  padding: 6px 18px;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.hero-admision-inner h1 {
+  font-family: var(--font-titulo);
+  font-size: 2.4rem;
+  line-height: 1.3;
+  margin-bottom: 16px;
+}
+
+.hero-admision-inner p { font-size: 1.05rem; opacity: 0.92; margin-bottom: 32px; }
+
+.hero-admision-botones { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+.btn-primario {
+  background: var(--rojo);
+  color: var(--blanco);
+  padding: 13px 30px;
+  border-radius: var(--radio);
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background 0.2s, transform 0.15s;
+  display: inline-block;
+}
+.btn-primario:hover { background: #a93226; transform: translateY(-2px); }
+
+.btn-secundario {
+  background: var(--blanco);
+  color: var(--morado);
+  padding: 13px 30px;
+  border-radius: var(--radio);
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background 0.2s, transform 0.15s;
+  display: inline-block;
+}
+.btn-secundario:hover { background: var(--gris-claro); transform: translateY(-2px); }
+
+/* ============================================================
+   PASOS DEL PROCESO
+============================================================ */
+.pasos-admision { padding: 72px 24px; text-align: center; }
+
+.pasos-admision h2 { font-family: var(--font-titulo); font-size: 1.9rem; margin-bottom: 10px; color: var(--morado); }
+
+.pasos-admision .subtitulo { color: var(--gris-texto); margin-bottom: 48px; font-size: 1.02rem; }
+
+.grid-pasos {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+}
+
+.card-paso {
+  background: var(--gris-claro);
+  border-radius: var(--radio);
+  padding: 36px 26px;
+  text-align: left;
+  position: relative;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card-paso:hover { box-shadow: var(--sombra); transform: translateY(-4px); }
+
+.paso-numero {
+  width: 44px;
+  height: 44px;
+  background: var(--morado);
+  color: var(--blanco);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 18px;
+}
+
+.card-paso h3 { font-size: 1.1rem; margin-bottom: 10px; color: var(--negro); }
+.card-paso p { font-size: 0.92rem; color: var(--gris-texto); line-height: 1.55; margin-bottom: 16px; }
+
+.paso-enlace {
+  color: var(--morado);
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.paso-enlace:hover { color: var(--rojo); }
+
+/* ============================================================
+   BENEFICIOS
+============================================================ */
+.beneficios-admision { background: var(--gris-claro); padding: 72px 24px; }
+
+.beneficios-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 56px;
+}
+
+.beneficios-texto { flex: 1; }
+.beneficios-texto h2 { font-family: var(--font-titulo); font-size: 1.7rem; color: var(--morado); margin-bottom: 24px; }
+
+.lista-beneficios li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.98rem;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.lista-beneficios li:last-child { border-bottom: none; }
+.lista-beneficios .icono { font-size: 1.3rem; }
+
+.beneficios-imagen { flex-shrink: 0; }
+.beneficios-imagen img {
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 20px rgba(0,0,0,0.15));
+}
+
+/* ============================================================
+   FAQ
+============================================================ */
+.faq-admision { max-width: 800px; margin: 0 auto; padding: 72px 24px; }
+
+.faq-admision h2 { font-family: var(--font-titulo); font-size: 1.9rem; text-align: center; color: var(--morado); margin-bottom: 40px; }
+
+.faq-item {
+  background: var(--gris-claro);
+  border-radius: var(--radio);
+  padding: 18px 22px;
+  margin-bottom: 12px;
+}
+
+.faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.98rem;
+  list-style: none;
+  position: relative;
+  padding-right: 24px;
+}
+
+.faq-item summary::-webkit-details-marker { display: none; }
+
+.faq-item summary::after {
+  content: '+';
+  position: absolute;
+  right: 0;
+  top: 0;
+  font-size: 1.2rem;
+  color: var(--morado);
+  transition: transform 0.2s;
+}
+
+.faq-item[open] summary::after { transform: rotate(45deg); }
+
+.faq-item p { margin-top: 12px; color: var(--gris-texto); font-size: 0.92rem; line-height: 1.55; }
+
+/* ============================================================
+   CTA FINAL
+============================================================ */
+.cta-final {
+  background: var(--rojo);
+  color: var(--blanco);
+  text-align: center;
+  padding: 64px 24px;
+}
+
+.cta-final h2 { font-family: var(--font-titulo); font-size: 1.9rem; margin-bottom: 10px; }
+.cta-final p { opacity: 0.92; margin-bottom: 28px; font-size: 1.02rem; }
+.cta-final .btn-primario { background: var(--blanco); color: var(--rojo); }
+.cta-final .btn-primario:hover { background: var(--gris-claro); }
+
+/* ============================================================
+   FOOTER (idéntico al de index.css)
+============================================================ */
+footer { background: var(--negro); color: #cccccc; padding: 48px 24px 24px; }
+
+.footer-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 32px;
+  margin-bottom: 32px;
+}
+
+.footer-col h4 { color: var(--blanco); font-size: 0.95rem; margin-bottom: 14px; font-weight: bold; }
+.footer-col p, .footer-col li, .footer-col a { font-size: 0.85rem; line-height: 1.8; color: #aaaaaa; }
+.footer-col a:hover { color: var(--blanco); }
+
+.footer-redes { display: flex; gap: 12px; margin-top: 12px; }
+.footer-redes a { background: #333333; color: var(--blanco); padding: 6px 14px; border-radius: var(--radio); font-size: 0.8rem; transition: background 0.2s; }
+.footer-redes a:hover { background: var(--morado); }
+
+.footer-copy {
+  max-width: 1200px;
+  margin: 0 auto;
+  border-top: 1px solid #333333;
+  padding-top: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #777777;
+}
+
+/* ============================================================
+   ANIMACIÓN DE ENTRADA
+============================================================ */
+.animar-entrada { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s ease; }
+.animar-entrada.visible { opacity: 1; transform: translateY(0); }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 960px) {
+  .nav-links, .nav-auth, .nav-divider { display: none; }
+  .btn-hamburguesa { display: block; }
+
+  .nav-links.abierto {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 73px;
+    left: 0;
+    right: 0;
+    background: var(--morado-nav);
+    padding: 12px 20px;
+    gap: 2px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    z-index: 99;
+  }
+
+  .nav-auth.abierto {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: var(--morado-nav);
+    padding: 16px 20px;
+    gap: 10px;
+    z-index: 99;
+  }
+
+  .grid-pasos { grid-template-columns: 1fr; }
+  .beneficios-inner { flex-direction: column; text-align: center; }
+  .hero-admision-inner h1 { font-size: 1.9rem; }
+}
+
+@media (max-width: 620px) {
+  .hero-admision { padding: 56px 20px; }
+  .pasos-admision, .beneficios-admision, .faq-admision, .cta-final { padding: 48px 20px; }
+}

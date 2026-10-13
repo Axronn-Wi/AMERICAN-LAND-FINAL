@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pago Fallido - Instituto American Land</title>
+</head>
+<body>
+
+  <!-- ===== CONTENEDOR PRINCIPAL ===== -->
+  <main>
+
+    <!-- Logo -->
+    <div>
+      <img src="logo.png" alt="Logo Instituto American Land" width="150" />
+    </div>
+
+    <!-- Ícono de error -->
+    <div>
+      <span>&#10007;</span>
+    </div>
+
+    <!-- Título y mensaje -->
+    <h1>¡Pago No Exitoso!</h1>
+    <p>Lo sentimos, no pudimos procesar tu pago. Por favor revisa los datos e intenta de nuevo.</p>
+
+    <!-- ===== MOTIVO DEL ERROR ===== -->
+    <section id="seccion-error">
+
+      <h2>Motivo del Error</h2>
+
+      <div id="mensaje-error">
+        <span id="codigo-error">Error: -</span>
+        <p id="descripcion-error">No se pudo completar la transacción.</p>
+      </div>
+
+      <!-- Lista de posibles causas -->
+      <div>
+        <h3>Posibles causas:</h3>
+        <ul>
+          <li>Datos de la tarjeta incorrectos (número, fecha de vencimiento o CVV).</li>
+          <li>Fondos insuficientes en la cuenta.</li>
+          <li>Tarjeta bloqueada o vencida.</li>
+          <li>Error de conexión con el banco.</li>
+          <li>El comprobante de transferencia no es válido o no se pudo verificar.</li>
+          <li>Tiempo de sesión agotado.</li>
+        </ul>
+      </div>
+
+    </section>
+
+    <!-- ===== RESUMEN DEL INTENTO ===== -->
+    <section id="resumen-intento">
+
+      <h2>Detalle del Intento</h2>
+
+      <ul>
+        <li><strong>Método de Pago Usado:</strong> <span id="resumen-metodo">-</span></li>
+        <li><strong>Monto Intentado:</strong> <span id="resumen-total">-</span></li>
+        <li><strong>Fecha y Hora:</strong> <span id="resumen-fecha">-</span></li>
+        <li><strong>Número de Intento:</strong> <span id="resumen-intento-num">-</span></li>
+      </ul>
+
+    </section>
+
+    <!-- ===== ACCIONES ===== -->
+    <div>
+
+      <!-- Reintentar pago -->
+      <div>
+        <a href="realizar-pago.html">Intentar de Nuevo</a>
+      </div>
+
+      <!-- Cambiar método de pago -->
+      <div>
+        <a href="seleccion-nivel-horario-pago.html">Cambiar Método de Pago</a>
+      </div>
+
+      <!-- Volver al inicio -->
+      <div>
+        <a href="index.html">Volver al Inicio</a>
+      </div>
+
+    </div>
+
+    <!-- Nota de ayuda -->
+    <div>
+      <p>
+        Si el problema persiste, comunícate con nosotros y te ayudaremos a completar tu inscripción.
+      </p>
+      <p>
+        <a href="mailto:ventasymarketing.al@gmail.com">ventasymarketing.al@gmail.com</a>
+      </p>
+      <p>
+        <a href="tel:+573138132388">3138132388</a>
+      </p>
+    </div>
+
+  </main>
+
+</body>
+</html>

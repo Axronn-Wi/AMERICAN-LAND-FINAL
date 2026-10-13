@@ -1,0 +1,362 @@
+/* ============================================================
+   inscripcion.css — Estilos de la página de Inscripción
+   Instituto American Land
+   Ubicación: assets/css/inscripcion.css
+   (Depende de index.css para variables, navbar y footer)
+============================================================ */
+
+/* El atributo hidden debe ganar siempre sobre display:flex/grid */
+[hidden] { display: none !important; }
+
+body { background: var(--gris-claro); }
+
+/* ============================================================
+   ENCABEZADO
+============================================================ */
+.hero-inscripcion {
+  background: linear-gradient(135deg, var(--morado) 0%, var(--morado-claro) 100%);
+  padding: clamp(44px, 7vw, 68px) 24px;
+  text-align: center;
+}
+
+.hero-inscripcion-inner { max-width: 640px; margin: 0 auto; color: var(--blanco); }
+
+.hero-inscripcion h1 {
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  line-height: 1.2;
+  margin-bottom: 14px;
+}
+
+.hero-inscripcion p {
+  font-size: 1.08rem;
+  font-weight: 300;
+  opacity: 0.94;
+  line-height: 1.7;
+}
+
+/* ============================================================
+   INDICADOR DE PASOS
+============================================================ */
+.insc-pasos-barra {
+  background: var(--blanco);
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.insc-pasos {
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  list-style: none;
+}
+
+.insc-paso {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--gris-texto);
+  font-size: 0.9rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.insc-paso:not(:last-child)::after {
+  content: '';
+  flex: 1;
+  height: 2px;
+  margin: 0 12px;
+  background: #dddddd;
+}
+
+.insc-paso .num {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e4e4e4;
+  color: var(--gris-texto);
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+  transition: background 0.25s, color 0.25s;
+}
+
+.insc-paso.activo { color: var(--negro); font-weight: 700; }
+.insc-paso.activo .num { background: var(--rojo); color: var(--blanco); }
+
+.insc-paso.completo .num { background: var(--morado); color: var(--blanco); }
+.insc-paso.completo:not(:last-child)::after { background: var(--morado); }
+
+/* ============================================================
+   CONTENEDOR Y PANELES
+============================================================ */
+.insc-contenido { padding: 40px 24px 64px; }
+
+.insc-contenedor { max-width: 960px; margin: 0 auto; }
+
+.insc-panel {
+  background: var(--blanco);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: clamp(24px, 4vw, 40px);
+}
+
+.insc-panel h2 {
+  font-family: var(--font-titulo);
+  font-size: clamp(1.4rem, 3vw, 1.7rem);
+  color: var(--morado);
+  margin-bottom: 8px;
+}
+
+.insc-sub {
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--gris-texto);
+  margin-bottom: 28px;
+}
+
+.insc-cargando { color: var(--gris-texto); font-size: 0.95rem; grid-column: 1 / -1; }
+
+/* Alertas */
+.insc-alerta {
+  border-radius: var(--radio);
+  padding: 14px 18px;
+  margin-bottom: 20px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  background: #fdecea;
+  color: #8a1f14;
+  border: 1px solid #f5c2bc;
+}
+
+.insc-alerta.info {
+  background: #eef1fb;
+  color: var(--morado);
+  border-color: #d3d8f1;
+}
+
+/* ============================================================
+   PASO 1 — NIVELES
+============================================================ */
+.insc-grid-niveles {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.insc-card {
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  background: var(--gris-claro);
+  border: 2px solid transparent;
+  border-radius: var(--radio);
+  padding: 26px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+}
+
+.insc-card:hover { box-shadow: var(--sombra); transform: translateY(-3px); }
+.insc-card:focus-visible { outline: 3px solid var(--morado-claro); outline-offset: 2px; }
+.insc-card.seleccionado { border-color: var(--rojo); background: var(--blanco); box-shadow: var(--sombra); }
+
+.insc-card .rango {
+  align-self: flex-start;
+  background: var(--morado);
+  color: var(--blanco);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 50px;
+}
+
+.insc-card h3 { font-size: 1.1rem; font-weight: 600; color: var(--negro); }
+.insc-card .desc { font-size: 0.88rem; color: var(--gris-texto); line-height: 1.55; flex: 1; }
+.insc-card .meta { font-size: 0.82rem; color: var(--gris-texto); }
+
+.insc-card .precio {
+  font-family: var(--font-titulo);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--rojo);
+}
+
+/* ============================================================
+   PASO 2 — SALONES
+============================================================ */
+.insc-lista-salones { display: flex; flex-direction: column; gap: 14px; }
+
+.insc-salon {
+  font-family: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  background: var(--gris-claro);
+  border: 2px solid transparent;
+  border-radius: var(--radio);
+  padding: 20px 22px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 20px;
+  align-items: center;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.insc-salon:hover:not(:disabled) { box-shadow: var(--sombra); border-color: var(--morado-claro); }
+.insc-salon:focus-visible { outline: 3px solid var(--morado-claro); outline-offset: 2px; }
+.insc-salon:disabled { opacity: 0.55; cursor: not-allowed; }
+
+.insc-salon h3 { font-size: 1.02rem; font-weight: 600; color: var(--negro); }
+.insc-salon .linea { font-size: 0.88rem; color: var(--gris-texto); line-height: 1.5; }
+
+.insc-salon .cupos {
+  grid-row: 1 / span 3;
+  grid-column: 2;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--gris-texto);
+}
+
+.insc-salon .cupos strong {
+  display: block;
+  font-family: var(--font-titulo);
+  font-size: 1.5rem;
+  color: var(--morado);
+  line-height: 1.1;
+}
+
+.insc-salon.agotado .cupos strong { color: var(--rojo); }
+
+/* ============================================================
+   PASO 3 — RESUMEN Y PAGO
+============================================================ */
+.insc-resumen {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 0;
+  border: 1px solid #ececec;
+  border-radius: var(--radio);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+.insc-resumen dt,
+.insc-resumen dd { padding: 12px 18px; font-size: 0.92rem; border-bottom: 1px solid #ececec; }
+
+.insc-resumen dt { background: var(--gris-claro); color: var(--gris-texto); font-weight: 500; }
+.insc-resumen dd { color: var(--negro); font-weight: 500; }
+.insc-resumen dt:last-of-type,
+.insc-resumen dd:last-of-type { border-bottom: none; }
+
+.insc-resumen .total { font-family: var(--font-titulo); font-size: 1.2rem; font-weight: 700; color: var(--rojo); }
+
+.insc-metodos {
+  border: none;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.insc-metodos legend { font-size: 0.92rem; font-weight: 600; color: var(--negro); margin-bottom: 12px; }
+
+.insc-metodo {
+  flex: 1;
+  min-width: 130px;
+  cursor: pointer;
+}
+
+.insc-metodo input { position: absolute; opacity: 0; pointer-events: none; }
+
+.insc-metodo span {
+  display: block;
+  text-align: center;
+  padding: 13px 16px;
+  border: 2px solid #e2e2e2;
+  border-radius: var(--radio);
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--gris-texto);
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.insc-metodo input:checked + span { border-color: var(--rojo); color: var(--rojo); background: #fdf3f1; }
+.insc-metodo input:focus-visible + span { outline: 3px solid var(--morado-claro); outline-offset: 2px; }
+
+.insc-nota { font-size: 0.82rem; color: var(--gris-texto); margin-bottom: 22px; }
+
+.insc-btn-confirmar { border: none; cursor: pointer; font-family: inherit; }
+.insc-btn-confirmar:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+/* Bloque cuando no hay sesión */
+.insc-sesion {
+  background: #eef1fb;
+  border-radius: var(--radio);
+  padding: 22px;
+  margin-bottom: 8px;
+}
+
+.insc-sesion p { font-size: 0.95rem; color: var(--negro); line-height: 1.6; margin-bottom: 16px; }
+.insc-sesion-botones { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+.insc-sesion .btn-secundario { border: 1.5px solid var(--morado); }
+
+/* Botón de volver */
+.insc-acciones { margin-top: 24px; }
+
+.insc-btn-volver {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--morado);
+  cursor: pointer;
+  padding: 6px 2px;
+}
+
+.insc-btn-volver:hover { color: var(--rojo); }
+
+/* ============================================================
+   ÉXITO
+============================================================ */
+.insc-exito { text-align: center; }
+
+.insc-exito-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--morado);
+  color: var(--blanco);
+  font-size: 1.8rem;
+  margin-bottom: 18px;
+}
+
+.insc-exito .insc-resumen { text-align: left; max-width: 520px; margin: 0 auto 28px; }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 860px) {
+  .insc-grid-niveles { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .insc-paso .txt { display: none; }
+  .insc-resumen { grid-template-columns: 1fr; }
+  .insc-resumen dt { border-bottom: none; padding-bottom: 2px; }
+  .insc-salon { grid-template-columns: 1fr; }
+  .insc-salon .cupos { grid-row: auto; grid-column: 1; text-align: left; }
+}

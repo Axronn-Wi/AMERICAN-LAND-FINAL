@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Realizar Pago - Instituto American Land</title>
+</head>
+<body>
+
+  <!-- ===== CONTENEDOR PRINCIPAL ===== -->
+  <main>
+
+    <!-- Logo -->
+    <div>
+      <img src="logo.png" alt="Logo Instituto American Land" width="150" />
+    </div>
+
+    <h1>Realizar Pago</h1>
+
+    <!-- ===== RESUMEN DE INSCRIPCIÓN ===== -->
+    <section>
+      <h2>Resumen de tu Inscripción</h2>
+      <ul>
+        <li><strong>Nivel:</strong> <span id="resumen-nivel">-</span></li>
+        <li><strong>Horario:</strong> <span id="resumen-horario">-</span></li>
+        <li><strong>Método de Pago:</strong> <span id="resumen-metodo">-</span></li>
+        <li><strong>Total a Pagar:</strong> <span id="resumen-total">$0</span></li>
+      </ul>
+    </section>
+
+    <!-- ===== FORMULARIO DE PAGO ===== -->
+    <form action="#" method="POST" id="form-pago">
+
+      <!-- SECCIÓN: TARJETA DE CRÉDITO/DÉBITO -->
+      <section id="seccion-tarjeta">
+        <h2>Datos de la Tarjeta</h2>
+
+        <div>
+          <label for="nombre-titular">
+            <span>&#9733;</span> Nombre del Titular
+          </label>
+          <input
+            type="text"
+            id="nombre-titular"
+            name="nombre_titular"
+            placeholder="Nombre como aparece en la tarjeta"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="numero-tarjeta">
+            <span>&#9733;</span> Número de Tarjeta
+          </label>
+          <input
+            type="text"
+            id="numero-tarjeta"
+            name="numero_tarjeta"
+            placeholder="0000 0000 0000 0000"
+            maxlength="19"
+            required
+          />
+        </div>
+
+        <div>
+          <!-- Fecha de vencimiento -->
+          <div>
+            <label for="fecha-vencimiento">
+              <span>&#9733;</span> Fecha de Vencimiento
+            </label>
+            <input
+              type="text"
+              id="fecha-vencimiento"
+              name="fecha_vencimiento"
+              placeholder="MM/AA"
+              maxlength="5"
+              required
+            />
+          </div>
+
+          <!-- CVV -->
+          <div>
+            <label for="cvv">
+              <span>&#9733;</span> CVV
+            </label>
+            <input
+              type="text"
+              id="cvv"
+              name="cvv"
+              placeholder="123"
+              maxlength="4"
+              required
+            />
+          </div>
+        </div>
+
+        <!-- Tipo de tarjeta -->
+        <div>
+          <label for="tipo-tarjeta">Tipo de Tarjeta</label>
+          <select id="tipo-tarjeta" name="tipo_tarjeta">
+            <option value="" disabled selected>Selecciona el tipo</option>
+            <option value="visa">VISA</option>
+            <option value="mastercard">Mastercard</option>
+            <option value="american_express">American Express</option>
+          </select>
+        </div>
+
+      </section>
+
+      <!-- SECCIÓN: PSE -->
+      <section id="seccion-pse">
+        <h2>Pago por PSE</h2>
+
+        <div>
+          <label for="banco">
+            <span>&#9733;</span> Selecciona tu Banco
+          </label>
+          <select id="banco" name="banco">
+            <option value="" disabled selected>Selecciona tu banco</option>
+            <option value="bancolombia">Bancolombia</option>
+            <option value="davivienda">Davivienda</option>
+            <option value="bbva">BBVA</option>
+            <option value="bogota">Banco de Bogotá</option>
+            <option value="occidente">Banco de Occidente</option>
+            <option value="nequi">Nequi</option>
+            <option value="otro">Otro</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="tipo-persona">Tipo de Persona</label>
+          <select id="tipo-persona" name="tipo_persona">
+            <option value="" disabled selected>Selecciona</option>
+            <option value="natural">Persona Natural</option>
+            <option value="juridica">Persona Jurídica</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="numero-documento-pse">
+            <span>&#9733;</span> Número de Documento
+          </label>
+          <input
+            type="text"
+            id="numero-documento-pse"
+            name="numero_documento_pse"
+            placeholder="Ingresa tu número de documento"
+            required
+          />
+        </div>
+
+      </section>
+
+      <!-- SECCIÓN: TRANSFERENCIA BANCARIA / BILLETERAS DIGITALES -->
+      <section id="seccion-transferencia">
+        <h2>Transferencia Bancaria / Billeteras Digitales</h2>
+
+        <p>Realiza tu transferencia a la siguiente cuenta y sube el comprobante de pago:</p>
+
+        <ul>
+          <li><strong>Banco:</strong> Bancolombia</li>
+          <li><strong>Tipo de Cuenta:</strong> Ahorros</li>
+          <li><strong>Número de Cuenta:</strong> 000-000000-00</li>
+          <li><strong>Titular:</strong> Instituto American Land</li>
+          <li><strong>NIT:</strong> 000.000.000-0</li>
+        </ul>
+
+        <div>
+          <label for="comprobante">
+            <span>&#9733;</span> Subir Comprobante de Pago
+          </label>
+          <input
+            type="file"
+            id="comprobante"
+            name="comprobante"
+            accept="image/*,.pdf"
+            required
+          />
+        </div>
+
+        <div>
+          <label for="numero-referencia">Número de Referencia (opcional)</label>
+          <input
+            type="text"
+            id="numero-referencia"
+            name="numero_referencia"
+            placeholder="Ingresa el número de referencia de la transferencia"
+          />
+        </div>
+
+      </section>
+
+      <!-- Términos y condiciones -->
+      <div>
+        <input type="checkbox" id="terminos" name="terminos" required />
+        <label for="terminos">
+          Acepto los <a href="#terminos-condiciones">Términos y Condiciones</a> y la
+          <a href="#politica-privacidad">Política de Privacidad</a> del Instituto American Land.
+        </label>
+      </div>
+
+      <!-- Botones de acción -->
+      <div>
+        <a href="seleccion-nivel-horario-pago.html">Volver</a>
+        <button type="submit">Confirmar y Pagar</button>
+      </div>
+
+    </form>
+
+  </main>
+
+</body>
+</html>

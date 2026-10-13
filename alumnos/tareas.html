@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tareas - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/tareas.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">E</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Estudiante</span>
+          <span class="nav-rol">Estudiante</span>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="salon_virtual.html">Salón Virtual</a></li>
+        <li><a href="horario.html">Horario</a></li>
+        <li><a href="tareas.html" class="activo">Tareas</a></li>
+        <li><a href="notas.html">Notas</a></li>
+      </ul>
+
+      <div class="nav-acciones">
+        <button class="btn-nav-icon" title="Mensajes">&#128172;</button>
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Mis Clases</h3>
+        <ul>
+          <li class="clase-item">
+            <span class="clase-dot"></span>
+            <a href="salon_virtual.html">Cargando...</a>
+          </li>
+        </ul>
+      </section>
+      <section class="sidebar-seccion">
+        <h3>Accesos Rápidos</h3>
+        <ul>
+          <li><a href="salon_virtual.html" class="acceso-link"><span>&#128187;</span> Entrar al salón</a></li>
+          <li><a href="tareas.html"        class="acceso-link"><span>&#128203;</span> Mis Tareas</a></li>
+          <li><a href="notas.html"         class="acceso-link"><span>&#9733;</span> Ver Notas</a></li>
+        </ul>
+      </section>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+      <!-- Encabezado -->
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Tareas</h1>
+          <p id="texto-subtitulo"></p>
+        </div>
+        <!-- Resumen rápido -->
+        <div class="resumen-tareas">
+          <div class="resumen-item">
+            <span class="resumen-num" id="num-pendientes">0</span>
+            <span class="resumen-label">Pendientes</span>
+          </div>
+          <div class="resumen-divider"></div>
+          <div class="resumen-item">
+            <span class="resumen-num verde" id="num-entregadas">0</span>
+            <span class="resumen-label">Entregadas</span>
+          </div>
+          <div class="resumen-divider"></div>
+          <div class="resumen-item">
+            <span class="resumen-num gris" id="num-total">0</span>
+            <span class="resumen-label">Total</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- MATERIAL DE APOYO -->
+      <section class="card-seccion">
+        <div class="card-header">
+          <div class="card-titulo-wrap">
+            <span class="card-icono">&#128218;</span>
+            <h2>Material De Apoyo</h2>
+          </div>
+          <span class="badge-count" id="badge-material">Cargando...</span>
+        </div>
+
+        <div class="grid-material" id="grid-material"></div>
+      </section>
+
+      <!-- ENTREGAS -->
+      <section class="card-seccion">
+        <div class="card-header">
+          <div class="card-titulo-wrap">
+            <span class="card-icono">&#128203;</span>
+            <h2>Entregas</h2>
+          </div>
+          <!-- Filtro de estado -->
+          <div class="filtro-wrap">
+            <button class="btn-filtro activo" data-estado="todos">Todas</button>
+            <button class="btn-filtro" data-estado="pendiente">Pendientes</button>
+            <button class="btn-filtro" data-estado="entregado">Entregadas</button>
+            <button class="btn-filtro" data-estado="revisado">Revisadas</button>
+          </div>
+        </div>
+
+        <div class="lista-entregas" id="lista-entregas"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL ENTREGA -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-card" id="modal-card">
+      <div class="modal-header">
+        <h3 id="modal-titulo">Entregar Tarea</h3>
+        <button class="modal-cerrar" id="modal-cerrar">&#10007;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-subtitulo">Sube tu archivo para entregar la tarea</p>
+        <div class="upload-area" id="upload-area">
+          <span class="upload-icono">&#128193;</span>
+          <p>Arrastra tu archivo aquí</p>
+          <p class="upload-sub">o haz clic para seleccionar</p>
+          <input type="file" id="input-archivo" accept=".pdf,.doc,.docx,.ppt,.pptx" hidden />
+        </div>
+        <p class="archivo-nombre" id="archivo-nombre"></p>
+        <textarea class="comentario-input" id="comentario" placeholder="Comentario opcional para el profesor..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancelar" id="btn-cancelar">Cancelar</button>
+        <button class="btn-confirmar" id="btn-confirmar">Enviar Tarea</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/tareas.js"></script>
+</body>
+</html>

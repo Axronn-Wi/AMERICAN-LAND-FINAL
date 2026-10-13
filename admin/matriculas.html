@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Matrículas - Panel Admin - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/inicio_admin.css" />
+  <link rel="stylesheet" href="../assets/css/matriculas_admin.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">A</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Administrador</span>
+          <span class="nav-rol">Admin</span>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="docentes.html">Docentes</a></li>
+        <li><a href="alumnos.html">Alumnos</a></li>
+        <li><a href="salones.html">Salones</a></li>
+        <li><a href="matriculas.html" class="activo">Matrículas</a></li>
+      </ul>
+
+      <div class="nav-acciones">
+        <button class="btn-nav-icon" title="Notificaciones" id="btn-notif">&#128276;</button>
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Panel Admin</h3>
+        <ul>
+          <li class="menu-item">
+            <span class="menu-icono">&#127968;</span>
+            <a href="inicio.html">Inicio</a>
+          </li>
+          <li class="menu-item">
+            <span class="menu-icono">&#128104;&#8205;&#127979;</span>
+            <a href="docentes.html">Docentes</a>
+          </li>
+          <li class="menu-item">
+            <span class="menu-icono">&#127891;</span>
+            <a href="alumnos.html">Alumnos</a>
+          </li>
+          <li class="menu-item">
+            <span class="menu-icono">&#128198;</span>
+            <a href="salones.html">Salones</a>
+          </li>
+          <li class="menu-item activo">
+            <span class="menu-icono">&#128203;</span>
+            <a href="matriculas.html">Matrículas</a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="sidebar-seccion">
+        <h3>Acciones Rápidas</h3>
+        <ul>
+          <li>
+            <button class="acceso-btn" id="sb-nuevo-alumno">&#43; Nuevo Alumno</button>
+          </li>
+          <li>
+            <button class="acceso-btn" id="sb-nuevo-docente">&#43; Nuevo Docente</button>
+          </li>
+          <li>
+            <button class="acceso-btn" id="sb-nuevo-salon">&#43; Nuevo Salón</button>
+          </li>
+        </ul>
+      </section>
+
+      <div class="sidebar-footer">
+        <p>Instituto American Land</p>
+        <p>Pitalito, Huila &bull; Desde 2009</p>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+      <!-- Encabezado -->
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Gestión de Matrículas</h1>
+          <p id="texto-fecha">Cargando fecha...</p>
+        </div>
+        <div class="encabezado-acciones">
+          <button class="btn-accion-header" id="btn-abrir-modal">&#43; Nueva Matrícula</button>
+        </div>
+      </div>
+
+      <!-- ALERTA -->
+      <div class="alerta" id="alerta"></div>
+
+      <!-- ── STATS ── -->
+      <div class="grid-stats">
+
+        <div class="stat-card stat-matriculas">
+          <div class="stat-icono">&#128203;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-total">0</span>
+            <span class="stat-label">Total Matrículas</span>
+          </div>
+          <span class="stat-delta neutro">Registro histórico</span>
+        </div>
+
+        <div class="stat-card" style="position:relative;">
+          <div class="stat-icono">&#9203;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-pendientes">0</span>
+            <span class="stat-label">Pendientes</span>
+          </div>
+          <span class="stat-delta alerta" id="delta-pendientes">&#9888; Requiere revisión</span>
+        </div>
+
+        <div class="stat-card stat-aprobadas">
+          <div class="stat-icono">&#9989;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-aprobadas">0</span>
+            <span class="stat-label">Activas</span>
+          </div>
+          <span class="stat-delta positivo">&#8679; Aprobadas</span>
+        </div>
+
+        <div class="stat-card stat-rechazadas">
+          <div class="stat-icono">&#10060;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-rechazadas">0</span>
+            <span class="stat-label">Canceladas</span>
+          </div>
+          <span class="stat-delta neutro">&#8212; Rechazadas</span>
+        </div>
+
+      </div>
+
+      <!-- ── FILTROS ── -->
+      <section class="card-seccion">
+        <div class="filtros-bar">
+
+          <div class="campo-busqueda">
+            <span class="icono-buscar">&#128269;</span>
+            <input type="text" id="input-busqueda" class="input-busqueda" placeholder="Buscar por estudiante, salón o número..." />
+          </div>
+
+          <select id="filtro-estado" class="select-filtro">
+            <option value="todos">Todos los estados</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="activa">Activa</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+
+          <!-- Las opciones de nivel y salón las llena matriculas_admin.js con los datos reales -->
+          <select id="filtro-nivel" class="select-filtro">
+            <option value="todos">Todos los niveles</option>
+          </select>
+
+          <select id="filtro-salon" class="select-filtro">
+            <option value="todos">Todos los salones</option>
+          </select>
+
+          <button class="btn-reset-filtros" id="btn-reset-filtros">Limpiar filtros</button>
+        </div>
+      </section>
+
+      <!-- ── TABLA DE MATRÍCULAS ── -->
+      <section class="card-seccion">
+        <div class="card-header">
+          <h2>Listado de Matrículas</h2>
+          <span class="badge-conteo" id="badge-actividad">—</span>
+        </div>
+
+        <div class="tabla-wrap">
+          <table class="tabla-matriculas">
+            <thead>
+              <tr>
+                <th>N° Matrícula</th>
+                <th>Estudiante</th>
+                <th>Nivel</th>
+                <th>Salón</th>
+                <th>Saldo pendiente</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-matriculas">
+              <tr><td colspan="8" style="padding:24px;text-align:center;">Cargando matrículas...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="info-resultados" id="info-resultados"></p>
+        <div class="paginacion" id="paginacion"></div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===== MODAL: REGISTRAR PAGO ===== -->
+  <div class="modal-overlay" id="modal-pago">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Registrar pago</h2>
+        <button type="button" class="btn-cerrar-modal" id="btn-cerrar-pago" title="Cerrar">&times;</button>
+      </div>
+
+      <form class="modal-form" id="form-pago" novalidate>
+        <div class="form-fila">
+          <div class="form-grupo">
+            <label>Estudiante</label>
+            <span id="pago-estudiante">—</span>
+          </div>
+          <div class="form-grupo">
+            <label>Salón</label>
+            <span id="pago-salon">—</span>
+          </div>
+        </div>
+
+        <div class="form-grupo">
+          <label>Saldo pendiente</label>
+          <span id="pago-saldo">—</span>
+        </div>
+
+        <div class="form-fila">
+          <div class="form-grupo">
+            <label for="pago-monto">Monto a pagar (COP)</label>
+            <input type="number" id="pago-monto" min="1" step="1" placeholder="Ej: 150000" />
+          </div>
+          <div class="form-grupo">
+            <label for="pago-metodo">Método de pago</label>
+            <select id="pago-metodo">
+              <option value="">Selecciona...</option>
+              <option value="pse">PSE</option>
+              <option value="tarjeta">Tarjeta</option>
+              <option value="transferencia">Transferencia</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-grupo">
+          <label for="pago-referencia">Referencia de la transacción (opcional)</label>
+          <input type="text" id="pago-referencia" maxlength="100" placeholder="Ej: número de comprobante" />
+        </div>
+
+        <p id="pago-error" style="color:var(--rojo);font-size:0.8rem;min-height:1em;"></p>
+
+        <div class="modal-acciones">
+          <button type="button" class="btn-modal-cancelar" id="btn-cancelar-pago">Cancelar</button>
+          <button type="submit" class="btn-modal-guardar" id="btn-guardar-pago">Registrar pago</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: NUEVA MATRÍCULA ===== -->
+  <div class="modal-overlay" id="modal-nueva">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Nueva matrícula</h2>
+        <button type="button" class="btn-cerrar-modal" id="btn-cerrar-nueva" title="Cerrar">&times;</button>
+      </div>
+
+      <form class="modal-form" id="form-nueva" novalidate>
+        <div class="form-grupo">
+          <label for="nueva-estudiante">Estudiante</label>
+          <select id="nueva-estudiante">
+            <option value="">Selecciona...</option>
+          </select>
+        </div>
+
+        <div class="form-grupo">
+          <label for="nueva-salon">Salón</label>
+          <select id="nueva-salon">
+            <option value="">Selecciona...</option>
+          </select>
+        </div>
+
+        <p style="font-size:0.8rem;color:var(--gris-texto);">La matrícula se crea como <strong>Pendiente</strong> con el valor del nivel. Después registra el pago y usa "Aprobar".</p>
+
+        <p id="nueva-error" style="color:var(--rojo);font-size:0.8rem;min-height:1em;"></p>
+
+        <div class="modal-acciones">
+          <button type="button" class="btn-modal-cancelar" id="btn-cancelar-nueva">Cancelar</button>
+          <button type="submit" class="btn-modal-guardar" id="btn-guardar-nueva">Crear matrícula</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../assets/js/matriculas_admin.js"></script>
+</body>
+</html>

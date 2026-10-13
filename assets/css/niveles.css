@@ -1,0 +1,294 @@
+/* ============================================================
+   niveles.css — Estilos de la página de Niveles
+   Instituto American Land
+   Ubicación: assets/css/niveles.css
+   (Depende de index.css para variables, navbar y footer)
+============================================================ */
+
+/* ============================================================
+   ENCABEZADO
+============================================================ */
+.hero-niveles {
+  background: linear-gradient(135deg, var(--morado) 0%, var(--morado-claro) 100%);
+  padding: 72px 24px;
+  text-align: center;
+}
+
+.hero-niveles-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  color: var(--blanco);
+}
+
+.hero-niveles .etiqueta {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.35);
+  color: var(--blanco);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+}
+
+.hero-niveles h1 {
+  font-family: var(--font-titulo);
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  margin-bottom: 18px;
+  line-height: 1.2;
+}
+
+.hero-niveles p {
+  font-size: 1.08rem;
+  font-weight: 300;
+  opacity: 0.94;
+  margin: 0 auto;
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+/* Chips de navegación rápida */
+.chips-niveles {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 32px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  padding: 8px 14px;
+  border-radius: 50px;
+  background: rgba(255,255,255,0.14);
+  border: 1.5px solid rgba(255,255,255,0.4);
+  color: var(--blanco);
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+
+.chip:hover {
+  background: var(--rojo);
+  border-color: var(--rojo);
+  transform: translateY(-2px);
+}
+
+/* ============================================================
+   GRID DE NIVELES
+============================================================ */
+.lista-niveles {
+  background: var(--gris-claro);
+  padding: 64px 24px;
+}
+
+.grid-niveles {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+}
+
+.card-nivel {
+  background: var(--blanco);
+  border-radius: var(--radio);
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card-nivel:hover { box-shadow: var(--sombra); transform: translateY(-4px); }
+
+.card-nivel-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.badge-nivel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 48px;
+  padding: 0 6px;
+  border-radius: 50%;
+  background: var(--morado);
+  color: var(--blanco);
+  font-family: var(--font-titulo);
+  font-weight: bold;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+
+/* Distintivo de color por nivel (misma paleta, distintas variantes) */
+#nivel-a1 .badge-nivel,
+#nivel-a2 .badge-nivel { background: var(--morado); }
+
+#nivel-b1 .badge-nivel,
+#nivel-b2 .badge-nivel { background: var(--morado-claro); }
+
+#nivel-c1 .badge-nivel,
+#nivel-c2 .badge-nivel { background: var(--rojo); }
+
+.card-nivel-cabecera h2 {
+  font-family: var(--font-titulo);
+  font-size: 1.3rem;
+  color: var(--negro);
+}
+
+.card-nivel-desc {
+  font-size: 0.94rem;
+  color: var(--gris-texto);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.btn-ver-temas {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  color: var(--morado);
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+  margin-bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-ver-temas .flecha {
+  transition: transform 0.25s ease;
+  display: inline-block;
+}
+
+.btn-ver-temas[aria-expanded="true"] .flecha {
+  transform: rotate(180deg);
+}
+
+.btn-ver-temas:hover { color: var(--morado-claro); }
+
+.card-nivel-temas {
+  list-style: none;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.3s ease, margin 0.35s ease;
+  margin-top: 0;
+}
+
+.card-nivel-temas.abierto {
+  max-height: 400px;
+  opacity: 1;
+  margin-top: 8px;
+  margin-bottom: 14px;
+}
+
+.card-nivel-temas li {
+  font-size: 0.88rem;
+  color: var(--gris-texto);
+  padding: 6px 0 6px 22px;
+  position: relative;
+  border-bottom: 1px solid #ececec;
+}
+
+.card-nivel-temas li:last-child { border-bottom: none; }
+
+.card-nivel-temas li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--morado);
+  font-weight: bold;
+  font-size: 0.8rem;
+}
+
+.card-nivel-pie {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid #eeeeee;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.card-nivel-pie .duracion {
+  font-size: 0.85rem;
+  color: var(--gris-texto);
+  font-weight: 600;
+}
+
+.card-nivel-pie .btn-primario {
+  padding: 10px 20px;
+  font-size: 0.88rem;
+}
+
+/* ============================================================
+   TEST DE NIVEL
+============================================================ */
+.test-nivel {
+  background: var(--morado);
+  color: var(--blanco);
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.test-nivel h2 { font-family: var(--font-titulo); font-size: clamp(1.4rem, 3vw, 1.8rem); margin-bottom: 12px; }
+.test-nivel p { font-size: 1rem; font-weight: 300; line-height: 1.6; opacity: 0.92; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+/* ============================================================
+   CTA FINAL
+============================================================ */
+.cta-final {
+  background: var(--rojo);
+  color: var(--blanco);
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.cta-final h2 { font-family: var(--font-titulo); font-size: clamp(1.4rem, 3vw, 1.8rem); margin-bottom: 12px; }
+.cta-final p { font-size: 1rem; font-weight: 300; line-height: 1.6; opacity: 0.92; margin-bottom: 28px; max-width: 600px; margin-left: auto; margin-right: auto; }
+
+.cta-botones {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-outline {
+  color: var(--blanco);
+  border: 1.5px solid rgba(255,255,255,0.6);
+  padding: 12px 28px;
+  border-radius: var(--radio);
+  font-size: 1rem;
+  font-weight: bold;
+  display: inline-block;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-outline:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 860px) {
+  .grid-niveles { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .card-nivel { padding: 26px 20px; }
+}

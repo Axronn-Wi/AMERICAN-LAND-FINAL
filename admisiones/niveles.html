@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Niveles de Inglés — Instituto American Land</title>
+
+  <!-- CSS compartido del sitio (navbar, footer, botones, variables) -->
+  <link rel="stylesheet" href="../assets/css/index.css" />
+  <!-- CSS propio de esta página -->
+  <link rel="stylesheet" href="../assets/css/niveles.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+
+      <a href="../index.html#inicio" class="nav-marca">
+        <img src="../assets/img/Logo.png" alt="Logo" class="nav-marca-logo" />
+        <div class="nav-marca-texto">
+          <strong>American Land</strong>
+          <span>Since 2009</span>
+        </div>
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#inicio">Inicio</a></li>
+        <li><a href="seleccion.html" class="activo">Admisión</a></li>
+        <li><a href="estudiantes.html">Estudiantes</a></li>
+        <li><a href="../index.html#contacto">Contacto</a></li>
+      </ul>
+
+      <div class="nav-auth" id="nav-auth">
+        <a href="../auth/login.html" class="btn-login">Log In</a>
+        <a href="../auth/registro.html" class="btn-signup">Sign Up</a>
+      </div>
+
+      <button class="btn-hamburguesa" id="btn-menu" aria-label="Abrir menú">&#9776;</button>
+
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ===== ENCABEZADO ===== -->
+    <section class="hero-niveles" id="encabezado-niveles">
+      <div class="hero-niveles-inner">
+        <span class="etiqueta">Niveles A1 — C2</span>
+        <h1>Niveles de Inglés</h1>
+        <p>Aprende inglés con los mejores niveles desde A1 hasta C2. Encuentra el nivel que se adapta a ti y comienza tu camino al éxito.</p>
+      </div>
+
+      <!-- Navegación rápida entre niveles -->
+      <div class="chips-niveles">
+        <a href="#nivel-a1" class="chip">A1</a>
+        <a href="#nivel-a2" class="chip">A2</a>
+        <a href="#nivel-b1" class="chip">B1</a>
+        <a href="#nivel-b2" class="chip">B2</a>
+        <a href="#nivel-c1" class="chip">C1</a>
+        <a href="#nivel-c2" class="chip">C2</a>
+      </div>
+    </section>
+
+    <!-- ===== TARJETAS DE NIVELES ===== -->
+    <section class="lista-niveles" id="lista-niveles">
+      <div class="grid-niveles">
+
+        <!-- Nivel 1: Beginner A1 -->
+        <article class="card-nivel animar-entrada" id="nivel-a1">
+          <div class="card-nivel-cabecera">
+            <span class="badge-nivel">A1</span>
+            <h2>Beginner</h2>
+          </div>
+          <p class="card-nivel-desc">
+            Ideal para personas que nunca han tenido contacto con el inglés o tienen conocimientos
+            muy básicos. En este nivel aprenderás a presentarte, saludar, contar hasta 100,
+            identificar colores, objetos cotidianos y construir frases simples del día a día.
+          </p>
+          <button class="btn-ver-temas" type="button" aria-expanded="false">
+            Ver temario <span class="flecha">▾</span>
+          </button>
+          <ul class="card-nivel-temas">
+            <li>Presentaciones personales</li>
+            <li>Vocabulario básico del hogar y entorno</li>
+            <li>Números, colores y días de la semana</li>
+            <li>Frases de cortesía y saludos</li>
+            <li>Verbo To Be y pronombres personales</li>
+          </ul>
+          <div class="card-nivel-pie">
+            <span class="duracion">⏱ Duración: 3 meses</span>
+            <a href="inscripcion.html?nivel=A1" class="btn-primario">Inscribirme</a>
+          </div>
+        </article>
+
+        <!-- Nivel 2: Elementary A2 -->
+        <article class="card-nivel animar-entrada" id="nivel-a2">
+          <div class="card-nivel-cabecera">
+            <span class="badge-nivel">A2</span>
+            <h2>Elementary</h2>
+          </div>
+          <p class="card-nivel-desc">
+            Dirigido a quienes ya manejan lo más básico del inglés. Aprenderás a comunicarte
+            en situaciones cotidianas como ir de compras, pedir en un restaurante, hablar sobre
+            tu familia y describir tu rutina diaria con mayor fluidez.
+          </p>
+          <button class="btn-ver-temas" type="button" aria-expanded="false">
+            Ver temario <span class="flecha">▾</span>
+          </button>
+          <ul class="card-nivel-temas">
+            <li>Presente simple y presente continuo</li>
+            <li>Descripción de rutinas y hábitos</li>
+            <li>Vocabulario de comida, ropa y transporte</li>
+            <li>Preguntas y respuestas básicas</li>
+            <li>Expresiones de tiempo y lugar</li>
+          </ul>
+          <div class="card-nivel-pie">
+            <span class="duracion">⏱ Duración: 3 meses</span>
+            <a href="inscripcion.html?nivel=A2" class="btn-primario">Inscribirme</a>
+          </div>
+        </article>
+
+        <!-- Nivel 3: Intermediate B1 -->
+        <article class="card-nivel animar-entrada" id="nivel-b1">
+          <div class="card-nivel-cabecera">
+            <span class="badge-nivel">B1</span>
+            <h2>Intermediate</h2>
+          </div>
+          <p class="card-nivel-desc">
+            Para estudiantes que pueden comunicarse en inglés pero desean mejorar su fluidez
+            y comprensión. Podrás entender los puntos principales de textos claros y participar
+            en conversaciones sobre temas familiares como trabajo, viajes y eventos de actualidad.
+          </p>
+          <button class="btn-ver-temas" type="button" aria-expanded="false">
+            Ver temario <span class="flecha">▾</span>
+          </button>
+          <ul class="card-nivel-temas">
+            <li>Pasado simple y pasado continuo</li>
+            <li>Futuro con will y going to</li>
+            <li>Vocabulario de negocios y viajes</li>
+            <li>Comprensión de textos y audios</li>
+            <li>Expresión de opiniones y deseos</li>
+          </ul>
+          <div class="card-nivel-pie">
+            <span class="duracion">⏱ Duración: 4 meses</span>
+            <a href="inscripcion.html?nivel=B1" class="btn-primario">Inscribirme</a>
+          </div>
+        </article>
+
+        <!-- Nivel 4: Upper Intermediate B2 -->
+        <article class="card-nivel animar-entrada" id="nivel-b2">
+          <div class="card-nivel-cabecera">
+            <span class="badge-nivel">B2</span>
+            <h2>Upper Intermediate</h2>
+          </div>
+          <p class="card-nivel-desc">
+            Nivel para estudiantes con buena base en inglés que buscan mayor precisión y
+            espontaneidad. Podrás interactuar con hablantes nativos con mayor naturalidad,
+            comprender textos complejos y expresarte con claridad sobre una amplia variedad de temas.
+          </p>
+          <button class="btn-ver-temas" type="button" aria-expanded="false">
+            Ver temario <span class="flecha">▾</span>
+          </button>
+          <ul class="card-nivel-temas">
+            <li>Condicionales y oraciones pasivas</li>
+            <li>Tiempos perfectos y modales avanzados</li>
+            <li>Lectura y análisis de artículos</li>
+            <li>Debates y argumentación</li>
+            <li>Escritura de ensayos y correos formales</li>
+          </ul>
+          <div class="card-nivel-pie">
+            <span class="duracion">⏱ Duración: 4 meses</span>
+            <a href="inscripcion.html?nivel=B2" class="btn-primario">Inscribirme</a>
+          </div>
+        </article>
+
+        <!-- Nivel 5: Advanced C1 -->
+        <article class="card-nivel animar-entrada" id="nivel-c1">
+          <div class="card-nivel-cabecera">
+            <span class="badge-nivel">C1</span>
+            <h2>Advanced</h2>
+          </div>
+          <p class="card-nivel-desc">
+            Diseñado para quienes desean alcanzar un dominio avanzado del inglés. Usarás el
+            idioma de forma flexible y efectiva para fines académicos y profesionales, con
+            amplio vocabulario y capacidad para comprender textos extensos y complejos.
+          </p>
+          <button class="btn-ver-temas" type="button" aria-expanded="false">
+            Ver temario <span class="flecha">▾</span>
+          </button>
+          <ul class="card-nivel-temas">
+            <li>Estructuras gramaticales avanzadas</li>
+            <li>Vocabulario técnico y especializado</li>
+            <li>Presentaciones y discursos formales</li>
+            <li>Análisis de literatura y medios</li>
+            <li>Preparación para certificaciones internacionales</li>
+          </ul>
+          <div class="card-nivel-pie">
+            <span class="duracion">⏱ Duración: 5 meses</span>
+            <a href="inscripcion.html?nivel=C1" class="btn-primario">Inscribirme</a>
+          </div>
+        </article>
+
+        <!-- Nivel 6: Proficient C2 -->
+        <article class="card-nivel animar-entrada" id="nivel-c2">
+          <div class="card-nivel-cabecera">
+            <span class="badge-nivel">C2</span>
+            <h2>Proficient</h2>
+          </div>
+          <p class="card-nivel-desc">
+            El nivel más alto del Marco Común Europeo. Comprenderás con facilidad prácticamente
+            todo lo que escuches o leas, y podrás expresarte de forma espontánea, muy fluida
+            y precisa. Ideal para quienes buscan certificaciones internacionales como IELTS o TOEFL.
+          </p>
+          <button class="btn-ver-temas" type="button" aria-expanded="false">
+            Ver temario <span class="flecha">▾</span>
+          </button>
+          <ul class="card-nivel-temas">
+            <li>Dominio completo de la gramática inglesa</li>
+            <li>Comprensión de textos académicos y literarios</li>
+            <li>Comunicación fluida con hablantes nativos</li>
+            <li>Redacción académica y profesional</li>
+            <li>Preparación para IELTS, TOEFL y Cambridge</li>
+          </ul>
+          <div class="card-nivel-pie">
+            <span class="duracion">⏱ Duración: 5 meses</span>
+            <a href="inscripcion.html?nivel=C2" class="btn-primario">Inscribirme</a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ===== ¿NO SÉ QUÉ NIVEL SOY? ===== -->
+    <section class="test-nivel" id="test-nivel">
+      <h2>¿No sabes en qué nivel estás?</h2>
+      <p>Realiza nuestro test de clasificación gratuito y te diremos cuál es el nivel ideal para ti.</p>
+      <a href="../index.html#contacto" class="btn-outline">Hacer el Test de Nivel</a>
+    </section>
+
+    <!-- ===== LLAMADO A LA ACCIÓN ===== -->
+    <section class="cta-final">
+      <h2>¿Listo para empezar?</h2>
+      <p>Inscríbete hoy y forma parte de nuestra comunidad de más de 500 estudiantes.</p>
+      <div class="cta-botones">
+        <a href="../auth/registro.html" class="btn-primario">Inscribirme Ahora</a>
+        <a href="../auth/login.html" class="btn-outline">Ya tengo cuenta</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer id="contacto">
+    <div class="footer-grid">
+
+      <div class="footer-col">
+        <h4>Instituto American Land</h4>
+        <p>Aprende inglés con los mejores profesores</p>
+        <div class="footer-redes">
+          <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a>
+          <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Enlaces Rápidos</h4>
+        <ul>
+          <li><a href="niveles.html">Niveles</a></li>
+          <li><a href="seleccion.html">Admisiones</a></li>
+          <li><a href="estudiantes.html">Estudiantes</a></li>
+          <li><a href="../index.html#contacto">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="mailto:ventasymarketing.al@gmail.com">ventasymarketing.al@gmail.com</a></li>
+          <li><a href="tel:+573138132388">3138132388</a></li>
+          <li>Calle 3 # 1-45 barrio Quinche</li>
+          <li>Pitalito, Huila, Colombia</li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#privacidad">Política de Privacidad</a></li>
+          <li><a href="#accesibilidad">Declaración de Accesibilidad</a></li>
+          <li><a href="#terminos">Términos y Condiciones</a></li>
+          <li><a href="#reembolso">Política de Reembolso</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-copy">
+      <p>&copy; 2011 Instituto American Land. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- JS compartido del sitio (menú móvil, scroll, animaciones) -->
+  <script src="../assets/js/index.js"></script>
+  <!-- JS propio de esta página -->
+  <script src="../assets/js/niveles.js"></script>
+
+</body>
+</html>

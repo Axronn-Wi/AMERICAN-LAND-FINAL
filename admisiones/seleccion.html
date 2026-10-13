@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admisiones — Instituto American Land</title>
+
+  <!-- CSS compartido del sitio (navbar, footer, botones, variables) -->
+  <link rel="stylesheet" href="../assets/css/index.css" />
+  <!-- CSS propio de esta página -->
+  <link rel="stylesheet" href="../assets/css/seleccion.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+
+      <a href="../index.html#inicio" class="nav-marca">
+        <img src="../assets/img/Logo.png" alt="Logo" class="nav-marca-logo" />
+        <div class="nav-marca-texto">
+          <strong>American Land</strong>
+          <span>Since 2009</span>
+        </div>
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#inicio">Inicio</a></li>
+        <li><a href="seleccion.html" class="activo">Admisión</a></li>
+        <li><a href="estudiantes.html">Estudiantes</a></li>
+        <li><a href="../index.html#contacto">Contacto</a></li>
+      </ul>
+
+      <div class="nav-auth" id="nav-auth">
+        <a href="../auth/login.html" class="btn-login">Log In</a>
+        <a href="../auth/registro.html" class="btn-signup">Sign Up</a>
+      </div>
+
+      <button class="btn-hamburguesa" id="btn-menu" aria-label="Abrir menú">&#9776;</button>
+
+    </nav>
+  </header>
+
+  <!-- ===== HERO ADMISIONES ===== -->
+  <section class="hero-admisiones" id="inicio-admisiones">
+    <div class="hero-admisiones-inner">
+      <span class="etiqueta">Admisiones abiertas</span>
+      <h1>Proceso de Admisión</h1>
+      <p>Da el primer paso hacia el dominio del inglés. Elige tu perfil, selecciona tu nivel y comienza tu inscripción hoy mismo.</p>
+      <div class="hero-botones">
+        <a href="inscripcion.html" class="btn-primario">Comenzar Registro</a>
+        <a href="niveles.html" class="btn-secundario">Ver Niveles</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PASOS DEL PROCESO ===== -->
+  <section class="pasos" id="pasos">
+    <h2>¿Cómo funciona?</h2>
+    <p class="subtitulo-pasos">Cuatro pasos sencillos para formar parte de la comunidad American Land</p>
+
+    <div class="grid-pasos">
+
+      <div class="paso-item animar-entrada">
+        <span class="paso-numero">1</span>
+        <h3>Elige tu perfil</h3>
+        <p>Selecciona si eres estudiante nuevo, actual o representas a una empresa</p>
+      </div>
+
+      <div class="paso-item animar-entrada">
+        <span class="paso-numero">2</span>
+        <h3>Selecciona tu nivel</h3>
+        <p>Ubícate desde A1 hasta C2 según tu conocimiento previo del idioma</p>
+      </div>
+
+      <div class="paso-item animar-entrada">
+        <span class="paso-numero">3</span>
+        <h3>Completa tus datos</h3>
+        <p>Llena el formulario de registro con tu información personal</p>
+      </div>
+
+      <div class="paso-item animar-entrada">
+        <span class="paso-numero">4</span>
+        <h3>Confirma tu cupo</h3>
+        <p>Realiza el pago de inscripción y recibe la confirmación de tu clase</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===== SELECCIÓN DE PERFIL ===== -->
+  <section class="selector-perfil" id="selector-perfil">
+    <h2>¿Qué tipo de estudiante eres?</h2>
+    <p class="subtitulo-pasos">Selecciona una opción para continuar con tu proceso de admisión</p>
+
+    <div class="grid-perfiles">
+
+      <button class="card-perfil animar-entrada" data-perfil="nuevo" type="button">
+        <span class="icono">🌱</span>
+        <h3>Nuevo Estudiante</h3>
+        <p>Primera vez aprendiendo inglés con nosotros</p>
+      </button>
+
+      <button class="card-perfil animar-entrada" data-perfil="actual" type="button">
+        <span class="icono">📈</span>
+        <h3>Estudiante Actual</h3>
+        <p>Ya estudias con nosotros y quieres subir de nivel</p>
+      </button>
+
+      <button class="card-perfil animar-entrada" data-perfil="empresa" type="button">
+        <span class="icono">🏢</span>
+        <h3>Empresarial / Corporativo</h3>
+        <p>Buscas capacitación en inglés para tu equipo de trabajo</p>
+      </button>
+
+    </div>
+
+    <div class="continuar-wrap">
+      <button class="btn-primario" id="btn-continuar" disabled>Continuar</button>
+      <p class="ayuda-seleccion" id="ayuda-seleccion">Selecciona un perfil para continuar</p>
+    </div>
+  </section>
+
+  <!-- ===== REQUISITOS ===== -->
+  <section class="requisitos" id="requisitos">
+    <div class="requisitos-inner">
+      <h2>Requisitos de Inscripción</h2>
+      <ul class="lista-requisitos">
+        <li><span class="check">✓</span> Documento de identidad vigente</li>
+        <li><span class="check">✓</span> Fotografía tamaño documento</li>
+        <li><span class="check">✓</span> Formulario de inscripción diligenciado</li>
+        <li><span class="check">✓</span> Correo electrónico y número de contacto activos</li>
+        <li><span class="check">✓</span> Pago de la matrícula correspondiente al nivel</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== CTA FINAL ===== -->
+  <section class="cta-final">
+    <h2>¿Tienes preguntas sobre el proceso?</h2>
+    <p>Nuestro equipo de admisiones está listo para ayudarte a encontrar el nivel ideal para ti.</p>
+    <a href="../index.html#contacto" class="btn-secundario">Contáctanos</a>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer id="contacto">
+    <div class="footer-grid">
+
+      <div class="footer-col">
+        <h4>Instituto American Land</h4>
+        <p>Aprende inglés con los mejores profesores</p>
+        <div class="footer-redes">
+          <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a>
+          <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Enlaces Rápidos</h4>
+        <ul>
+          <li><a href="niveles.html">Niveles</a></li>
+          <li><a href="seleccion.html">Admisiones</a></li>
+          <li><a href="estudiantes.html">Estudiantes</a></li>
+          <li><a href="../index.html#contacto">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="mailto:ventasymarketing.al@gmail.com">ventasymarketing.al@gmail.com</a></li>
+          <li><a href="tel:+573138132388">3138132388</a></li>
+          <li>Calle 3 # 1-45 barrio Quinche</li>
+          <li>Pitalito, Huila, Colombia</li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#privacidad">Política de Privacidad</a></li>
+          <li><a href="#accesibilidad">Declaración de Accesibilidad</a></li>
+          <li><a href="#terminos">Términos y Condiciones</a></li>
+          <li><a href="#reembolso">Política de Reembolso</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-copy">
+      <p>&copy; 2011 Instituto American Land. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- JS compartido del sitio (menú móvil, scroll, animaciones) -->
+  <script src="../assets/js/index.js"></script>
+  <!-- JS propio de esta página -->
+  <script src="../assets/js/seleccion.js"></script>
+
+</body>
+</html>

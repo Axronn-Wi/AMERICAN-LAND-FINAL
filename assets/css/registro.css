@@ -1,0 +1,318 @@
+/* ============================================================
+   registro.css — Estilos de la página de registro
+   Instituto American Land
+   Copia visual exacta de login.css
+============================================================ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+a { text-decoration: none; }
+
+:root {
+  --morado:      #4B0082;
+  --morado-nav:  #3B0072;
+  --rojo:        #C0392B;
+  --blanco:      #FFFFFF;
+  --gris-claro:  #F4F4F8;
+  --gris-borde:  #DDDDEE;
+  --gris-texto:  #666666;
+  --negro:       #1A1A1A;
+  --verde:       #27AE60;
+  --rojo-error:  #E74C3C;
+  --logo-size:   200px;
+  --font:        'Segoe UI', Arial, sans-serif;
+  --radio:       10px;
+  --sombra:      0 8px 32px rgba(75,0,130,0.13);
+}
+
+/* ── FONDO ── */
+body {
+  font-family: var(--font);
+  min-height: 100vh;
+  background: var(--gris-claro);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(75,0,130,0.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 80%, rgba(192,57,43,0.07) 0%, transparent 55%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── ESTRELLAS DECORATIVAS ── */
+.estrella {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.18;
+  font-size: 1.6rem;
+  animation: flotar 6s ease-in-out infinite;
+}
+
+.estrella:nth-child(1)  { top: 8%;  left: 5%;   font-size: 2rem;   animation-delay: 0s;    color: var(--rojo);   }
+.estrella:nth-child(2)  { top: 15%; left: 18%;  font-size: 1.2rem; animation-delay: 1s;    color: var(--morado); }
+.estrella:nth-child(3)  { top: 25%; right: 8%;  font-size: 2.2rem; animation-delay: 0.5s;  color: var(--rojo);   }
+.estrella:nth-child(4)  { top: 40%; left: 3%;   font-size: 1rem;   animation-delay: 2s;    color: var(--morado); }
+.estrella:nth-child(5)  { top: 60%; right: 5%;  font-size: 1.8rem; animation-delay: 1.5s;  color: var(--rojo);   }
+.estrella:nth-child(6)  { top: 70%; left: 12%;  font-size: 1.3rem; animation-delay: 0.8s;  color: var(--morado); }
+.estrella:nth-child(7)  { top: 80%; right: 15%; font-size: 2rem;   animation-delay: 2.5s;  color: var(--rojo);   }
+.estrella:nth-child(8)  { top: 90%; left: 25%;  font-size: 1.1rem; animation-delay: 1.2s;  color: var(--morado); }
+.estrella:nth-child(9)  { top: 5%;  right: 25%; font-size: 1.5rem; animation-delay: 3s;    color: var(--rojo);   }
+.estrella:nth-child(10) { top: 50%; left: 8%;   font-size: 0.9rem; animation-delay: 0.3s;  color: var(--morado); }
+
+@keyframes flotar {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50%       { transform: translateY(-12px) rotate(15deg); }
+}
+
+/* ── BOTÓN VOLVER ── */
+.btn-volver {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  background: var(--blanco);
+  color: var(--morado);
+  border: 1.5px solid var(--gris-borde);
+  padding: 7px 16px;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-volver:hover {
+  background: var(--morado);
+  color: var(--blanco);
+  box-shadow: 0 4px 12px rgba(75,0,130,0.25);
+}
+
+/* ── TARJETA LOGIN ── */
+main {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  margin: 60px auto 40px;
+  padding: 0 16px;
+}
+
+.card-login {
+  background: var(--blanco);
+  border-radius: 20px;
+  box-shadow: var(--sombra);
+  padding: 40px 36px;
+  border: 1px solid rgba(75,0,130,0.08);
+}
+
+/* ── LOGO ── */
+.login-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.login-logo img {
+  width: var(--logo-size);
+  height: var(--logo-size);
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(75,0,130,0.2));
+  transition: transform 0.3s ease;
+}
+
+.login-logo img:hover { transform: scale(1.05); }
+
+/* ── TÍTULOS ── */
+.login-titulo {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--negro);
+  margin-bottom: 6px;
+}
+
+.login-subtitulo {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--gris-texto);
+  margin-bottom: 28px;
+}
+
+/* ── CAMPOS ── */
+.campo { margin-bottom: 18px; }
+
+.campo label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--negro);
+  margin-bottom: 6px;
+  letter-spacing: 0.2px;
+}
+
+.campo label .star { color: var(--rojo); margin-right: 4px; }
+
+.input-wrapper { position: relative; }
+
+.input-wrapper .icono-campo {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.campo input,
+.campo select {
+  width: 100%;
+  padding: 11px 14px 11px 38px;
+  border: 1.5px solid var(--gris-borde);
+  border-radius: var(--radio);
+  font-size: 0.9rem;
+  font-family: var(--font);
+  color: var(--negro);
+  background: var(--gris-claro);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+  outline: none;
+  appearance: none;
+}
+
+.campo input:focus,
+.campo select:focus {
+  border-color: var(--morado);
+  box-shadow: 0 0 0 3px rgba(75,0,130,0.1);
+  background: var(--blanco);
+}
+
+.campo input.invalido {
+  border-color: var(--rojo-error);
+  box-shadow: 0 0 0 3px rgba(231,76,60,0.1);
+}
+
+.campo .msg-error {
+  display: none;
+  font-size: 0.75rem;
+  color: var(--rojo-error);
+  margin-top: 5px;
+  padding-left: 4px;
+}
+
+.campo .msg-error.visible { display: block; }
+
+/* Input tipo date — ajuste del padding */
+.campo input[type="date"] {
+  padding-left: 38px;
+  cursor: pointer;
+}
+
+/* ── TOGGLE CONTRASEÑA ── */
+.btn-toggle-pass {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.45;
+  transition: opacity 0.2s;
+  padding: 0;
+}
+
+.btn-toggle-pass:hover { opacity: 0.85; }
+
+/* ── BOTÓN SUBMIT ── */
+.btn-submit {
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, var(--morado) 0%, #6A0DAD 100%);
+  color: var(--blanco);
+  border: none;
+  border-radius: var(--radio);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 0.4px;
+  margin-top: 6px;
+  box-shadow: 0 4px 14px rgba(75,0,130,0.35);
+  transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.btn-submit:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(75,0,130,0.4);
+}
+
+.btn-submit:active { transform: translateY(0); }
+
+.btn-submit.cargando {
+  opacity: 0.7;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ── ALERTAS ── */
+.alerta {
+  display: none;
+  padding: 11px 16px;
+  border-radius: var(--radio);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.alerta.exito {
+  background: rgba(39,174,96,0.1);
+  border: 1.5px solid var(--verde);
+  color: #1e8449;
+}
+
+.alerta.error {
+  background: rgba(231,76,60,0.08);
+  border: 1.5px solid var(--rojo-error);
+  color: var(--rojo-error);
+}
+
+.alerta.visible { display: block; }
+
+/* ── ENLACES INFERIORES ── */
+.login-links {
+  margin-top: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.login-links a {
+  font-size: 0.83rem;
+  color: var(--morado);
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.login-links a:hover { color: var(--rojo); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 480px) {
+  .card-login { padding: 28px 20px; }
+  main { margin-top: 70px; }
+}

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/registro.css" />
+</head>
+<body>
+
+  <!-- Estrellas decorativas -->
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+
+  <!-- Botón volver -->
+  <a href="../index.html" class="btn-volver">&#8592; Inicio</a>
+
+  <main>
+    <div class="card-login">
+
+      <!-- Logo -->
+      <div class="login-logo">
+        <img src="../assets/img/Logo.png" alt="Logo Instituto American Land" />
+      </div>
+
+      <!-- Título -->
+      <h1 class="login-titulo">Crear Cuenta</h1>
+      <p class="login-subtitulo">Únete al Instituto American Land</p>
+
+      <!-- Alerta global -->
+      <div class="alerta" id="alerta-global"></div>
+
+      <!-- FORMULARIO -->
+      <form id="form-registro" action="#" method="POST" novalidate>
+
+        <!-- Nombre completo -->
+        <div class="campo">
+          <label for="nombre">
+            <span class="star">&#9733;</span> Nombre Completo
+          </label>
+          <div class="input-wrapper">
+            <span class="icono-campo">&#128100;</span>
+            <input
+              type="text"
+              id="nombre"
+              name="nombre"
+              placeholder="Ingresa tu nombre completo"
+              required
+              autocomplete="name"
+            />
+          </div>
+          <span class="msg-error" id="error-nombre">El nombre es obligatorio.</span>
+        </div>
+
+        <!-- Correo electrónico -->
+        <div class="campo">
+          <label for="correo">
+            <span class="star">&#9733;</span> Correo Electrónico
+          </label>
+          <div class="input-wrapper">
+            <span class="icono-campo">&#9993;</span>
+            <input
+              type="email"
+              id="correo"
+              name="correo"
+              placeholder="correo@ejemplo.com"
+              required
+              autocomplete="email"
+            />
+          </div>
+          <span class="msg-error" id="error-correo">Ingresa un correo electrónico válido.</span>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="campo">
+          <label for="contrasena">
+            <span class="star">&#9733;</span> Contraseña
+          </label>
+          <div class="input-wrapper">
+            <span class="icono-campo">&#128274;</span>
+            <input
+              type="password"
+              id="contrasena"
+              name="contrasena"
+              placeholder="Mínimo 6 caracteres"
+              required
+              autocomplete="new-password"
+            />
+            <button type="button" class="btn-toggle-pass" id="toggle-pass" aria-label="Mostrar contraseña">
+              &#128065;
+            </button>
+          </div>
+          <span class="msg-error" id="error-contrasena">La contraseña debe tener al menos 6 caracteres.</span>
+        </div>
+
+        <!-- Confirmar contraseña -->
+        <div class="campo">
+          <label for="confirmar-contrasena">
+            <span class="star">&#9733;</span> Confirmar Contraseña
+          </label>
+          <div class="input-wrapper">
+            <span class="icono-campo">&#128274;</span>
+            <input
+              type="password"
+              id="confirmar-contrasena"
+              name="confirmar_contrasena"
+              placeholder="Repite tu contraseña"
+              required
+              autocomplete="new-password"
+            />
+            <button type="button" class="btn-toggle-pass" id="toggle-pass-2" aria-label="Mostrar contraseña">
+              &#128065;
+            </button>
+          </div>
+          <span class="msg-error" id="error-confirmar">Las contraseñas no coinciden.</span>
+        </div>
+
+        <!-- Teléfono -->
+        <div class="campo">
+          <label for="telefono">
+            <span class="star">&#9733;</span> Número de Teléfono
+          </label>
+          <div class="input-wrapper">
+            <span class="icono-campo">&#128222;</span>
+            <input
+              type="tel"
+              id="telefono"
+              name="telefono"
+              placeholder="Ej: 3138132388"
+              required
+              autocomplete="tel"
+            />
+          </div>
+          <span class="msg-error" id="error-telefono">Ingresa un número de teléfono válido.</span>
+        </div>
+
+        <!-- Fecha de nacimiento -->
+        <div class="campo">
+          <label for="fecha-nacimiento">
+            <span class="star">&#9733;</span> Fecha de Nacimiento
+          </label>
+          <div class="input-wrapper">
+            <span class="icono-campo">&#128197;</span>
+            <input
+              type="date"
+              id="fecha-nacimiento"
+              name="fecha_nacimiento"
+              required
+            />
+          </div>
+          <span class="msg-error" id="error-fecha">La fecha de nacimiento es obligatoria.</span>
+        </div>
+
+        <!-- País -->
+        <div class="campo">
+          <label for="pais">
+            <span class="star">&#9733;</span> País
+          </label>
+          <div class="input-wrapper">
+            <span class="icono-campo">&#127757;</span>
+            <input
+              type="text"
+              id="pais"
+              name="pais"
+              placeholder="Ej: Colombia"
+              required
+              autocomplete="country-name"
+            />
+          </div>
+          <span class="msg-error" id="error-pais">El país es obligatorio.</span>
+        </div>
+
+        <!-- Ciudad -->
+        <div class="campo">
+          <label for="ciudad">
+            <span class="star">&#9733;</span> Ciudad
+          </label>
+          <div class="input-wrapper">
+            <span class="icono-campo">&#127968;</span>
+            <input
+              type="text"
+              id="ciudad"
+              name="ciudad"
+              placeholder="Ej: Pitalito"
+              required
+              autocomplete="address-level2"
+            />
+          </div>
+          <span class="msg-error" id="error-ciudad">La ciudad es obligatoria.</span>
+        </div>
+
+        <!-- Botón submit -->
+        <button type="submit" class="btn-submit" id="btn-submit">
+          Registrarse
+        </button>
+
+      </form>
+
+      <!-- Enlace inferior -->
+      <div class="login-links">
+        <a href="login.html">¿Ya tienes una cuenta? <strong>Inicia sesión</strong></a>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="../assets/js/registro.js"></script>
+</body>
+</html>

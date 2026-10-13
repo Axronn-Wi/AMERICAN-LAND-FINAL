@@ -1,0 +1,157 @@
+/* ============================================================
+   matriculas_admin.css
+   Instituto American Land
+   Ubicación: assets/css/matriculas_admin.css
+   (Complementa a inicio_admin.css — mismo sistema de estilos)
+============================================================ */
+
+/* ══════════════════════════════════════════
+   STATS EXTRA (aprobadas / rechazadas)
+══════════════════════════════════════════ */
+.stat-aprobadas::before  { background: linear-gradient(90deg, var(--verde), #58d68d); }
+.stat-rechazadas::before { background: linear-gradient(90deg, var(--rojo), #e6786a); }
+
+/* ══════════════════════════════════════════
+   BARRA DE FILTROS
+══════════════════════════════════════════ */
+.filtros-bar {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+
+.campo-busqueda {
+  position: relative; flex: 1; min-width: 220px;
+}
+.campo-busqueda .icono-buscar {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+  font-size: 0.85rem; color: var(--gris-texto); pointer-events: none;
+}
+.input-busqueda {
+  width: 100%; padding: 10px 14px 10px 36px; border-radius: 50px;
+  border: 1.5px solid var(--gris-borde); background: var(--gris-claro);
+  font-size: 0.85rem; font-family: inherit; color: var(--negro);
+  transition: border-color 0.2s, background 0.2s;
+}
+.input-busqueda:focus {
+  outline: none; border-color: var(--morado-claro); background: var(--blanco);
+}
+
+.select-filtro {
+  padding: 9px 14px; border-radius: 50px;
+  border: 1.5px solid var(--gris-borde); background: var(--gris-claro);
+  font-size: 0.82rem; font-family: inherit; color: var(--negro);
+  font-weight: 600; cursor: pointer; transition: border-color 0.2s, background 0.2s;
+}
+.select-filtro:focus { outline: none; border-color: var(--morado-claro); background: var(--blanco); }
+
+.btn-reset-filtros {
+  padding: 9px 16px; border-radius: 50px; border: 1.5px dashed var(--gris-borde);
+  background: transparent; color: var(--gris-texto); font-size: 0.8rem; font-weight: 700;
+  cursor: pointer; transition: border-color 0.2s, color 0.2s; white-space: nowrap;
+}
+.btn-reset-filtros:hover { border-color: var(--rojo); color: var(--rojo); }
+
+/* ══════════════════════════════════════════
+   CONTADOR DE RESULTADOS
+══════════════════════════════════════════ */
+.info-resultados {
+  font-size: 0.78rem; color: var(--gris-texto); margin-top: 4px;
+}
+.info-resultados strong { color: var(--morado); }
+
+/* ══════════════════════════════════════════
+   ESTADO VACÍO
+══════════════════════════════════════════ */
+.estado-vacio {
+  text-align: center; padding: 44px 20px; color: var(--gris-texto);
+}
+.estado-vacio .icono-vacio { font-size: 2.2rem; margin-bottom: 10px; display: block; }
+.estado-vacio p { font-size: 0.88rem; }
+
+/* ══════════════════════════════════════════
+   PAGINACIÓN
+══════════════════════════════════════════ */
+.paginacion {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  margin-top: 18px; flex-wrap: wrap;
+}
+.btn-pagina {
+  min-width: 34px; height: 34px; padding: 0 10px; border-radius: 8px;
+  border: 1.5px solid var(--gris-borde); background: var(--blanco);
+  color: var(--negro); font-size: 0.82rem; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-pagina:hover:not(:disabled) { border-color: var(--morado-claro); color: var(--morado-claro); }
+.btn-pagina.activo { background: var(--morado); border-color: var(--morado); color: var(--blanco); }
+.btn-pagina:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ══════════════════════════════════════════
+   MODAL — NUEVA MATRÍCULA
+══════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(26,26,26,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 500; opacity: 0; pointer-events: none; transition: opacity 0.25s ease;
+  padding: 20px;
+}
+.modal-overlay.abierto { opacity: 1; pointer-events: auto; }
+
+.modal-box {
+  background: var(--blanco); border-radius: 16px; width: 100%; max-width: 480px;
+  max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  transform: translateY(14px) scale(0.98); transition: transform 0.25s ease;
+}
+.modal-overlay.abierto .modal-box { transform: translateY(0) scale(1); }
+
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 24px; border-bottom: 1px solid var(--gris-borde);
+}
+.modal-header h2 { font-size: 1.05rem; font-weight: 700; color: var(--negro); }
+.btn-cerrar-modal {
+  width: 30px; height: 30px; border-radius: 50%; border: none;
+  background: var(--gris-claro); color: var(--gris-texto); font-size: 1rem;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.btn-cerrar-modal:hover { background: #e2e2ec; }
+
+.modal-form { padding: 22px 24px; display: flex; flex-direction: column; gap: 16px; }
+.form-grupo { display: flex; flex-direction: column; gap: 6px; }
+.form-grupo label {
+  font-size: 0.76rem; font-weight: 700; color: var(--gris-texto);
+  letter-spacing: 0.4px; text-transform: uppercase;
+}
+.form-grupo input, .form-grupo select {
+  padding: 10px 13px; border-radius: 10px; border: 1.5px solid var(--gris-borde);
+  font-size: 0.87rem; font-family: inherit; color: var(--negro); background: var(--gris-claro);
+  transition: border-color 0.2s, background 0.2s;
+}
+.form-grupo input:focus, .form-grupo select:focus {
+  outline: none; border-color: var(--morado-claro); background: var(--blanco);
+}
+.form-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.modal-acciones {
+  display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px;
+}
+.btn-modal-cancelar {
+  padding: 10px 20px; border-radius: 50px; border: 1.5px solid var(--gris-borde);
+  background: transparent; color: var(--gris-texto); font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.btn-modal-cancelar:hover { border-color: var(--rojo); color: var(--rojo); }
+.btn-modal-guardar {
+  padding: 10px 22px; border-radius: 50px; border: none;
+  background: var(--morado); color: var(--blanco); font-size: 0.85rem; font-weight: 700;
+  cursor: pointer; transition: background 0.2s;
+}
+.btn-modal-guardar:hover { background: var(--morado-claro); }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .filtros-bar { flex-direction: column; align-items: stretch; }
+  .campo-busqueda { min-width: 0; }
+  .form-fila { grid-template-columns: 1fr; }
+}

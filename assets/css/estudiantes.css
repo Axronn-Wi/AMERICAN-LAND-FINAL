@@ -1,0 +1,425 @@
+/* ============================================================
+   estudiantes.css — Estilos de la página de Estudiantes
+   (egresados, testimonios y beneficios)
+   Instituto American Land
+   Ubicación: assets/css/estudiantes.css
+   (Depende de index.css para variables, navbar y footer)
+============================================================ */
+
+/* ============================================================
+   HERO
+============================================================ */
+.hero-estudiantes {
+  background: linear-gradient(135deg, var(--morado) 0%, var(--morado-claro) 100%);
+  padding: clamp(56px, 9vw, 88px) 24px;
+  text-align: center;
+}
+
+.hero-estudiantes-inner {
+  max-width: 700px;
+  margin: 0 auto;
+  color: var(--blanco);
+}
+
+.hero-estudiantes .etiqueta {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.35);
+  color: var(--blanco);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 7px 20px;
+  border-radius: 50px;
+  margin-bottom: 22px;
+}
+
+.hero-estudiantes h1 {
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  margin-bottom: 18px;
+  line-height: 1.2;
+}
+
+.hero-estudiantes p {
+  font-size: 1.08rem;
+  font-weight: 300;
+  opacity: 0.94;
+  margin: 0 auto 30px;
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+.hero-estudiantes .hero-botones {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ============================================================
+   CIFRAS
+============================================================ */
+.cifras-estudiantes {
+  background: var(--rojo);
+  color: var(--blanco);
+  padding: 44px 24px;
+}
+
+.grid-cifras {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  text-align: center;
+}
+
+.cifra-item strong {
+  display: block;
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  font-size: clamp(1.7rem, 3vw, 2.1rem);
+  line-height: 1;
+  margin-bottom: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cifra-item span {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 400;
+  opacity: 0.92;
+  line-height: 1.5;
+  max-width: 190px;
+  margin: 0 auto;
+}
+
+/* ============================================================
+   TESTIMONIO DESTACADO (CARRUSEL)
+============================================================ */
+.testimonio-destacado {
+  background: var(--blanco);
+  padding: clamp(56px, 8vw, 80px) 24px;
+  text-align: center;
+}
+
+.testimonio-destacado h2 {
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  color: var(--morado);
+  margin-bottom: 44px;
+}
+
+.carrusel {
+  position: relative;
+  max-width: 680px;
+  margin: 0 auto;
+  min-height: 240px;
+}
+
+.testimonio-slide {
+  display: none;
+  background: var(--gris-claro);
+  border-radius: var(--radio);
+  padding: 40px 40px 36px;
+  text-align: left;
+}
+
+.testimonio-slide.activo {
+  display: block;
+  animation: aparecer 0.4s ease;
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.comillas {
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  font-size: 2.8rem;
+  color: var(--morado-claro);
+  line-height: 1;
+  display: block;
+  margin-bottom: 10px;
+}
+
+.testimonio-texto {
+  font-size: 1.08rem;
+  font-weight: 400;
+  color: var(--negro);
+  line-height: 1.7;
+  margin-bottom: 26px;
+}
+
+.testimonio-autor {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.testimonio-autor strong {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--negro);
+  line-height: 1.4;
+}
+
+.testimonio-autor span {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--gris-texto);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+
+.avatar-egresado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--morado);
+  color: var(--blanco);
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  font-size: 0.92rem;
+  letter-spacing: 0;
+  flex-shrink: 0;
+}
+
+.carrusel-controles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.carrusel-flecha {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--morado);
+  background: var(--blanco);
+  color: var(--morado);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.carrusel-flecha:hover { background: var(--morado); color: var(--blanco); }
+
+.carrusel-puntos { display: flex; gap: 8px; }
+
+.punto-carrusel {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #d9d9d9;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.punto-carrusel.activo {
+  background: var(--rojo);
+  transform: scale(1.2);
+}
+
+/* ============================================================
+   GALERÍA DE EGRESADOS
+============================================================ */
+.egresados {
+  background: var(--gris-claro);
+  padding: clamp(56px, 8vw, 80px) 24px;
+  text-align: center;
+}
+
+.egresados h2,
+.beneficios-estudiantes h2 {
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  color: var(--morado);
+  margin-bottom: 14px;
+}
+
+.egresados .subtitulo,
+.beneficios-estudiantes .subtitulo {
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--gris-texto);
+  line-height: 1.6;
+  margin: 0 auto 48px;
+  max-width: 560px;
+}
+
+.grid-egresados {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.card-egresado {
+  background: var(--blanco);
+  border-radius: var(--radio);
+  padding: 34px 26px;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card-egresado:hover { box-shadow: var(--sombra); transform: translateY(-4px); }
+
+.avatar-egresado.grande {
+  width: 64px;
+  height: 64px;
+  font-size: 1.15rem;
+  margin: 0 auto 18px;
+}
+
+.card-egresado h3 {
+  font-family: var(--font-cuerpo);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 10px;
+  color: var(--negro);
+}
+
+.badge-nivel-mini {
+  display: inline-block;
+  background: var(--rojo);
+  color: var(--blanco);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 4px 13px;
+  border-radius: 50px;
+  margin-bottom: 16px;
+}
+
+.card-egresado p {
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: var(--gris-texto);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   BENEFICIOS
+============================================================ */
+.beneficios-estudiantes {
+  background: var(--blanco);
+  padding: clamp(56px, 8vw, 80px) 24px;
+  text-align: center;
+}
+
+.grid-beneficios {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.card-beneficio {
+  text-align: center;
+  padding: 34px 24px;
+  border-radius: var(--radio);
+  background: var(--gris-claro);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.card-beneficio:hover { box-shadow: var(--sombra); transform: translateY(-4px); }
+.card-beneficio .icono { font-size: 2.2rem; margin-bottom: 16px; display: block; }
+
+.card-beneficio h3 {
+  font-family: var(--font-cuerpo);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 10px;
+  color: var(--negro);
+}
+
+.card-beneficio p {
+  font-size: 0.88rem;
+  font-weight: 400;
+  color: var(--gris-texto);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   CTA FINAL
+============================================================ */
+.cta-final {
+  background: var(--rojo);
+  color: var(--blanco);
+  padding: clamp(48px, 7vw, 68px) 24px;
+  text-align: center;
+}
+
+.cta-final h2 {
+  font-family: var(--font-titulo);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 3vw, 1.8rem);
+  margin-bottom: 14px;
+}
+
+.cta-final p {
+  font-size: 1rem;
+  font-weight: 300;
+  opacity: 0.94;
+  line-height: 1.6;
+  margin: 0 auto 30px;
+  max-width: 560px;
+}
+
+.cta-botones {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-outline {
+  color: var(--blanco);
+  border: 1.5px solid rgba(255,255,255,0.6);
+  padding: 12px 28px;
+  border-radius: var(--radio);
+  font-size: 1rem;
+  font-weight: 600;
+  display: inline-block;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.btn-outline:hover { background: rgba(255,255,255,0.12); transform: translateY(-2px); }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 960px) {
+  .grid-cifras { grid-template-columns: repeat(2, 1fr); }
+  .grid-egresados { grid-template-columns: repeat(2, 1fr); }
+  .grid-beneficios { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  .grid-cifras { grid-template-columns: 1fr; }
+  .grid-egresados { grid-template-columns: 1fr; }
+  .grid-beneficios { grid-template-columns: 1fr; }
+  .testimonio-slide { padding: 30px 24px; }
+  .comillas { font-size: 2.2rem; }
+}

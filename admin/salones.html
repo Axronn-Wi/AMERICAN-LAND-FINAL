@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salones - Panel Admin - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/inicio_admin.css" />
+  <link rel="stylesheet" href="../assets/css/salones_admin.css" />
+  <style>
+    /* Estilos extra de esta página (puedes pasarlos a assets/css/salones_admin.css) */
+    .aviso-salones { display: none; padding: 12px 18px; border-radius: 12px; font-size: 0.85rem; font-weight: 600; margin-bottom: 16px; }
+    .aviso-salones.visible { display: block; }
+    .aviso-salones.exito { background: #e8f8ef; color: #1e8449; border: 1px solid #a9dfbf; }
+    .aviso-salones.error { background: #fdecea; color: #c0392b; border: 1px solid #f5b7b1; }
+    .salon-estado { font-size: 0.68rem; font-weight: 700; padding: 3px 10px; border-radius: 50px; text-transform: uppercase; letter-spacing: 0.4px; white-space: nowrap; }
+    .salon-estado.activo { background: #e8f8ef; color: #1e8449; }
+    .salon-estado.otro { background: #ececec; color: #666; }
+    .grupo-modal { display: flex; flex-direction: column; gap: 14px; }
+    .modal-nota { font-size: 0.78rem; color: var(--gris-texto); line-height: 1.4; }
+    .modal-aviso { padding: 20px 22px 4px; font-size: 0.9rem; color: var(--negro); line-height: 1.5; }
+    .btn-peligro { padding: 10px 22px; border-radius: 50px; border: none; background: var(--rojo); color: var(--blanco); font-size: 0.85rem; font-weight: 700; cursor: pointer; }
+    .btn-peligro:disabled, .btn-guardar:disabled { opacity: 0.6; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">A</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Administrador</span>
+          <span class="nav-rol">Admin</span>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="docentes.html">Docentes</a></li>
+        <li><a href="alumnos.html">Alumnos</a></li>
+        <li><a href="salones.html" class="activo">Salones</a></li>
+        <li><a href="matriculas.html">Matrículas</a></li>
+      </ul>
+
+      <div class="nav-acciones">
+        <button class="btn-nav-icon" title="Notificaciones" id="btn-notif">&#128276;</button>
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Panel Admin</h3>
+        <ul>
+          <li class="menu-item">
+            <span class="menu-icono">&#127968;</span>
+            <a href="inicio.html">Inicio</a>
+          </li>
+          <li class="menu-item">
+            <span class="menu-icono">&#128104;&#8205;&#127979;</span>
+            <a href="docentes.html">Docentes</a>
+          </li>
+          <li class="menu-item">
+            <span class="menu-icono">&#127891;</span>
+            <a href="alumnos.html">Alumnos</a>
+          </li>
+          <li class="menu-item activo">
+            <span class="menu-icono">&#128198;</span>
+            <a href="salones.html">Salones</a>
+          </li>
+          <li class="menu-item">
+            <span class="menu-icono">&#128203;</span>
+            <a href="matriculas.html">Matrículas</a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="sidebar-seccion">
+        <h3>Acciones Rápidas</h3>
+        <ul>
+          <li>
+            <button class="acceso-btn" id="sb-nuevo-alumno">&#43; Nuevo Alumno</button>
+          </li>
+          <li>
+            <button class="acceso-btn" id="sb-nuevo-docente">&#43; Nuevo Docente</button>
+          </li>
+          <li>
+            <button class="acceso-btn" id="sb-nuevo-salon">&#43; Nuevo Salón</button>
+          </li>
+        </ul>
+      </section>
+
+      <div class="sidebar-footer">
+        <p>Instituto American Land</p>
+        <p>Pitalito, Huila &bull; Desde 2009</p>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+      <!-- Encabezado -->
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Gestión de Salones</h1>
+          <p id="texto-resumen">Cargando salones...</p>
+        </div>
+        <div class="encabezado-acciones">
+          <button class="btn-accion-header" id="btn-nuevo-salon-header">&#43; Nuevo Salón</button>
+        </div>
+      </div>
+
+      <div class="aviso-salones" id="alerta" role="status"></div>
+
+      <!-- ── STATS ── -->
+      <div class="grid-stats">
+
+        <div class="stat-card stat-docentes">
+          <div class="stat-icono">&#128198;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-total">0</span>
+            <span class="stat-label">Total de Salones</span>
+          </div>
+          <span class="stat-delta neutro">Registrados</span>
+        </div>
+
+        <div class="stat-card stat-salones">
+          <div class="stat-icono">&#9989;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-activos">0</span>
+            <span class="stat-label">Salones Activos</span>
+          </div>
+          <span class="stat-delta positivo">&#8679; En funcionamiento</span>
+        </div>
+
+        <div class="stat-card stat-alumnos">
+          <div class="stat-icono">&#128101;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-capacidad">0</span>
+            <span class="stat-label">Cupos Ocupados</span>
+          </div>
+          <span class="stat-delta neutro" id="stat-capacidad-detalle">de 0 cupos</span>
+        </div>
+
+        <div class="stat-card stat-matriculas">
+          <div class="stat-icono">&#9888;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-revision">0</span>
+            <span class="stat-label">Salones Llenos</span>
+          </div>
+          <span class="stat-delta alerta">Sin cupos disponibles</span>
+        </div>
+
+      </div>
+
+      <!-- ── FILTROS ── -->
+      <section class="card-seccion">
+        <div class="filtros-bar">
+          <input type="text" id="filtro-busqueda" class="filtro-input" placeholder="Buscar por salón o docente...">
+
+          <select id="filtro-nivel" class="filtro-select">
+            <option value="todos">Todos los niveles</option>
+          </select>
+
+          <select id="filtro-estado" class="filtro-select">
+            <option value="todos">Todos los estados</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- ── GRID DE SALONES ── -->
+      <section class="card-seccion">
+        <div class="card-header">
+          <h2>Salones Registrados</h2>
+          <span class="badge-conteo" id="badge-resultados">0 resultados</span>
+        </div>
+
+        <div class="grid-salones" id="grid-salones">
+          <!-- Tarjetas generadas por JS -->
+        </div>
+
+        <p class="mensaje-vacio" id="mensaje-vacio" style="display:none;">
+          No se encontraron salones con los filtros seleccionados.
+        </p>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ===== MODAL NUEVO / EDITAR SALÓN ===== -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="modal-titulo">Nuevo Salón</h2>
+        <button type="button" class="modal-cerrar" id="modal-cerrar">&#10005;</button>
+      </div>
+
+      <form id="form-salon">
+        <input type="hidden" id="salon-id">
+
+        <div class="form-grupo">
+          <label for="salon-nombre">Nombre del salón</label>
+          <input type="text" id="salon-nombre" maxlength="100" placeholder="Ej. Ingles Basico B" required>
+        </div>
+
+        <!-- Solo al crear: el endpoint de editar no cambia estos datos -->
+        <div class="grupo-modal" id="grupo-asignacion">
+          <div class="form-fila">
+            <div class="form-grupo">
+              <label for="salon-docente">Docente</label>
+              <select id="salon-docente"></select>
+            </div>
+            <div class="form-grupo">
+              <label for="salon-nivel">Nivel</label>
+              <select id="salon-nivel"></select>
+            </div>
+          </div>
+
+          <div class="form-fila">
+            <div class="form-grupo">
+              <label for="salon-horario">Horario</label>
+              <select id="salon-horario"></select>
+            </div>
+            <div class="form-grupo">
+              <label for="salon-anno">Año</label>
+              <input type="number" id="salon-anno" min="2000" max="2100">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-fila">
+          <div class="form-grupo">
+            <label for="salon-capacidad">Capacidad máxima</label>
+            <input type="number" id="salon-capacidad" min="1" max="50" value="15" required>
+          </div>
+
+          <!-- Solo al editar -->
+          <div class="form-grupo" id="grupo-ciclo">
+            <label for="salon-ciclo">Ciclo actual</label>
+            <input type="number" id="salon-ciclo" min="1" value="1">
+          </div>
+        </div>
+
+        <!-- Solo al editar -->
+        <div class="form-grupo" id="grupo-estado">
+          <label for="salon-estado">Estado</label>
+          <select id="salon-estado"></select>
+        </div>
+
+        <div class="form-fila">
+          <div class="form-grupo">
+            <label for="salon-inicio">Fecha de inicio</label>
+            <input type="date" id="salon-inicio">
+          </div>
+          <div class="form-grupo">
+            <label for="salon-fin">Fecha de fin</label>
+            <input type="date" id="salon-fin">
+          </div>
+        </div>
+
+        <p class="modal-nota" id="nota-edicion" style="display:none;">
+          El docente, el nivel, el horario y el año no se pueden cambiar al editar un salón.
+        </p>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancelar" id="btn-cancelar">Cancelar</button>
+          <button type="submit" class="btn-guardar" id="btn-guardar-salon">Guardar Salón</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===== MODAL CONFIRMAR ELIMINAR ===== -->
+  <div class="modal-overlay" id="modal-eliminar">
+    <div class="modal-box" style="max-width:420px;">
+      <div class="modal-header">
+        <h2>Eliminar salón</h2>
+        <button type="button" class="modal-cerrar" id="eliminar-cerrar">&#10005;</button>
+      </div>
+      <p class="modal-aviso">
+        ¿Eliminar el salón <strong id="nombre-a-eliminar"></strong>? Esta acción no se puede deshacer. Si el salón ya tiene matrículas o tareas, no se podrá eliminar.
+      </p>
+      <div class="modal-footer" style="padding: 16px 22px 20px;">
+        <button type="button" class="btn-cancelar" id="btn-cancelar-eliminar">Cancelar</button>
+        <button type="button" class="btn-peligro" id="btn-confirmar-eliminar">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/salones_admin.js"></script>
+</body>
+</html>

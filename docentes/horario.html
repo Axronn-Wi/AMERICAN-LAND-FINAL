@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Horario - Portal Docente - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/horario_docente.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">D</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Docente</span>
+          <span class="nav-rol">Docente</span>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="notas.html">Notas</a></li>
+        <li><a href="horario.html" class="activo">Horario</a></li>
+        <li><a href="tareas.html">Tareas</a></li>
+      </ul>
+
+      <div class="nav-acciones">
+        <button class="btn-nav-icon" title="Mensajes">&#128172;</button>
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Mis Clases</h3>
+        <ul></ul>
+      </section>
+      <section class="sidebar-seccion">
+        <h3>Accesos Rápidos</h3>
+        <ul>
+          <li><a href="notas.html"   class="acceso-link"><span>&#128203;</span> Ingresar Notas</a></li>
+          <li><a href="tareas.html"  class="acceso-link"><span>&#128218;</span> Ver Tareas</a></li>
+          <li><a href="horario.html" class="acceso-link"><span>&#128197;</span> Mi Horario</a></li>
+        </ul>
+      </section>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+      <!-- Encabezado -->
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Mi Horario</h1>
+          <p id="texto-semana"></p>
+        </div>
+        <div class="encabezado-acciones">
+          <button class="btn-semana" id="btn-anterior">&#8592; Anterior</button>
+          <button class="btn-semana" id="btn-siguiente">Siguiente &#8594;</button>
+        </div>
+      </div>
+
+      <!-- VISTA SEMANAL -->
+      <section class="card-seccion">
+        <h2 class="card-titulo">Vista Semanal</h2>
+
+        <div class="tabla-wrap">
+          <table class="tabla-horario">
+            <thead>
+              <tr>
+                <th class="th-hora">Hora</th>
+                <th>Lunes</th>
+                <th>Martes</th>
+                <th>Miércoles</th>
+                <th>Jueves</th>
+                <th>Viernes</th>
+                <th>Sábado</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-horario"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- SECCIÓN INFERIOR -->
+      <div class="grid-inferior">
+
+        <!-- Resumen de carga -->
+        <section class="card-seccion">
+          <div class="card-header">
+            <h2>Resumen de Carga</h2>
+            <span class="horas-total-badge" id="horas-total">—</span>
+          </div>
+          <table class="tabla-datos">
+            <thead>
+              <tr>
+                <th>Salón</th>
+                <th>Nivel</th>
+                <th>Horas</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-resumen"></tbody>
+          </table>
+        </section>
+
+        <!-- Próximas fechas -->
+        <section class="card-seccion">
+          <div class="card-header">
+            <h2>Próximas Fechas Importantes</h2>
+          </div>
+          <div class="lista-fechas" id="lista-fechas"></div>
+        </section>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/horario_docente.js"></script>
+</body>
+</html>

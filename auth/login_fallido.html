@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Error de inicio de sesión | American Land</title>
+  <link rel="stylesheet" href="../assets/css/login_fallido.css" />
+</head>
+<body>
+
+
+  <main class="contenedor-exito">
+    <img src="../assets/img/Logo.png" alt="American Land English Academy" class="logo-exito" />
+
+    <div class="icono-error" aria-hidden="true">✕</div>
+
+    <div class="texto-exito">
+      <h1 class="mensaje-error">¡No pudimos iniciar tu sesión!</h1>
+      <p class="mensaje-bienvenida" id="mensaje-causa">
+        Revisa tus datos e inténtalo nuevamente
+      </p>
+
+      <ul class="lista-causas">
+        <li>El correo electrónico no está registrado.</li>
+        <li>La contraseña ingresada es incorrecta.</li>
+        <li>El rol seleccionado no coincide con tu cuenta.</li>
+        <li>Tu cuenta podría estar inactiva o pendiente de aprobación.</li>
+      </ul>
+    </div>
+
+    <div class="acciones-exito">
+      <button type="button" id="btn-reintentar" class="btn-ir-ahora">Reintentar</button>
+      <a href="recuperar-contrasena.html" class="btn-secundario-fallido">Recuperar contraseña</a>
+    </div>
+
+    <p class="enlace-registro">
+      ¿No tienes una cuenta? <a href="registro.html">Regístrate</a>
+    </p>
+  </main>
+
+  <script src="../assets/js/login_fallido.js"></script>
+</body>
+</html>

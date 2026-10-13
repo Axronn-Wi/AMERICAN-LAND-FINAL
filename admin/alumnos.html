@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alumnos - Panel Admin - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/alumnos_admin.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">A</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Administrador</span>
+          <span class="nav-rol">Admin</span>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="docentes.html">Docentes</a></li>
+        <li><a href="alumnos.html" class="activo">Alumnos</a></li>
+        <li><a href="salones.html">Salones</a></li>
+        <li><a href="matriculas.html">Matrículas</a></li>
+      </ul>
+
+      <div class="nav-acciones">
+        <button class="btn-nav-icon" title="Notificaciones" id="btn-notif">&#128276;</button>
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Panel Admin</h3>
+        <ul>
+          <li class="menu-item"><span class="menu-icono">&#127968;</span><a href="inicio.html">Inicio</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128104;&#8205;&#127979;</span><a href="docentes.html">Docentes</a></li>
+          <li class="menu-item activo"><span class="menu-icono">&#127891;</span><a href="alumnos.html">Alumnos</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128198;</span><a href="salones.html">Salones</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128203;</span><a href="matriculas.html">Matrículas</a></li>
+        </ul>
+      </section>
+
+      <!-- El nivel del alumno no viene en la API de usuarios: filtros desactivados -->
+      <section class="sidebar-seccion">
+        <h3>Filtrar por Nivel &middot; Próximamente</h3>
+        <ul class="filtros-sidebar" id="filtros-nivel">
+          <li><button class="filtro-sb activo" data-nivel="todos">Todos los niveles</button></li>
+          <li><button class="filtro-sb" data-nivel="A1" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">A1 — Principiante</button></li>
+          <li><button class="filtro-sb" data-nivel="A2" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">A2 — Básico</button></li>
+          <li><button class="filtro-sb" data-nivel="B1" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">B1 — Intermedio</button></li>
+          <li><button class="filtro-sb" data-nivel="B2" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">B2 — Interm. Alto</button></li>
+          <li><button class="filtro-sb" data-nivel="C1" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">C1 — Avanzado</button></li>
+          <li><button class="filtro-sb" data-nivel="C2" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">C2 — Maestría</button></li>
+        </ul>
+      </section>
+
+      <section class="sidebar-seccion">
+        <h3>Filtrar por Estado</h3>
+        <ul class="filtros-sidebar" id="filtros-estado">
+          <li><button class="filtro-sb-estado activo" data-estado="todos">Todos</button></li>
+          <li><button class="filtro-sb-estado" data-estado="activo">Activos</button></li>
+          <li><button class="filtro-sb-estado" data-estado="inactivo">Inactivos</button></li>
+          <li><button class="filtro-sb-estado" data-estado="pendiente" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">Pendientes</button></li>
+        </ul>
+      </section>
+
+      <div class="sidebar-footer">
+        <p>Instituto American Land</p>
+        <p>Pitalito, Huila &bull; Desde 2009</p>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+      <!-- Encabezado -->
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Gestión de Alumnos</h1>
+          <p id="texto-conteo">Cargando alumnos...</p>
+        </div>
+        <div class="encabezado-acciones">
+          <button class="btn-accion-header" id="btn-nuevo-alumno">&#43; Agregar Alumno</button>
+        </div>
+      </div>
+
+      <!-- Alerta (los estilos los pone alumnos_admin.js, este CSS no trae alertas) -->
+      <div id="alerta" class="oculto" role="status"></div>
+
+      <!-- Stats rápidos -->
+      <div class="grid-stats-mini">
+        <div class="stat-mini stat-activos">
+          <span class="stat-mini-num" id="sm-activos">0</span>
+          <span class="stat-mini-label">Activos</span>
+        </div>
+        <div class="stat-mini stat-inactivos">
+          <span class="stat-mini-num" id="sm-inactivos">0</span>
+          <span class="stat-mini-label">Inactivos</span>
+        </div>
+        <div class="stat-mini stat-pendientes">
+          <span class="stat-mini-num" id="sm-pendientes" title="Próximamente">—</span>
+          <span class="stat-mini-label">Pendientes</span>
+        </div>
+        <div class="stat-mini stat-total">
+          <span class="stat-mini-num" id="sm-total">0</span>
+          <span class="stat-mini-label">Total</span>
+        </div>
+      </div>
+
+      <!-- Barra de búsqueda -->
+      <section class="card-seccion barra-wrap">
+        <div class="barra-busqueda">
+          <span class="icono-busqueda">&#128269;</span>
+          <input type="text" id="input-busqueda" class="input-busqueda"
+            placeholder="Buscar por nombre o correo..." />
+          <button class="btn-limpiar oculto" id="btn-limpiar">✕</button>
+        </div>
+        <div class="opciones-vista">
+          <button class="btn-vista activo" id="btn-vista-tabla" title="Vista tabla">&#9776;</button>
+          <button class="btn-vista" id="btn-vista-cards" title="Vista tarjetas">&#9638;</button>
+        </div>
+      </section>
+
+      <!-- TABLA -->
+      <section class="card-seccion" id="seccion-tabla">
+        <div class="card-header">
+          <h2>Lista de Alumnos</h2>
+          <span class="badge-conteo" id="badge-resultados">—</span>
+        </div>
+        <div class="tabla-wrap">
+          <table class="tabla-alumnos">
+            <thead>
+              <tr>
+                <th class="th-sort" data-col="nombre">Alumno <span class="sort-icon">&#8597;</span></th>
+                <th>Matrícula</th>
+                <th>Nivel</th>
+                <th>Salón</th>
+                <th>Teléfono</th>
+                <th class="th-sort" data-col="ingreso">Ingreso <span class="sort-icon">&#8597;</span></th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-alumnos"></tbody>
+          </table>
+        </div>
+        <div class="sin-resultados oculto" id="sin-resultados">
+          <span>&#128269;</span>
+          <p>No se encontraron alumnos con ese criterio.</p>
+          <button class="btn-reset" id="btn-reset">Limpiar búsqueda</button>
+        </div>
+      </section>
+
+      <!-- GRID CARDS (oculto por defecto) -->
+      <div class="grid-cards oculto" id="seccion-cards"></div>
+
+    </main>
+  </div>
+
+  <!-- ===== MODAL AGREGAR ALUMNO ===== -->
+  <div class="modal-overlay oculto" id="modal-alumno" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+    <div class="modal-caja">
+      <div class="modal-header">
+        <h2 id="modal-titulo">Agregar Alumno</h2>
+        <button class="btn-cerrar-modal" id="btn-cerrar-modal" aria-label="Cerrar">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+
+        <div class="grid-modal-2">
+          <div class="campo-modal">
+            <label for="m-nombre">Nombre completo <span class="oblig">*</span></label>
+            <input type="text" id="m-nombre" placeholder="Ej. Laura Gómez" />
+            <span class="m-error" id="e-nombre"></span>
+          </div>
+          <div class="campo-modal">
+            <label for="m-correo">Correo electrónico <span class="oblig">*</span></label>
+            <input type="email" id="m-correo" placeholder="correo@ejemplo.com" />
+            <span class="m-error" id="e-correo"></span>
+          </div>
+        </div>
+
+        <div class="grid-modal-2">
+          <div class="campo-modal">
+            <label for="m-contrasena">Contraseña <span class="oblig" id="m-contrasena-oblig">*</span></label>
+            <input type="password" id="m-contrasena" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+            <span class="m-error" id="e-contrasena"></span>
+          </div>
+          <div class="campo-modal">
+            <label for="m-telefono">Teléfono</label>
+            <input type="tel" id="m-telefono" placeholder="Ej. 3001234567" />
+            <span class="m-error" id="e-telefono"></span>
+          </div>
+        </div>
+
+        <div class="grid-modal-2">
+          <div class="campo-modal">
+            <label for="m-fecha-nac">Fecha de nacimiento</label>
+            <input type="date" id="m-fecha-nac" />
+            <span class="m-error" id="e-fecha-nac"></span>
+          </div>
+          <div class="campo-modal">
+            <label for="m-pais">País</label>
+            <input type="text" id="m-pais" placeholder="Ej. Colombia" />
+          </div>
+        </div>
+
+        <div class="grid-modal-2">
+          <div class="campo-modal">
+            <label for="m-ciudad">Ciudad</label>
+            <input type="text" id="m-ciudad" placeholder="Ej. Pitalito" />
+          </div>
+          <div class="campo-modal">
+            <small class="texto-ayuda">El nivel y el salón se asignan al matricular al alumno (módulo Matrículas).</small>
+          </div>
+        </div>
+
+        <small class="texto-ayuda oculto" id="ayuda-edicion">Al editar, deja vacíos la contraseña, la fecha de nacimiento, el país y la ciudad para conservar los actuales.</small>
+        <span class="m-error" id="e-general"></span>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancelar" id="btn-cancelar-modal">Cancelar</button>
+        <button class="btn-modal-guardar" id="btn-guardar-modal">Guardar Alumno</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL CONFIRMAR DESACTIVACIÓN ===== -->
+  <div class="modal-overlay oculto" id="modal-eliminar" role="dialog" aria-modal="true">
+    <div class="modal-caja modal-sm">
+      <div class="modal-header">
+        <h2>¿Desactivar alumno?</h2>
+        <button class="btn-cerrar-modal" id="btn-cerrar-eliminar">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <p class="texto-confirmar">
+          Vas a desactivar a <strong id="nombre-a-eliminar"></strong>.
+          Quedará como inactivo y podrás activarlo de nuevo cuando quieras.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancelar" id="btn-cancelar-eliminar">Cancelar</button>
+        <button class="btn-modal-eliminar" id="btn-confirmar-eliminar">Sí, desactivar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/alumnos_admin.js"></script>
+</body>
+</html>

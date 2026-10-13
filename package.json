@@ -1,0 +1,13 @@
+{
+  "name": "software-american-land",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Software American Land - Instituto American Land",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "postinstall": "npm install --prefix backend",
+    "start": "node backend/server.js"
+  }
+}

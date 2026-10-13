@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inicio - Panel Admin - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/inicio_admin.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">A</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Administrador</span>
+          <span class="nav-rol">Admin</span>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="inicio.html" class="activo">Inicio</a></li>
+        <li><a href="docentes.html">Docentes</a></li>
+        <li><a href="alumnos.html">Alumnos</a></li>
+        <li><a href="salones.html">Salones</a></li>
+        <li><a href="matriculas.html">Matrículas</a></li>
+      </ul>
+
+      <div class="nav-acciones">
+        <button class="btn-nav-icon" title="Notificaciones" id="btn-notif">&#128276;</button>
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Panel Admin</h3>
+        <ul>
+          <li class="menu-item activo">
+            <span class="menu-icono">&#127968;</span>
+            <a href="inicio.html">Inicio</a>
+          </li>
+          <li class="menu-item">
+            <span class="menu-icono">&#128104;&#8205;&#127979;</span>
+            <a href="docentes.html">Docentes</a>
+          </li>
+          <li class="menu-item">
+            <span class="menu-icono">&#127891;</span>
+            <a href="alumnos.html">Alumnos</a>
+          </li>
+          <li class="menu-item">
+            <span class="menu-icono">&#128198;</span>
+            <a href="salones.html">Salones</a>
+          </li>
+          <li class="menu-item">
+            <span class="menu-icono">&#128203;</span>
+            <a href="matriculas.html">Matrículas</a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="sidebar-seccion">
+        <h3>Acciones Rápidas</h3>
+        <ul>
+          <li>
+            <button class="acceso-btn" id="sb-nuevo-alumno">&#43; Nuevo Alumno</button>
+          </li>
+          <li>
+            <button class="acceso-btn" id="sb-nuevo-docente">&#43; Nuevo Docente</button>
+          </li>
+          <li>
+            <button class="acceso-btn" id="sb-nuevo-salon">&#43; Nuevo Salón</button>
+          </li>
+        </ul>
+      </section>
+
+      <div class="sidebar-footer">
+        <p>Instituto American Land</p>
+        <p>Pitalito, Huila &bull; Desde 2009</p>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+      <!-- Encabezado bienvenida -->
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Panel de Control</h1>
+          <p id="texto-fecha">Cargando fecha...</p>
+        </div>
+        <div class="encabezado-acciones">
+          <a href="matriculas.html" class="btn-accion-header">Ver Matrículas &#8594;</a>
+        </div>
+      </div>
+
+      <!-- ALERTA -->
+      <div class="alerta" id="alerta"></div>
+
+      <!-- ── STATS ── -->
+      <div class="grid-stats">
+
+        <div class="stat-card stat-alumnos">
+          <div class="stat-icono">&#127891;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-alumnos">0</span>
+            <span class="stat-label">Alumnos Activos</span>
+          </div>
+          <span class="stat-delta neutro" id="delta-alumnos">—</span>
+        </div>
+
+        <div class="stat-card stat-docentes">
+          <div class="stat-icono">&#128104;&#8205;&#127979;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-docentes">0</span>
+            <span class="stat-label">Docentes</span>
+          </div>
+          <span class="stat-delta neutro" id="delta-docentes">—</span>
+        </div>
+
+        <div class="stat-card stat-salones">
+          <div class="stat-icono">&#128198;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-salones">0</span>
+            <span class="stat-label">Salones Activos</span>
+          </div>
+          <span class="stat-delta neutro" id="delta-salones">—</span>
+        </div>
+
+        <div class="stat-card stat-matriculas">
+          <div class="stat-icono">&#128203;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-matriculas">0</span>
+            <span class="stat-label">Matrículas Pendientes</span>
+          </div>
+          <span class="stat-delta neutro" id="delta-matriculas">—</span>
+        </div>
+
+      </div>
+
+      <!-- ── GRID MEDIO ── -->
+      <div class="grid-medio">
+
+        <!-- Salones activos -->
+        <section class="card-seccion">
+          <div class="card-header">
+            <h2>Salones Activos</h2>
+            <a href="salones.html" class="link-ver-todo">Ver todos &#8594;</a>
+          </div>
+
+          <div class="lista-salones" id="lista-salones">
+            <p style="padding:24px;text-align:center;">Cargando salones...</p>
+          </div>
+        </section>
+
+        <!-- Actividad reciente -->
+        <section class="card-seccion">
+          <div class="card-header">
+            <h2>Actividad Reciente</h2>
+            <span class="badge-conteo" id="badge-actividad">Reciente</span>
+          </div>
+
+          <div class="lista-actividad" id="lista-actividad">
+            <p style="padding:24px;text-align:center;">Cargando actividad...</p>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- ── MATRÍCULAS PENDIENTES ── -->
+      <section class="card-seccion">
+        <div class="card-header">
+          <h2>Matrículas Pendientes</h2>
+          <a href="matriculas.html" class="link-ver-todo">Ver todas &#8594;</a>
+        </div>
+
+        <div class="tabla-wrap">
+          <table class="tabla-matriculas">
+            <thead>
+              <tr>
+                <th>N° Matrícula</th>
+                <th>Estudiante</th>
+                <th>Nivel</th>
+                <th>Salón</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-matriculas">
+              <tr><td colspan="7" style="padding:24px;text-align:center;">Cargando matrículas...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/inicio_admin.js"></script>
+</body>
+</html>

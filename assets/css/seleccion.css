@@ -1,0 +1,273 @@
+/* ============================================================
+   seleccion.css — Estilos de la página de Admisión
+   Instituto American Land
+   Ubicación: assets/css/seleccion.css
+   (Depende de index.css para variables, navbar y footer)
+============================================================ */
+
+/* ============================================================
+   HERO ADMISIONES
+============================================================ */
+.hero-admisiones {
+  background: linear-gradient(135deg, var(--morado) 0%, var(--morado-claro) 100%);
+  padding: 72px 24px;
+  text-align: center;
+}
+
+.hero-admisiones-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  color: var(--blanco);
+}
+
+.hero-admisiones .etiqueta {
+  display: inline-block;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.35);
+  color: var(--blanco);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 6px 18px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+}
+
+.hero-admisiones h1 {
+  font-family: var(--font-titulo);
+  font-size: clamp(1.9rem, 4vw, 2.6rem);
+  margin-bottom: 18px;
+  line-height: 1.2;
+}
+
+.hero-admisiones p {
+  font-size: 1.08rem;
+  font-weight: 300;
+  opacity: 0.94;
+  margin: 0 auto 30px;
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+.hero-admisiones .hero-botones {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* ============================================================
+   PASOS DEL PROCESO
+============================================================ */
+.pasos {
+  background: var(--blanco);
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.pasos h2 {
+  font-family: var(--font-titulo);
+  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  color: var(--morado);
+  margin-bottom: 12px;
+}
+
+.subtitulo-pasos {
+  font-size: 1rem;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--gris-texto);
+  margin-bottom: 48px;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.grid-pasos {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.paso-item {
+  position: relative;
+  text-align: center;
+  padding: 36px 20px 28px;
+  border-radius: var(--radio);
+  background: var(--gris-claro);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.paso-item:hover { box-shadow: var(--sombra); transform: translateY(-4px); }
+
+.paso-numero {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--rojo);
+  color: var(--blanco);
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+
+.paso-item h3 { font-size: 1rem; font-weight: 600; line-height: 1.4; margin-bottom: 10px; color: var(--negro); }
+.paso-item p { font-size: 0.9rem; color: var(--gris-texto); line-height: 1.5; }
+
+/* ============================================================
+   SELECCIÓN DE PERFIL
+============================================================ */
+.selector-perfil {
+  background: var(--gris-claro);
+  padding: 64px 24px;
+  text-align: center;
+}
+
+.selector-perfil h2 {
+  font-family: var(--font-titulo);
+  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  color: var(--morado);
+  margin-bottom: 12px;
+}
+
+.grid-perfiles {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.card-perfil {
+  cursor: pointer;
+  text-align: center;
+  padding: 36px 20px;
+  border-radius: var(--radio);
+  background: var(--blanco);
+  border: 2px solid transparent;
+  font-family: inherit;
+  color: inherit;
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+}
+
+.card-perfil:hover { box-shadow: var(--sombra); transform: translateY(-4px); }
+
+.card-perfil .icono { font-size: 2.2rem; margin-bottom: 16px; display: block; }
+.card-perfil h3 { font-size: 1rem; font-weight: 600; line-height: 1.4; margin-bottom: 10px; }
+.card-perfil p { font-size: 0.88rem; color: var(--gris-texto); line-height: 1.5; }
+
+.card-perfil.seleccionado {
+  border-color: var(--rojo);
+  box-shadow: var(--sombra);
+  background: var(--blanco);
+}
+
+.card-perfil.seleccionado h3 { color: var(--rojo); }
+
+.continuar-wrap {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.continuar-wrap .btn-primario:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.continuar-wrap .btn-primario:disabled:hover {
+  background: var(--rojo);
+  transform: none;
+}
+
+.ayuda-seleccion {
+  font-size: 0.85rem;
+  color: var(--gris-texto);
+}
+
+/* ============================================================
+   REQUISITOS
+============================================================ */
+.requisitos {
+  background: var(--blanco);
+  padding: 64px 24px;
+}
+
+.requisitos-inner {
+  max-width: 700px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.requisitos h2 {
+  font-family: var(--font-titulo);
+  font-size: clamp(1.5rem, 3vw, 1.9rem);
+  color: var(--morado);
+  margin-bottom: 32px;
+}
+
+.lista-requisitos {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 14px;
+  text-align: left;
+}
+
+.lista-requisitos li {
+  font-size: 0.98rem;
+  color: var(--negro);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lista-requisitos .check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--morado);
+  color: var(--blanco);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* ============================================================
+   CTA FINAL
+============================================================ */
+.cta-final {
+  background: var(--rojo);
+  color: var(--blanco);
+  padding: 56px 24px;
+  text-align: center;
+}
+
+.cta-final h2 { font-family: var(--font-titulo); font-size: clamp(1.4rem, 3vw, 1.8rem); margin-bottom: 12px; }
+.cta-final p { font-size: 1rem; font-weight: 300; line-height: 1.6; opacity: 0.92; margin-bottom: 24px; max-width: 600px; margin-left: auto; margin-right: auto; }
+.cta-final .btn-secundario { display: inline-block; }
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+@media (max-width: 960px) {
+  .grid-pasos { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .grid-perfiles { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+  .grid-pasos { grid-template-columns: 1fr; }
+}

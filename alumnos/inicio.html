@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Estudiante - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/inicio_alumnos.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+
+      <!-- Perfil -->
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">A</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Estudiante</span>
+          <span class="nav-rol">Estudiante</span>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <ul class="nav-links">
+        <li><a href="inicio.html" class="activo">Inicio</a></li>
+        <li><a href="salon_virtual.html">Salón Virtual</a></li>
+        <li><a href="horario.html">Horario</a></li>
+        <li><a href="tareas.html">Tareas</a></li>
+        <li><a href="notas.html">Notas</a></li>
+      </ul>
+
+      <!-- Acciones -->
+      <div class="nav-acciones">
+        <button class="btn-nav-icon" title="Mensajes">&#128172;</button>
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+
+    </nav>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <section class="sidebar-seccion">
+        <h3>Mis Clases</h3>
+        <ul>
+          <li class="clase-item activa">
+            <span class="clase-dot"></span>
+            <a href="salon_virtual.html">Salón Canada</a>
+          </li>
+        </ul>
+      </section>
+
+      <section class="sidebar-seccion">
+        <h3>Accesos Rápidos</h3>
+        <ul>
+          <li>
+            <a href="salon_virtual.html" class="acceso-link">
+              <span>&#128187;</span> Entrar al salón
+            </a>
+          </li>
+          <li>
+            <a href="tareas.html" class="acceso-link">
+              <span>&#128203;</span> Mis Tareas
+            </a>
+          </li>
+          <li>
+            <a href="notas.html" class="acceso-link">
+              <span>&#9733;</span> Ver Notas
+            </a>
+          </li>
+        </ul>
+      </section>
+
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+      <!-- Encabezado salón -->
+      <section class="encabezado-salon">
+        <div class="encabezado-info">
+          <h1>Salón Canada</h1>
+          <p>L-M-M-J &nbsp;&#183;&nbsp; 8:00AM - 12:00PM &nbsp;&#183;&nbsp; Prof. Luis P.</p>
+        </div>
+        <a href="salon_virtual.html" class="btn-entrar">&#128187; Entrar al salón</a>
+      </section>
+
+      <!-- TARJETAS ESTADÍSTICAS -->
+      <section class="grid-stats">
+
+        <div class="stat-card">
+          <div class="stat-icono">&#128336;</div>
+          <div class="stat-info">
+            <h3>Horas Completadas</h3>
+            <p class="stat-valor" id="horas-valor">20/50</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icono">&#11088;</div>
+          <div class="stat-info">
+            <h3>Mi Promedio</h3>
+            <p class="stat-valor" id="promedio-valor">4.5</p>
+            <span class="stat-sub">Sobre 5.0</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icono">&#128203;</div>
+          <div class="stat-info">
+            <h3>Asistencia</h3>
+            <p class="stat-valor" id="asistencia-valor">90%</p>
+            <span class="stat-sub">Este Ciclo</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-card-alerta">
+          <div class="stat-icono">&#128218;</div>
+          <div class="stat-info">
+            <h3>Tareas</h3>
+            <p class="stat-valor" id="tareas-valor">3</p>
+            <span class="stat-sub">Por Entregar</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- SECCIÓN INFERIOR -->
+      <div class="grid-inferior">
+
+        <!-- Tareas recientes -->
+        <section class="card-seccion">
+          <div class="card-header">
+            <h2>Tareas</h2>
+            <a href="tareas.html" class="ver-todos">Ver todos &#8594;</a>
+          </div>
+          <table class="tabla-datos">
+            <thead>
+              <tr>
+                <th>Actividad</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Exposición Oral</td>
+                <td><span class="badge badge-entregado">Entregado</span></td>
+              </tr>
+              <tr>
+                <td>Introducción</td>
+                <td><span class="badge badge-pendiente">Pendiente</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- Notas recientes -->
+        <section class="card-seccion">
+          <div class="card-header">
+            <h2>Mis Notas</h2>
+            <a href="notas.html" class="ver-todos">Ver todos &#8594;</a>
+          </div>
+          <table class="tabla-datos">
+            <thead>
+              <tr>
+                <th>Actividad</th>
+                <th>Nota</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Ciclo 1</td>
+                <td><span class="nota-badge">5.0</span></td>
+              </tr>
+              <tr>
+                <td>Examen Ciclo 1</td>
+                <td><span class="nota-badge">4.2</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <script src="../assets/js/inicio_alumnos.js"></script>
+</body>
+</html>

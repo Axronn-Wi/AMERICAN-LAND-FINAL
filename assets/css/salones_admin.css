@@ -1,0 +1,163 @@
+/* ============================================================
+   salones_admin.css
+   Instituto American Land
+   Ubicación: assets/css/salones_admin.css
+   (Complementa a inicio_admin.css — comparte variables y layout)
+============================================================ */
+
+/* ══════════════════════════════════════════
+   FILTROS
+══════════════════════════════════════════ */
+.filtros-bar {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+}
+
+.filtro-input {
+  flex: 1; min-width: 220px;
+  padding: 10px 16px; border-radius: 50px;
+  border: 1.5px solid var(--gris-borde); background: var(--gris-claro);
+  font-size: 0.85rem; color: var(--negro); font-family: var(--font);
+  transition: border-color 0.2s, background 0.2s;
+}
+.filtro-input:focus {
+  outline: none; border-color: var(--morado-claro); background: var(--blanco);
+}
+
+.filtro-select {
+  padding: 10px 14px; border-radius: 50px;
+  border: 1.5px solid var(--gris-borde); background: var(--gris-claro);
+  font-size: 0.83rem; font-weight: 600; color: var(--negro);
+  font-family: var(--font); cursor: pointer; transition: border-color 0.2s;
+}
+.filtro-select:focus { outline: none; border-color: var(--morado-claro); }
+
+/* ══════════════════════════════════════════
+   GRID DE SALONES
+══════════════════════════════════════════ */
+.grid-salones {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.mensaje-vacio {
+  text-align: center; color: var(--gris-texto); font-size: 0.88rem;
+  padding: 30px 0;
+}
+
+.salon-tarjeta {
+  border: 1px solid var(--gris-borde); border-radius: 14px;
+  background: var(--gris-claro); padding: 0; overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.salon-tarjeta:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(75,0,130,0.12); }
+
+.salon-tarjeta-barra { height: 6px; width: 100%; }
+.salon-tarjeta-barra.rojo     { background: var(--rojo); }
+.salon-tarjeta-barra.azul     { background: var(--azul); }
+.salon-tarjeta-barra.morado   { background: var(--morado-claro); }
+.salon-tarjeta-barra.amarillo { background: var(--amarillo); }
+.salon-tarjeta-barra.verde    { background: var(--verde); }
+
+.salon-tarjeta-cuerpo { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+
+.salon-tarjeta-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.salon-tarjeta-nombre { font-size: 1rem; font-weight: 700; color: var(--negro); margin-bottom: 2px; }
+.salon-tarjeta-nivel  { font-size: 0.72rem; color: var(--morado-claro); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+.salon-tarjeta-horario {
+  font-size: 0.78rem; color: var(--gris-texto);
+  display: flex; align-items: center; gap: 6px;
+}
+
+.salon-tarjeta-capacidad { display: flex; flex-direction: column; gap: 5px; }
+.salon-tarjeta-capacidad-texto {
+  display: flex; justify-content: space-between; font-size: 0.74rem; color: var(--gris-texto); font-weight: 600;
+}
+.barra-capacidad { height: 7px; border-radius: 50px; background: var(--gris-borde); overflow: hidden; }
+.barra-capacidad-fill { height: 100%; border-radius: 50px; transition: width 0.4s ease; }
+.barra-capacidad-fill.ok    { background: var(--verde); }
+.barra-capacidad-fill.media { background: var(--amarillo); }
+.barra-capacidad-fill.llena { background: var(--rojo); }
+
+.salon-tarjeta-footer {
+  padding: 12px 18px; border-top: 1px solid var(--gris-borde);
+  background: var(--blanco); display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+
+.salon-tarjeta-acciones { display: flex; gap: 6px; }
+.btn-editar-salon, .btn-eliminar-salon {
+  padding: 5px 12px; border-radius: 50px; font-size: 0.73rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; border: 1.5px solid;
+}
+.btn-editar-salon { border-color: var(--morado-claro); color: var(--morado-claro); background: transparent; }
+.btn-editar-salon:hover { background: var(--morado-claro); color: var(--blanco); }
+.btn-eliminar-salon { border-color: var(--rojo); color: var(--rojo); background: transparent; }
+.btn-eliminar-salon:hover { background: var(--rojo); color: var(--blanco); }
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(26,26,26,0.55); align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.activo { display: flex; }
+
+.modal-box {
+  background: var(--blanco); border-radius: 16px; width: 100%; max-width: 460px;
+  max-height: 90vh; overflow-y: auto; box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+  animation: aparecerModal 0.25s ease;
+}
+@keyframes aparecerModal {
+  from { opacity: 0; transform: translateY(14px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 22px; border-bottom: 1px solid var(--gris-borde);
+}
+.modal-header h2 { font-size: 1.05rem; font-weight: 700; color: var(--negro); }
+.modal-cerrar {
+  border: none; background: var(--gris-claro); width: 30px; height: 30px; border-radius: 50%;
+  font-size: 0.85rem; color: var(--gris-texto); cursor: pointer; transition: background 0.2s;
+}
+.modal-cerrar:hover { background: var(--gris-borde); }
+
+#form-salon { padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; }
+
+.form-grupo { display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.form-grupo label { font-size: 0.76rem; font-weight: 700; color: var(--gris-texto); text-transform: uppercase; letter-spacing: 0.4px; }
+.form-grupo input, .form-grupo select {
+  padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--gris-borde);
+  font-size: 0.86rem; font-family: var(--font); color: var(--negro); background: var(--gris-claro);
+  transition: border-color 0.2s;
+}
+.form-grupo input:focus, .form-grupo select:focus { outline: none; border-color: var(--morado-claro); background: var(--blanco); }
+
+.form-fila { display: flex; gap: 12px; }
+
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px; }
+.btn-cancelar {
+  padding: 10px 20px; border-radius: 50px; border: 1.5px solid var(--gris-borde);
+  background: transparent; color: var(--gris-texto); font-size: 0.85rem; font-weight: 700; cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-cancelar:hover { background: var(--gris-claro); }
+.btn-guardar {
+  padding: 10px 22px; border-radius: 50px; border: none;
+  background: var(--morado); color: var(--blanco); font-size: 0.85rem; font-weight: 700; cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-guardar:hover { background: var(--morado-claro); }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .grid-salones { grid-template-columns: 1fr; }
+  .form-fila { flex-direction: column; }
+  .filtros-bar { flex-direction: column; align-items: stretch; }
+  .filtro-select { width: 100%; }
+}

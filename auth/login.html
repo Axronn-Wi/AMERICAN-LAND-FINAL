@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iniciar Sesión - Instituto American Land</title>
+
+  <!-- Enlace al CSS externo -->
+  <link rel="stylesheet" href="../assets/css/login.css" />
+</head>
+<body>
+
+  <!-- Estrellas decorativas -->
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+
+  <!-- Botón volver -->
+  <a href="../index.html" class="btn-volver">&#8592; Inicio</a>
+
+  <!-- ===== TARJETA LOGIN ===== -->
+  <main>
+    <div class="card-login">
+
+      <!-- Logo -->
+      <div class="login-logo">
+        <img src="../assets/img/Logo.png" alt="Logo Instituto American Land" />
+      </div>
+
+      <!-- Título -->
+      <h1 class="login-titulo">Iniciar Sesión</h1>
+      <p class="login-subtitulo">Bienvenido de nuevo al Instituto American Land</p>
+
+      <!-- Alerta global -->
+      <div class="alerta" id="alerta-global"></div>
+
+      <!-- ===== FORMULARIO ===== -->
+      <form id="form-login" action="#" method="POST" novalidate>
+
+        <!-- Correo electrónico -->
+        <div class="campo">
+          <label for="correo">
+            <span class="star">&#9733;</span> Correo electrónico
+          </label>
+          <div class="input-wrapper">
+            <span class="icono-campo">&#9993;</span>
+            <input
+              type="email"
+              id="correo"
+              name="correo"
+              placeholder="correo@ejemplo.com"
+              required
+              autocomplete="email"
+            />
+          </div>
+          <span class="msg-error" id="error-correo">Ingresa un correo electrónico válido.</span>
+        </div>
+
+        <!-- Contraseña -->
+        <div class="campo">
+          <label for="contrasena">Contraseña</label>
+          <div class="input-wrapper">
+            <span class="icono-campo">&#128274;</span>
+            <input
+              type="password"
+              id="contrasena"
+              name="contrasena"
+              placeholder="Ingresa tu contraseña"
+              required
+              autocomplete="current-password"
+            />
+            <button type="button" class="btn-toggle-pass" id="toggle-pass" aria-label="Mostrar contraseña">
+              &#128065;
+            </button>
+          </div>
+          <span class="msg-error" id="error-contrasena">La contraseña es obligatoria.</span>
+        </div>
+
+        <!-- Rol -->
+        <div class="campo">
+          <label for="rol">Rol</label>
+          <div class="input-wrapper">
+            <span class="icono-campo">&#128100;</span>
+            <select id="rol" name="rol" required>
+              <option value="" disabled selected>Selecciona tu rol</option>
+              <option value="docente">Docente</option>
+              <option value="estudiante">Estudiante</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+          <span class="msg-error" id="error-rol">Selecciona un rol para continuar.</span>
+        </div>
+
+        <!-- Botón submit -->
+        <button type="submit" class="btn-submit" id="btn-submit">
+          Iniciar Sesión
+        </button>
+
+      </form>
+
+      <!-- Enlaces -->
+      <div class="login-links">
+        <a href="recover_pass.html">¿Olvidaste tu contraseña?</a>
+        <a href="registro.html">¿No tienes una cuenta? <strong>Regístrate</strong></a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Enlace al JS externo -->
+  <script src="../assets/js/login.js"></script>
+
+</body>
+</html>

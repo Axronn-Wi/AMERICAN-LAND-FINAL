@@ -1,0 +1,207 @@
+:root {
+  --morado:       #4B0082;
+  --morado-nav:   #3B0072;
+  --morado-claro: #6A0DAD;
+  --rojo:         #C0392B;
+  --blanco:       #FFFFFF;
+  --gris-claro:   #F5F5F5;
+  --gris-borde:   #DDDDEE;
+  --gris-texto:   #555555;
+  --negro:        #1A1A1A;
+  --verde:        #27AE60;
+  --rojo-error:   #E74C3C;
+  --font-titulo:  'Georgia', serif;
+  --font-cuerpo:  'Segoe UI', Arial, sans-serif;
+  --radio:        8px;
+  --sombra:       0 4px 16px rgba(0,0,0,0.12);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-cuerpo);
+  min-height: 100vh;
+  background: var(--blanco);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ===== Contenedor principal ===== */
+.contenedor-exito {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 400px;
+  width: 70%;
+  padding: 40px 30px;
+  animation: aparecer 0.6s ease;
+}
+
+@keyframes aparecer {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.logo-exito {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  margin-bottom: 30px;
+  border-radius: 50%;
+  box-shadow: var(--sombra);
+  animation: latido 2s ease-in-out infinite;
+}
+
+@keyframes latido {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.04); }
+}
+
+.texto-exito {
+  margin-bottom: 30px;
+}
+
+.mensaje-exito {
+  font-family: var(--font-titulo);
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--verde);
+  margin-bottom: 10px;
+}
+
+.mensaje-bienvenida {
+  font-family: var(--font-titulo);
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: var(--morado-claro);
+  margin-bottom: 18px;
+}
+
+.mensaje-redireccion {
+  font-size: 0.95rem;
+  color: var(--gris-texto);
+}
+
+#contador {
+  font-weight: bold;
+  color: var(--morado);
+}
+
+/* ===== Botón ===== */
+.acciones-exito {
+  display: flex;
+}
+
+.btn-ir-ahora {
+  background-color: var(--morado);
+  color: var(--blanco);
+  border: none;
+  padding: 12px 32px;
+  border-radius: var(--radio);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.btn-ir-ahora:hover {
+  background-color: var(--morado-claro);
+  transform: translateY(-2px);
+}
+
+.btn-ir-ahora:active {
+  transform: translateY(0);
+}
+
+/* ===== Decoraciones ===== */
+.decor {
+  position: fixed;
+  pointer-events: none;
+  z-index: 1;
+  user-select: none;
+}
+
+/* Rayas rojas esquina superior izquierda */
+.decor-stripes-tl {
+  top: -40px;
+  left: -60px;
+  width: 260px;
+  height: 180px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--rojo) 0px,
+    var(--rojo) 16px,
+    transparent 16px,
+    transparent 32px
+  );
+  opacity: 0.55;
+}
+
+/* Triángulo morado esquina inferior derecha */
+.decor-triangle-br {
+  bottom: -80px;
+  right: -80px;
+  width: 220px;
+  height: 220px;
+  background-color: var(--morado-claro);
+  opacity: 0.5;
+  clip-path: polygon(100% 0, 0% 100%, 100% 100%);
+}
+
+/* Banderas (emoji) */
+.decor-flag-tr,
+.decor-flag-br {
+  font-size: 4.5rem;
+  opacity: 0.9;
+}
+
+.decor-flag-tr {
+  top: -10px;
+  right: 30px;
+  transform: rotate(8deg);
+}
+
+.decor-flag-br {
+  bottom: 20px;
+  right: 10px;
+  transform: rotate(-8deg);
+}
+
+/* Estrellas */
+.decor-star {
+  color: var(--morado-claro);
+  font-size: 2.4rem;
+  opacity: 0.4;
+}
+
+.star-1 { top: 8%;  left: 38%; color: var(--rojo); font-size: 1.6rem; }
+.star-2 { top: 35%; right: 12%; }
+.star-3 { top: 38%; right: 5%; font-size: 1.2rem; }
+.star-4 { bottom: 6%; left: 6%; font-size: 2.8rem; }
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .logo-exito { width: 140px; height: 140px; }
+  .mensaje-exito { font-size: 1.6rem; }
+  .mensaje-bienvenida { font-size: 1.3rem; }
+  .decor-flag-tr, .decor-flag-br { font-size: 3rem; }
+}
+
+@media (max-width: 480px) {
+  .logo-exito { width: 110px; height: 110px; margin-bottom: 20px; }
+  .mensaje-exito { font-size: 1.3rem; }
+  .mensaje-bienvenida { font-size: 1.1rem; }
+  .decor-stripes-tl { width: 160px; height: 110px; }
+  .decor-triangle-br { width: 140px; height: 140px; }
+  .decor-flag-tr, .decor-flag-br { font-size: 2.2rem; }
+}

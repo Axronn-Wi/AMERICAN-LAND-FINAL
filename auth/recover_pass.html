@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recuperar Contraseña - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/recover_pass.css" />
+</head>
+<body>
+
+ <!-- Estrellas decorativas -->
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  
+  <!-- Botón volver -->
+  <a href="login.html" class="btn-volver">&#8592; Inicio de sesión</a>
+
+  <main>
+    <div class="card-login">
+
+      <!-- Logo — cambia --logo-size en recuperar-contrasena.css para ajustar el tamaño -->
+      <div class="login-logo">
+        <img src="../assets/img/logo.png" alt="Logo Instituto American Land" />
+      </div>
+
+      <!-- Título -->
+      <h1 class="login-titulo">Recuperar Contraseña</h1>
+      <p class="login-subtitulo">Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña</p>
+
+      <!-- Alerta global -->
+      <div class="alerta" id="alerta-global"></div>
+
+      <!-- PASO 1: formulario -->
+      <div id="paso-1">
+        <form id="form-recuperar" action="#" method="POST" novalidate>
+
+          <div class="campo">
+            <label for="correo">
+              <span class="star">&#9733;</span> Correo electrónico
+            </label>
+            <div class="input-wrapper">
+              <span class="icono-campo">&#9993;</span>
+              <input
+                type="email"
+                id="correo"
+                name="correo"
+                placeholder="correo@ejemplo.com"
+                required
+                autocomplete="email"
+              />
+            </div>
+            <span class="msg-error" id="error-correo">Ingresa un correo electrónico válido.</span>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btn-enviar">
+            Enviar enlace de recuperación
+          </button>
+
+        </form>
+      </div>
+
+      <!-- PASO 2: confirmación -->
+      <div id="paso-2" class="paso-oculto">
+        <div class="exito-bloque">
+          <div class="exito-icono">&#10003;</div>
+          <h2 class="exito-titulo">¡Correo enviado!</h2>
+          <p class="exito-texto">
+            Revisá tu bandeja en <strong id="correo-enviado"></strong>.<br/>
+            El enlace expira en <strong>30 minutos</strong>.
+          </p>
+          <p class="exito-nota">¿No lo ves? Revisa la carpeta de spam.</p>
+        </div>
+
+        <button class="btn-submit btn-reenviar" id="btn-reenviar" type="button">
+          Reenviar correo
+        </button>
+        <span id="contador-reenvio"></span>
+      </div>
+
+      <!-- Enlaces inferiores -->
+      <div class="login-links">
+        <a href="login.html">&#8592; Volver a iniciar sesión</a>
+        <a href="registro.html">¿No tienes cuenta? <strong>Regístrate</strong></a>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="../assets/js/recover_pass.js"></script>
+</body>
+</html>

@@ -1,0 +1,408 @@
+/* ============================================================
+   docentes_admin.css — Instituto American Land
+   Complementa inicio_admin.css (no lo reemplaza)
+============================================================ */
+
+/* ── BARRA DE FILTROS ── */
+.barra-filtros {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.busqueda-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.busqueda-icono {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.95rem;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+.input-busqueda {
+  width: 100%;
+  padding: 9px 14px 9px 36px;
+  border: 1.5px solid var(--gris-borde);
+  border-radius: 50px;
+  font-size: 0.88rem;
+  font-family: var(--font);
+  color: var(--negro);
+  background: var(--gris-claro);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-busqueda:focus {
+  border-color: var(--morado-claro);
+  box-shadow: 0 0 0 3px rgba(75,0,130,0.08);
+  background: var(--blanco);
+}
+
+.filtros-grupo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filtro-select {
+  padding: 9px 14px;
+  border: 1.5px solid var(--gris-borde);
+  border-radius: 50px;
+  font-size: 0.83rem;
+  font-family: var(--font);
+  color: var(--negro);
+  background: var(--gris-claro);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 28px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23666'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+}
+
+.filtro-select:focus { border-color: var(--morado-claro); }
+
+.btn-limpiar {
+  padding: 9px 16px;
+  border: 1.5px solid var(--gris-borde);
+  border-radius: 50px;
+  background: transparent;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gris-texto);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-limpiar:hover {
+  border-color: var(--rojo);
+  color: var(--rojo);
+  background: rgba(192,57,43,0.05);
+}
+
+/* ── TABLA DOCENTES ── */
+.tabla-docentes {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  min-width: 750px;
+}
+
+.tabla-docentes thead th {
+  text-align: left;
+  padding: 0 14px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--gris-texto);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--gris-borde);
+}
+
+.tabla-docentes tbody tr {
+  border-bottom: 1px solid var(--gris-borde);
+  transition: background 0.15s;
+}
+
+.tabla-docentes tbody tr:last-child { border-bottom: none; }
+.tabla-docentes tbody tr:hover { background: var(--gris-claro); }
+.tabla-docentes tbody td { padding: 14px; vertical-align: middle; }
+
+/* ── CELDA DOCENTE (avatar + nombre + correo) ── */
+.docente-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar-docente {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  color: var(--blanco);
+  font-size: 0.78rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+
+.docente-nombre {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--negro);
+  margin-bottom: 2px;
+}
+
+.docente-correo {
+  font-size: 0.72rem;
+  color: var(--gris-texto);
+}
+
+/* ── TAGS ── */
+.tag-especialidad {
+  display: inline-block;
+  background: rgba(75,0,130,0.07);
+  color: var(--morado);
+  border: 1px solid rgba(75,0,130,0.18);
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.salon-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.rojo-tag    { background: rgba(192,57,43,0.09);  color: var(--rojo);         border: 1px solid rgba(192,57,43,0.22); }
+.azul-tag    { background: rgba(41,128,185,0.09); color: var(--azul);         border: 1px solid rgba(41,128,185,0.22); }
+.morado-tag  { background: rgba(75,0,130,0.09);   color: var(--morado-claro); border: 1px solid rgba(75,0,130,0.2); }
+.amarillo-tag{ background: rgba(243,156,18,0.1);  color: #b7770d;             border: 1px solid rgba(243,156,18,0.28); }
+
+.horario-texto { font-size: 0.8rem; color: var(--negro); white-space: nowrap; }
+.num-alumnos   { font-size: 0.9rem; font-weight: 700; color: var(--negro); }
+.gris-texto    { color: var(--gris-texto) !important; }
+
+/* ── BADGE INACTIVO ── */
+.badge-estado.inactivo {
+  background: rgba(102,102,102,0.1);
+  color: var(--gris-texto);
+  border: 1px solid rgba(102,102,102,0.2);
+}
+
+/* ── BOTONES DE ACCIÓN EN TABLA ── */
+.btn-editar, .btn-ver, .btn-eliminar {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1.5px solid;
+  cursor: pointer;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  background: transparent;
+}
+
+.btn-editar  { border-color: var(--azul);   color: var(--azul); }
+.btn-ver     { border-color: var(--morado); color: var(--morado); }
+.btn-eliminar{ border-color: var(--rojo);   color: var(--rojo); }
+
+.btn-editar:hover   { background: var(--azul);   color: var(--blanco); }
+.btn-ver:hover      { background: var(--morado); color: var(--blanco); }
+.btn-eliminar:hover { background: var(--rojo);   color: var(--blanco); }
+
+/* ── SIN RESULTADOS ── */
+.sin-resultados {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--gris-texto);
+}
+
+.sin-resultados span { font-size: 2.5rem; display: block; margin-bottom: 10px; opacity: 0.4; }
+.sin-resultados p    { font-size: 0.9rem; }
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeOverlay 0.2s ease;
+}
+
+@keyframes fadeOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-box {
+  background: var(--blanco);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  width: 100%;
+  max-width: 620px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideModal 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
+
+.modal-box-sm { max-width: 420px; }
+
+@keyframes slideModal {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 26px 18px;
+  border-bottom: 1px solid var(--gris-borde);
+}
+
+.modal-titulo { font-size: 1.05rem; font-weight: 700; color: var(--negro); }
+
+.btn-cerrar-modal {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: var(--gris-texto);
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-cerrar-modal:hover { background: var(--gris-claro); color: var(--negro); }
+
+/* Campos del modal */
+form#form-docente { padding: 22px 26px; display: flex; flex-direction: column; gap: 14px; }
+
+.modal-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.modal-campo { display: flex; flex-direction: column; gap: 5px; }
+
+.modal-campo label {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--negro);
+  letter-spacing: 0.2px;
+}
+
+.req { color: var(--rojo); }
+
+.modal-campo input,
+.modal-campo select,
+.modal-campo textarea {
+  padding: 9px 12px;
+  border: 1.5px solid var(--gris-borde);
+  border-radius: var(--radio);
+  font-size: 0.88rem;
+  font-family: var(--font);
+  color: var(--negro);
+  background: var(--gris-claro);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  resize: vertical;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.modal-campo input:focus,
+.modal-campo select:focus,
+.modal-campo textarea:focus {
+  border-color: var(--morado-claro);
+  box-shadow: 0 0 0 3px rgba(75,0,130,0.09);
+  background: var(--blanco);
+}
+
+.modal-campo input.invalido { border-color: var(--rojo); }
+
+.campo-error {
+  font-size: 0.72rem;
+  color: var(--rojo);
+  min-height: 14px;
+}
+
+/* Footer del modal */
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 26px 22px;
+  border-top: 1px solid var(--gris-borde);
+}
+
+.btn-modal-cancelar {
+  padding: 9px 22px;
+  border: 1.5px solid var(--gris-borde);
+  border-radius: 50px;
+  background: transparent;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gris-texto);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-modal-cancelar:hover { border-color: var(--negro); color: var(--negro); }
+
+.btn-modal-guardar {
+  padding: 9px 26px;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+  color: var(--blanco);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(75,0,130,0.3);
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.btn-modal-guardar:hover { opacity: 0.9; transform: translateY(-1px); }
+
+.btn-modal-eliminar {
+  padding: 9px 26px;
+  border: none;
+  border-radius: 50px;
+  background: var(--rojo);
+  color: var(--blanco);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-modal-eliminar:hover { opacity: 0.85; }
+
+.modal-aviso {
+  padding: 16px 26px;
+  font-size: 0.9rem;
+  color: var(--negro);
+  line-height: 1.6;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 640px) {
+  .modal-fila { grid-template-columns: 1fr; }
+  .barra-filtros { flex-direction: column; align-items: stretch; }
+  .busqueda-wrapper { min-width: unset; }
+}

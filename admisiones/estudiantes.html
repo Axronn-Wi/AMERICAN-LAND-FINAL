@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nuestros Estudiantes — Instituto American Land</title>
+
+  <!-- CSS compartido del sitio (navbar, footer, botones, variables) -->
+  <link rel="stylesheet" href="../assets/css/index.css" />
+  <!-- CSS propio de esta página -->
+  <link rel="stylesheet" href="../assets/css/estudiantes.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+
+      <a href="../index.html#inicio" class="nav-marca">
+        <img src="../assets/img/Logo.png" alt="Logo" class="nav-marca-logo" />
+        <div class="nav-marca-texto">
+          <strong>American Land</strong>
+          <span>Since 2009</span>
+        </div>
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#inicio">Inicio</a></li>
+        <li><a href="seleccion.html">Admisión</a></li>
+        <li><a href="estudiantes.html" class="activo">Estudiantes</a></li>
+        <li><a href="../index.html#contacto">Contacto</a></li>
+      </ul>
+
+      <div class="nav-auth" id="nav-auth">
+        <a href="../auth/login.html" class="btn-login">Log In</a>
+        <a href="../auth/registro.html" class="btn-signup">Sign Up</a>
+      </div>
+
+      <button class="btn-hamburguesa" id="btn-menu" aria-label="Abrir menú">&#9776;</button>
+
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero-estudiantes">
+      <div class="hero-estudiantes-inner">
+        <span class="etiqueta">Historias reales</span>
+        <h1>Nuestros Estudiantes</h1>
+        <p>Conoce a quienes ya recorrieron el camino y hoy usan el inglés para abrir puertas en su vida profesional y personal. Tú puedes ser el próximo.</p>
+        <div class="hero-botones">
+          <a href="seleccion.html" class="btn-primario">Quiero Inscribirme</a>
+          <a href="#egresados" class="btn-secundario">Ver Historias</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CIFRAS ===== -->
+    <section class="cifras-estudiantes">
+      <div class="grid-cifras">
+        <div class="cifra-item animar-entrada">
+          <strong>+500</strong>
+          <span>Estudiantes graduados</span>
+        </div>
+        <div class="cifra-item animar-entrada">
+          <strong>87%</strong>
+          <span>Mejoraron su empleo tras certificarse</span>
+        </div>
+        <div class="cifra-item animar-entrada">
+          <strong>12</strong>
+          <span>Países donde trabajan nuestros egresados</span>
+        </div>
+        <div class="cifra-item animar-entrada">
+          <strong>15</strong>
+          <span>Años formando hablantes de inglés</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== TESTIMONIO DESTACADO (CARRUSEL) ===== -->
+    <section class="testimonio-destacado">
+      <h2>Lo que dicen nuestros egresados</h2>
+
+      <div class="carrusel" id="carrusel-testimonios">
+
+        <article class="testimonio-slide activo">
+          <span class="comillas">&#8220;</span>
+          <p class="testimonio-texto">Entrar a American Land cambió mi vida laboral. Pasé de no poder sostener una conversación a liderar reuniones en inglés con clientes internacionales.</p>
+          <div class="testimonio-autor">
+            <span class="avatar-egresado">MJ</span>
+            <div>
+              <strong>María José Rojas</strong>
+              <span>Nivel C1 · Analista de Comercio Exterior</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="testimonio-slide">
+          <span class="comillas">&#8220;</span>
+          <p class="testimonio-texto">Los profesores nativos y los horarios flexibles me permitieron estudiar mientras trabajaba. Hoy tengo mi certificación internacional y una beca en el exterior.</p>
+          <div class="testimonio-autor">
+            <span class="avatar-egresado">DA</span>
+            <div>
+              <strong>David Andrade</strong>
+              <span>Nivel C2 · Becario de intercambio</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="testimonio-slide">
+          <span class="comillas">&#8220;</span>
+          <p class="testimonio-texto">Llegué sin saber ni presentarme en inglés. Hoy doy soporte a clientes de Estados Unidos todos los días. El acompañamiento del instituto fue clave.</p>
+          <div class="testimonio-autor">
+            <span class="avatar-egresado">LP</span>
+            <div>
+              <strong>Laura Perdomo</strong>
+              <span>Nivel B2 · Agente de Servicio al Cliente Bilingüe</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="carrusel-controles">
+        <button type="button" class="carrusel-flecha" id="carrusel-anterior" aria-label="Testimonio anterior">&#10094;</button>
+        <div class="carrusel-puntos" id="carrusel-puntos"></div>
+        <button type="button" class="carrusel-flecha" id="carrusel-siguiente" aria-label="Testimonio siguiente">&#10095;</button>
+      </div>
+    </section>
+
+    <!-- ===== GALERÍA DE EGRESADOS ===== -->
+    <section class="egresados" id="egresados">
+      <h2>Egresados que ya lo lograron</h2>
+      <p class="subtitulo">Perfiles reales de estudiantes que completaron su proceso con nosotros</p>
+
+      <div class="grid-egresados">
+
+        <div class="card-egresado animar-entrada">
+          <span class="avatar-egresado grande">MJ</span>
+          <h3>María José Rojas</h3>
+          <span class="badge-nivel-mini">C1</span>
+          <p>Analista de Comercio Exterior. Hoy negocia directamente con proveedores en inglés.</p>
+        </div>
+
+        <div class="card-egresado animar-entrada">
+          <span class="avatar-egresado grande">DA</span>
+          <h3>David Andrade</h3>
+          <span class="badge-nivel-mini">C2</span>
+          <p>Becario de intercambio académico en el exterior gracias a su certificación.</p>
+        </div>
+
+        <div class="card-egresado animar-entrada">
+          <span class="avatar-egresado grande">LP</span>
+          <h3>Laura Perdomo</h3>
+          <span class="badge-nivel-mini">B2</span>
+          <p>Agente de servicio al cliente bilingüe en una empresa multinacional.</p>
+        </div>
+
+        <div class="card-egresado animar-entrada">
+          <span class="avatar-egresado grande">JC</span>
+          <h3>Julián Castañeda</h3>
+          <span class="badge-nivel-mini">B1</span>
+          <p>Guía turístico, ahora atiende visitantes extranjeros con total confianza.</p>
+        </div>
+
+        <div class="card-egresado animar-entrada">
+          <span class="avatar-egresado grande">NV</span>
+          <h3>Natalia Vargas</h3>
+          <span class="badge-nivel-mini">C1</span>
+          <p>Docente de inglés, formada desde A1 hasta certificación internacional.</p>
+        </div>
+
+        <div class="card-egresado animar-entrada">
+          <span class="avatar-egresado grande">SR</span>
+          <h3>Santiago Rivas</h3>
+          <span class="badge-nivel-mini">B2</span>
+          <p>Desarrollador de software, colabora hoy con equipos remotos en inglés.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== BENEFICIOS ===== -->
+    <section class="beneficios-estudiantes">
+      <h2>¿Por qué estudiar con nosotros?</h2>
+      <p class="subtitulo">Beneficios que marcan la diferencia en tu proceso de aprendizaje</p>
+
+      <div class="grid-beneficios">
+
+        <div class="card-beneficio animar-entrada">
+          <span class="icono">💼</span>
+          <h3>Mejores oportunidades laborales</h3>
+          <p>Empresas priorizan candidatos bilingües; nuestros egresados acceden a mejores cargos y salarios.</p>
+        </div>
+
+        <div class="card-beneficio animar-entrada">
+          <span class="icono">🌎</span>
+          <h3>Viaja sin barreras</h3>
+          <p>Comunícate con confianza en cualquier país de habla inglesa, en turismo o intercambios.</p>
+        </div>
+
+        <div class="card-beneficio animar-entrada">
+          <span class="icono">📜</span>
+          <h3>Certificación internacional</h3>
+          <p>Certificados reconocidos mundialmente que respaldan tu nivel ante empresas y universidades.</p>
+        </div>
+
+        <div class="card-beneficio animar-entrada">
+          <span class="icono">🤝</span>
+          <h3>Comunidad y networking</h3>
+          <p>Haz parte de una red de estudiantes y egresados en distintas industrias y países.</p>
+        </div>
+
+        <div class="card-beneficio animar-entrada">
+          <span class="icono">🕒</span>
+          <h3>Horarios flexibles</h3>
+          <p>Clases en la mañana, tarde y noche para que estudies sin dejar tus otras responsabilidades.</p>
+        </div>
+
+        <div class="card-beneficio animar-entrada">
+          <span class="icono">👩‍🏫</span>
+          <h3>Profesores nativos</h3>
+          <p>Aprende pronunciación y fluidez real de la mano de hablantes nativos del idioma.</p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===== CTA FINAL ===== -->
+    <section class="cta-final">
+      <h2>¿Listo para escribir tu propia historia?</h2>
+      <p>Cientos de estudiantes ya transformaron su futuro con nosotros. Ahora es tu turno.</p>
+      <div class="cta-botones">
+        <a href="seleccion.html" class="btn-primario">Comenzar mi Admisión</a>
+        <a href="niveles.html" class="btn-outline">Ver Niveles</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer id="contacto">
+    <div class="footer-grid">
+
+      <div class="footer-col">
+        <h4>Instituto American Land</h4>
+        <p>Aprende inglés con los mejores profesores</p>
+        <div class="footer-redes">
+          <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a>
+          <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Enlaces Rápidos</h4>
+        <ul>
+          <li><a href="niveles.html">Niveles</a></li>
+          <li><a href="seleccion.html">Admisiones</a></li>
+          <li><a href="estudiantes.html">Estudiantes</a></li>
+          <li><a href="../index.html#contacto">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="mailto:ventasymarketing.al@gmail.com">ventasymarketing.al@gmail.com</a></li>
+          <li><a href="tel:+573138132388">3138132388</a></li>
+          <li>Calle 3 # 1-45 barrio Quinche</li>
+          <li>Pitalito, Huila, Colombia</li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#privacidad">Política de Privacidad</a></li>
+          <li><a href="#accesibilidad">Declaración de Accesibilidad</a></li>
+          <li><a href="#terminos">Términos y Condiciones</a></li>
+          <li><a href="#reembolso">Política de Reembolso</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-copy">
+      <p>&copy; 2011 Instituto American Land. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- JS compartido del sitio (menú móvil, scroll, animaciones) -->
+  <script src="../assets/js/index.js"></script>
+  <!-- JS propio de esta página -->
+  <script src="../assets/js/estudiantes.js"></script>
+
+</body>
+</html>

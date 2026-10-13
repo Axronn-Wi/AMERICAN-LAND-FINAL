@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notas - Portal Docente - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/notas_docente.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">D</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Docente</span>
+          <span class="nav-rol">Docente</span>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="notas.html" class="activo">Notas</a></li>
+        <li><a href="horario.html">Horario</a></li>
+        <li><a href="tareas.html">Tareas</a></li>
+      </ul>
+
+      <div class="nav-acciones">
+        <button class="btn-nav-icon" title="Mensajes">&#128172;</button>
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Mis Clases</h3>
+        <!-- Lo llena notas_docente.js con los salones reales -->
+        <ul id="lista-clases"></ul>
+      </section>
+      <section class="sidebar-seccion">
+        <h3>Accesos Rápidos</h3>
+        <ul>
+          <li><a href="notas.html"   class="acceso-link"><span>&#128203;</span> Ingresar Notas</a></li>
+          <li><a href="tareas.html"  class="acceso-link"><span>&#128218;</span> Ver Tareas</a></li>
+          <li><a href="horario.html" class="acceso-link"><span>&#128197;</span> Mi Horario</a></li>
+        </ul>
+      </section>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+      <!-- Encabezado -->
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Notas</h1>
+          <p id="salon-detalle">Cargando...</p>
+        </div>
+        <button class="btn-accion" id="btn-guardar">&#128190; Guardar Notas</button>
+      </div>
+
+      <!-- SELECTOR DE CICLOS (botones creados por el JS con los ciclos reales) -->
+      <div class="ciclos-wrap" id="ciclos-wrap"></div>
+
+      <!-- ALERTA -->
+      <div class="alerta" id="alerta"></div>
+
+      <!-- TABLA NOTAS -->
+      <section class="card-seccion">
+        <div class="card-header">
+          <div class="card-titulo-wrap">
+            <span class="card-icono">&#128203;</span>
+            <h2>Ingresar / Editar Notas</h2>
+          </div>
+          <div class="tabla-acciones">
+            <span class="promedio-grupo">Promedio Grupo: <strong id="promedio-grupo">—</strong></span>
+          </div>
+        </div>
+
+        <div class="tabla-wrap">
+          <table class="tabla-notas" id="tabla-notas">
+            <thead>
+              <tr>
+                <th>Alumno</th>
+                <th>Nota del ciclo</th>
+                <th>Examen final</th>
+                <th>Promedio</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-notas">
+              <tr><td colspan="5" style="padding:24px;text-align:center;">Cargando notas...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/notas_docente.js"></script>
+</body>
+</html>

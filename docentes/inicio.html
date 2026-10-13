@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portal Docente - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/inicio_docente.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">D</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Docente</span>
+          <span class="nav-rol">Docente</span>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="inicio.html" class="activo">Inicio</a></li>
+        <li><a href="notas.html">Notas</a></li>
+        <li><a href="horario.html">Horario</a></li>
+        <li><a href="tareas.html">Tareas</a></li>
+      </ul>
+
+      <div class="nav-acciones">
+        <button class="btn-nav-icon" title="Mensajes">&#128172;</button>
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <section class="sidebar-seccion">
+        <h3>Mis Clases</h3>
+        <ul></ul>
+      </section>
+
+      <section class="sidebar-seccion">
+        <h3>Accesos Rápidos</h3>
+        <ul>
+          <li><a href="notas.html"   class="acceso-link"><span>&#128203;</span> Ingresar Notas</a></li>
+          <li><a href="tareas.html"  class="acceso-link"><span>&#128218;</span> Ver Tareas</a></li>
+          <li><a href="horario.html" class="acceso-link"><span>&#128197;</span> Mi Horario</a></li>
+        </ul>
+      </section>
+
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+      <!-- Encabezado salón -->
+      <section class="encabezado-salon">
+        <div class="encabezado-info">
+          <h1 id="salon-titulo">Cargando...</h1>
+          <p id="salon-detalle"></p>
+        </div>
+        <a href="notas.html" class="btn-accion" id="btn-ingresar-nota">&#43; Ingresar Nota</a>
+      </section>
+
+      <!-- TARJETAS ESTADÍSTICAS -->
+      <section class="grid-stats">
+
+        <div class="stat-card">
+          <div class="stat-icono">&#128101;</div>
+          <div class="stat-info">
+            <h3>Alumnos</h3>
+            <p class="stat-valor" id="stat-alumnos">0</p>
+            <span class="stat-sub">Matriculados en este salón</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icono">&#11088;</div>
+          <div class="stat-info">
+            <h3>Ciclo actual</h3>
+            <p class="stat-valor" id="stat-ciclo">—</p>
+            <span class="stat-sub">De 4 ciclos</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icono">&#128336;</div>
+          <div class="stat-info">
+            <h3>Horas</h3>
+            <p class="stat-valor" id="stat-horas">—</p>
+            <span class="stat-sub">Por semana</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icono">&#128203;</div>
+          <div class="stat-info">
+            <h3>Mis salones</h3>
+            <p class="stat-valor" id="stat-salones">0</p>
+            <span class="stat-sub">Asignados a ti</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- SECCIÓN INFERIOR -->
+      <div class="grid-inferior">
+
+        <!-- Resumen alumnos -->
+        <section class="card-seccion">
+          <div class="card-header">
+            <h2>Mis Alumnos</h2>
+            <a href="notas.html" class="ver-todos" id="ver-notas">Ver todas las notas &#8594;</a>
+          </div>
+          <table class="tabla-datos">
+            <thead>
+              <tr>
+                <th>Alumno</th>
+                <th>Código</th>
+                <th>Correo</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-alumnos"></tbody>
+          </table>
+        </section>
+
+        <!-- Actividad reciente -->
+        <section class="card-seccion">
+          <div class="card-header">
+            <h2>Actividad Reciente</h2>
+          </div>
+          <p class="act-tiempo" style="padding:24px;text-align:center">La actividad reciente de tu salón estará disponible pronto.</p>
+        </section>
+
+      </div>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/inicio_docente.js"></script>
+</body>
+</html>

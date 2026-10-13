@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Docentes - Panel Admin - Instituto American Land</title>
+  <link rel="stylesheet" href="../assets/css/inicio_admin.css" />
+  <link rel="stylesheet" href="../assets/css/docentes_admin.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">A</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Administrador</span>
+          <span class="nav-rol">Admin</span>
+        </div>
+      </div>
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="docentes.html" class="activo">Docentes</a></li>
+        <li><a href="alumnos.html">Alumnos</a></li>
+        <li><a href="salones.html">Salones</a></li>
+        <li><a href="matriculas.html">Matrículas</a></li>
+      </ul>
+      <div class="nav-acciones">
+        <button class="btn-nav-icon" title="Notificaciones" id="btn-notif">&#128276;</button>
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Panel Admin</h3>
+        <ul>
+          <li class="menu-item"><span class="menu-icono">&#127968;</span><a href="inicio.html">Inicio</a></li>
+          <li class="menu-item activo"><span class="menu-icono">&#128104;&#8205;&#127979;</span><a href="docentes.html">Docentes</a></li>
+          <li class="menu-item"><span class="menu-icono">&#127891;</span><a href="alumnos.html">Alumnos</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128198;</span><a href="salones.html">Salones</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128203;</span><a href="matriculas.html">Matrículas</a></li>
+        </ul>
+      </section>
+      <section class="sidebar-seccion">
+        <h3>Acciones Rápidas</h3>
+        <ul>
+          <li><button class="acceso-btn" id="sb-nuevo-docente">&#43; Nuevo Docente</button></li>
+          <li><button class="acceso-btn" id="sb-nuevo-alumno">&#43; Nuevo Alumno</button></li>
+          <li><button class="acceso-btn" id="sb-nuevo-salon">&#43; Nuevo Salón</button></li>
+        </ul>
+      </section>
+      <div class="sidebar-footer">
+        <p>Instituto American Land</p>
+        <p>Pitalito, Huila &bull; Desde 2009</p>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main class="contenido">
+
+      <!-- Encabezado -->
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Gestión de Docentes</h1>
+          <p id="texto-fecha">Cargando fecha...</p>
+        </div>
+        <button class="btn-accion-header" id="btn-nuevo-docente">&#43; Nuevo Docente</button>
+      </div>
+
+      <!-- ALERTA -->
+      <div class="alerta" id="alerta"></div>
+
+      <!-- Stats -->
+      <div class="grid-stats">
+        <div class="stat-card stat-alumnos">
+          <div class="stat-icono">&#128104;&#8205;&#127979;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-total">0</span>
+            <span class="stat-label">Total Docentes</span>
+          </div>
+          <span class="stat-delta positivo" id="delta-total">&#8679; Activos</span>
+        </div>
+        <div class="stat-card stat-docentes">
+          <div class="stat-icono">&#128198;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-salones-asig">0</span>
+            <span class="stat-label">Salones Asignados</span>
+          </div>
+          <span class="stat-delta neutro">&#8212; Con docente</span>
+        </div>
+        <div class="stat-card stat-salones">
+          <div class="stat-icono">&#127891;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-alumnos-asig">0</span>
+            <span class="stat-label">Alumnos Totales</span>
+          </div>
+          <span class="stat-delta neutro">&#8212; Matrículas activas</span>
+        </div>
+        <div class="stat-card stat-matriculas">
+          <div class="stat-icono">&#128337;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-horas">0</span>
+            <span class="stat-label">Horas Semanales</span>
+          </div>
+          <span class="stat-delta neutro">&#8212; En total</span>
+        </div>
+      </div>
+
+      <!-- Filtros -->
+      <div class="card-seccion">
+        <div class="barra-filtros">
+          <div class="busqueda-wrapper">
+            <span class="busqueda-icono">&#128269;</span>
+            <input type="text" id="input-busqueda" class="input-busqueda" placeholder="Buscar por nombre o correo..." />
+          </div>
+          <div class="filtros-grupo">
+            <select id="filtro-estado" class="filtro-select">
+              <option value="">Todos los estados</option>
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+            <!-- Las opciones de salón las llena docentes_admin.js con los salones reales -->
+            <select id="filtro-salon" class="filtro-select">
+              <option value="">Todos los salones</option>
+            </select>
+            <button class="btn-limpiar" id="btn-limpiar">&#10005; Limpiar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="card-seccion">
+        <div class="card-header">
+          <h2>Lista de Docentes</h2>
+          <span class="badge-conteo" id="badge-total">—</span>
+        </div>
+        <div class="tabla-wrap">
+          <table class="tabla-docentes">
+            <thead>
+              <tr>
+                <th>Docente</th>
+                <th>Especialidad</th>
+                <th>Salón Asignado</th>
+                <th>Horario</th>
+                <th>Alumnos</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-docentes">
+              <tr><td colspan="7" style="padding:24px;text-align:center;">Cargando docentes...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="sin-resultados" id="sin-resultados" style="display:none">
+          <span>&#128269;</span>
+          <p>No se encontraron docentes con ese criterio</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL NUEVO DOCENTE -->
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-titulo" style="display:none">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-titulo" id="modal-titulo">Nuevo Docente</h2>
+        <button class="btn-cerrar-modal" id="btn-cerrar-modal" aria-label="Cerrar">&#10005;</button>
+      </div>
+      <form id="form-docente" novalidate>
+        <div class="modal-fila">
+          <div class="modal-campo">
+            <label for="doc-nombre">Nombre completo <span class="req">*</span></label>
+            <input type="text" id="doc-nombre" placeholder="Ej: Mario Ramírez" />
+            <span class="campo-error" id="err-nombre"></span>
+          </div>
+          <div class="modal-campo">
+            <label for="doc-correo">Correo electrónico <span class="req">*</span></label>
+            <input type="email" id="doc-correo" placeholder="correo@americanland.edu.co" />
+            <span class="campo-error" id="err-correo"></span>
+          </div>
+        </div>
+        <div class="modal-fila">
+          <div class="modal-campo">
+            <label for="doc-contrasena">Contraseña <span class="req" id="doc-contrasena-oblig">*</span></label>
+            <input type="password" id="doc-contrasena" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+            <span class="campo-error" id="err-contrasena"></span>
+          </div>
+          <div class="modal-campo">
+            <label for="doc-telefono">Teléfono</label>
+            <input type="tel" id="doc-telefono" placeholder="Ej: 3001234567" />
+            <span class="campo-error" id="err-telefono"></span>
+          </div>
+        </div>
+        <div class="modal-fila">
+          <div class="modal-campo">
+            <label for="doc-especialidad">Especialidad <span class="req">*</span></label>
+            <input type="text" id="doc-especialidad" placeholder="Ej: Inglés Conversacional" />
+            <span class="campo-error" id="err-especialidad"></span>
+          </div>
+          <div class="modal-campo">
+            <label>Salón y horario</label>
+            <span class="gris-texto" style="font-size:0.78rem;line-height:1.4;">Se asignan al crear o editar el salón (módulo Salones).</span>
+          </div>
+        </div>
+        <span class="gris-texto" id="ayuda-edicion" style="display:none;font-size:0.76rem;line-height:1.4;">Al editar, deja vacía la contraseña para conservar la actual.</span>
+        <span class="campo-error" id="err-general"></span>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancelar" id="btn-cancelar-modal">Cancelar</button>
+          <button type="submit" class="btn-modal-guardar" id="btn-guardar-docente">Guardar Docente</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAR DESACTIVACIÓN -->
+  <div class="modal-overlay" id="modal-eliminar" role="dialog" aria-modal="true" style="display:none">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <h2 class="modal-titulo">Confirmar desactivación</h2>
+        <button class="btn-cerrar-modal" id="btn-cerrar-eliminar">&#10005;</button>
+      </div>
+      <p class="modal-aviso">¿Desactivar a <strong id="nombre-a-eliminar"></strong>? Quedará como inactivo y podrás activarlo de nuevo cuando quieras.</p>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancelar" id="btn-cancelar-eliminar">Cancelar</button>
+        <button type="button" class="btn-modal-eliminar" id="btn-confirmar-eliminar">Sí, desactivar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/docentes_admin.js"></script>
+</body>
+</html>

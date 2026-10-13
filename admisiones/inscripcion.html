@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscripción — Instituto American Land</title>
+
+  <!-- CSS compartido del sitio (navbar, footer, botones, variables) -->
+  <link rel="stylesheet" href="../assets/css/index.css" />
+  <!-- CSS propio de esta página -->
+  <link rel="stylesheet" href="../assets/css/inscripcion.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+
+      <a href="../index.html#inicio" class="nav-marca">
+        <img src="../assets/img/Logo.png" alt="Logo" class="nav-marca-logo" />
+        <div class="nav-marca-texto">
+          <strong>American Land</strong>
+          <span>Since 2009</span>
+        </div>
+      </a>
+
+      <div class="nav-divider"></div>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="../index.html#inicio">Inicio</a></li>
+        <li><a href="seleccion.html" class="activo">Admisión</a></li>
+        <li><a href="estudiantes.html">Estudiantes</a></li>
+        <li><a href="../index.html#contacto">Contacto</a></li>
+      </ul>
+
+      <div class="nav-auth" id="nav-auth">
+        <a href="../auth/login.html" class="btn-login">Log In</a>
+        <a href="../auth/registro.html" class="btn-signup">Sign Up</a>
+      </div>
+
+      <button class="btn-hamburguesa" id="btn-menu" aria-label="Abrir menú">&#9776;</button>
+
+    </nav>
+  </header>
+
+  <main>
+
+    <!-- ===== ENCABEZADO ===== -->
+    <section class="hero-inscripcion">
+      <div class="hero-inscripcion-inner">
+        <h1>Inscríbete en tu nivel</h1>
+        <p>Elige tu nivel, escoge el horario que mejor se ajuste a ti y confirma tu cupo en línea.</p>
+      </div>
+    </section>
+
+    <!-- ===== INDICADOR DE PASOS ===== -->
+    <section class="insc-pasos-barra">
+      <ol class="insc-pasos" id="insc-pasos">
+        <li class="insc-paso activo" data-paso="1"><span class="num">1</span><span class="txt">Nivel</span></li>
+        <li class="insc-paso" data-paso="2"><span class="num">2</span><span class="txt">Horario</span></li>
+        <li class="insc-paso" data-paso="3"><span class="num">3</span><span class="txt">Pago</span></li>
+      </ol>
+    </section>
+
+    <!-- ===== CONTENIDO ===== -->
+    <section class="insc-contenido">
+      <div class="insc-contenedor">
+
+        <!-- Mensajes de error / información -->
+        <div class="insc-alerta" id="insc-alerta" role="alert" hidden></div>
+
+        <!-- PASO 1: NIVEL -->
+        <div class="insc-panel" id="panel-1">
+          <h2>¿Qué nivel quieres estudiar?</h2>
+          <p class="insc-sub">Cada nivel agrupa dos niveles del Marco Común Europeo.</p>
+          <div class="insc-grid-niveles" id="lista-niveles">
+            <p class="insc-cargando">Cargando niveles…</p>
+          </div>
+        </div>
+
+        <!-- PASO 2: HORARIO (SALÓN) -->
+        <div class="insc-panel" id="panel-2" hidden>
+          <h2>Elige tu horario</h2>
+          <p class="insc-sub" id="sub-salones">Grupos disponibles para el nivel seleccionado.</p>
+          <div class="insc-lista-salones" id="lista-salones"></div>
+          <div class="insc-acciones">
+            <button type="button" class="insc-btn-volver" data-volver="1">&larr; Cambiar nivel</button>
+          </div>
+        </div>
+
+        <!-- PASO 3: RESUMEN Y PAGO -->
+        <div class="insc-panel" id="panel-3" hidden>
+          <h2>Confirma y paga tu matrícula</h2>
+          <p class="insc-sub">Revisa los datos antes de confirmar.</p>
+
+          <dl class="insc-resumen" id="resumen"></dl>
+
+          <!-- Se muestra si no hay sesión de estudiante -->
+          <div class="insc-sesion" id="bloque-sesion" hidden>
+            <p id="texto-sesion"></p>
+            <div class="insc-sesion-botones">
+              <a href="../auth/login.html?volver=inscripcion" class="btn-primario" id="enlace-login">Iniciar sesión</a>
+              <a href="../auth/registro.html?volver=inscripcion" class="btn-secundario" id="enlace-registro">Crear cuenta</a>
+              <button type="button" class="insc-btn-volver" id="btn-cerrar-sesion" hidden>Cerrar sesión</button>
+            </div>
+          </div>
+
+          <!-- Se muestra solo con sesión de estudiante -->
+          <div id="bloque-pago">
+            <fieldset class="insc-metodos">
+              <legend>Método de pago</legend>
+              <label class="insc-metodo">
+                <input type="radio" name="metodo" value="tarjeta" checked />
+                <span>Tarjeta</span>
+              </label>
+              <label class="insc-metodo">
+                <input type="radio" name="metodo" value="pse" />
+                <span>PSE</span>
+              </label>
+              <label class="insc-metodo">
+                <input type="radio" name="metodo" value="transferencia" />
+                <span>Transferencia</span>
+              </label>
+            </fieldset>
+            <p class="insc-nota">Pago de demostración: no se solicitan datos de tarjeta ni se hace ningún cobro real.</p>
+            <button type="button" class="btn-primario insc-btn-confirmar" id="btn-confirmar">Confirmar matrícula y pagar</button>
+          </div>
+
+          <div class="insc-acciones">
+            <button type="button" class="insc-btn-volver" data-volver="2">&larr; Cambiar horario</button>
+          </div>
+        </div>
+
+        <!-- ÉXITO -->
+        <div class="insc-panel insc-exito" id="panel-exito" hidden>
+          <span class="insc-exito-icono" aria-hidden="true">&#10003;</span>
+          <h2>¡Tu matrícula está activa!</h2>
+          <p class="insc-sub" id="exito-mensaje"></p>
+          <dl class="insc-resumen" id="exito-datos"></dl>
+          <a href="../index.html" class="btn-primario">Volver al inicio</a>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer id="contacto">
+    <div class="footer-grid">
+
+      <div class="footer-col">
+        <h4>Instituto American Land</h4>
+        <p>Aprende inglés con los mejores profesores</p>
+        <div class="footer-redes">
+          <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a>
+          <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Enlaces Rápidos</h4>
+        <ul>
+          <li><a href="niveles.html">Niveles</a></li>
+          <li><a href="seleccion.html">Admisiones</a></li>
+          <li><a href="estudiantes.html">Estudiantes</a></li>
+          <li><a href="../index.html#contacto">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Contacto</h4>
+        <ul>
+          <li><a href="mailto:ventasymarketing.al@gmail.com">ventasymarketing.al@gmail.com</a></li>
+          <li><a href="tel:+573138132388">3138132388</a></li>
+          <li>Calle 3 # 1-45 barrio Quinche</li>
+          <li>Pitalito, Huila, Colombia</li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#privacidad">Política de Privacidad</a></li>
+          <li><a href="#accesibilidad">Declaración de Accesibilidad</a></li>
+          <li><a href="#terminos">Términos y Condiciones</a></li>
+          <li><a href="#reembolso">Política de Reembolso</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div class="footer-copy">
+      <p>&copy; 2011 Instituto American Land. Todos los derechos reservados.</p>
+    </div>
+  </footer>
+
+  <!-- JS compartido del sitio (menú móvil, scroll, animaciones) -->
+  <script src="../assets/js/index.js"></script>
+  <!-- JS propio de esta página -->
+  <script src="../assets/js/inscripcion.js"></script>
+
+</body>
+</html>
