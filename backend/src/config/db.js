@@ -1,47 +1,25 @@
-const sql = require('mssql');
+const { Pool } = require('pg');
 require('dotenv').config();
 
-const config = {
-  server: process.env.DB_SERVER,
-  database: process.env.DB_DATABASE,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  port: parseInt(process.env.DB_PORT, 10) || 1433,
-  connectionTimeout: 60000,   // Azure SQL gratuita puede tardar en despertar de la pausa
-  requestTimeout: 30000,
-  pool: {
-    max: 10,
-    min: 0,                   // no mantener conexiones abiertas sin uso
-    idleTimeoutMillis: 30000
-  },
-  options: {
-    encrypt: process.env.DB_ENCRYPT === 'true',
-    trustServerCertificate: process.env.DB_TRUST_CERT === 'true'
-  }
+// Se configura la conexión usando la variable DATABASE_URL asignada en Render
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL ? { rejectUnauthorized: false } : false,
+  max: 10,                   // Máximo de conexiones en el pool
+  idleTimeoutMillis: 30000,   // Tiempo de espera para conexiones inactivas
+  connectionTimeoutMillis: 10000
+});
+
+pool.on('connect', () => {
+  console.log('✅ Conectado a la base de datos PostgreSQL');
+});
+
+pool.on('error', (err) => {
+  console.error('⚠️ Error inesperado en el cliente de PostgreSQL:', err.message);
+});
+
+module.exports = {
+  // Exportamos un método query genérico para ejecutar consultas SQL de manera limpia
+  query: (text, params) => pool.query(text, params),
+  pool
 };
-
-let pool;
-
-async function getPool() {
-  if (pool) return pool;
-
-  try {
-    pool = await sql.connect(config);
-
-    // Si la conexión se cae (pausa o mantenimiento de Azure), se descarta
-    // el pool para que la siguiente petición abra una conexión nueva
-    pool.on('error', function (err) {
-      console.error('⚠️ Se perdió la conexión con la base de datos:', err.message);
-      pool = undefined;
-    });
-
-    console.log('✅ Conectado a SQL Server:', process.env.DB_DATABASE);
-    return pool;
-  } catch (err) {
-    pool = undefined;
-    console.error('❌ Error de conexión a la base de datos:', err.message);
-    throw err;
-  }
-}
-
-module.exports = { sql, getPool };
