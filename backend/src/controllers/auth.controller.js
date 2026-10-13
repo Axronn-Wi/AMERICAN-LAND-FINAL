@@ -1,80 +1,92 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { sql, getPool } = require('../config/db');
+const pool = require('../config/db');
 require('dotenv').config();
 
 async function registro(req, res) {
+  const client = await pool.connect();
   try {
-            const { nombre_completo, correo, contrasena, telefono, fecha_nacimiento, pais, ciudad } = req.body;
+    const { nombre_completo, correo, contrasena, telefono, fecha_nacimiento, pais, ciudad } = req.body;
 
-    // El registro público SIEMPRE crea estudiantes. El rol no lo decide el cliente.
+    // El registro público SIEMPRE crea estudiantes.
     const rol = 'estudiante';
 
     if (!nombre_completo || !correo || !contrasena) {
       return res.status(400).json({ mensaje: 'Nombre, correo y contraseña son obligatorios.' });
     }
 
-    const pool = await getPool();
-
-    // Verificar si el correo ya existe
-    const existente = await pool.request()
-      .input('correo', sql.VarChar, correo)
-      .query('SELECT id FROM Usuarios WHERE correo = @correo');
-
-    if (existente.recordset.length > 0) {
+    // 1. Verificar si el correo ya existe (búsqueda insensible a mayúsculas)
+    const existente = await client.query(
+      'SELECT id FROM "Usuarios" WHERE LOWER(correo) = LOWER(\$1)', 
+      [correo]
+    );
+    if (existente.rows.length > 0) {
       return res.status(409).json({ mensaje: 'Este correo ya está registrado.' });
     }
 
-    // Buscar el id del rol
-    const rolResult = await pool.request()
-      .input('nombre_rol', sql.VarChar, rol)
-      .query('SELECT id FROM Roles WHERE nombre = @nombre_rol');
+    // 2. Buscar el id del rol (búsqueda insensible a mayúsculas)
+    let rolResult = await client.query(
+      'SELECT id FROM "Roles" WHERE LOWER(nombre) = LOWER(\$1)', 
+      [rol]
+    );
 
-    const id_rol = rolResult.recordset[0].id;
+    // Si la tabla o filas usan minúsculas en el esquema
+    if (rolResult.rows.length === 0) {
+      rolResult = await client.query(
+        'SELECT id FROM roles WHERE LOWER(nombre) = LOWER(\$1)', 
+        [rol]
+      );
+    }
 
+    if (rolResult.rows.length === 0) {
+      return res.status(500).json({ mensaje: 'El rol "estudiante" no existe en la base de datos.' });
+    }
+    const id_rol = rolResult.rows[0].id;
+
+    // 3. Encriptar contraseña
     const contrasena_hash = await bcrypt.hash(contrasena, 10);
 
-            const transaction = new sql.Transaction(pool);
-    await transaction.begin();
+    // 4. Iniciar transacción en PostgreSQL
+    await client.query('BEGIN');
 
-    let nuevoUsuarioId;
+    // Insertar en la tabla Usuarios y obtener el ID generado
+    const insertUsuarioQuery = `
+      INSERT INTO "Usuarios" (rol_id, nombre_completo, correo, contrasena_hash, telefono, fecha_nacimiento, pais, ciudad)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id
+    `;
+    const resUsuario = await client.query(insertUsuarioQuery, [
+      id_rol,
+      nombre_completo,
+      correo,
+      contrasena_hash,
+      telefono || null,
+      fecha_nacimiento || null,
+      pais || null,
+      ciudad || null
+    ]);
 
-    try {
-      const resultadoUsuario = await new sql.Request(transaction)
-        .input('rol_id', sql.Int, id_rol)
-        .input('nombre_completo', sql.VarChar, nombre_completo)
-        .input('correo', sql.VarChar, correo)
-        .input('contrasena_hash', sql.VarChar, contrasena_hash)
-        .input('telefono', sql.VarChar, telefono || null)
-        .input('fecha_nacimiento', sql.Date, fecha_nacimiento || null)
-        .input('pais', sql.VarChar, pais || null)
-        .input('ciudad', sql.VarChar, ciudad || null)
-        .query(`INSERT INTO Usuarios (rol_id, nombre_completo, correo, contrasena_hash, telefono, fecha_nacimiento, pais, ciudad)
-                OUTPUT INSERTED.id
-                VALUES (@rol_id, @nombre_completo, @correo, @contrasena_hash, @telefono, @fecha_nacimiento, @pais, @ciudad)`);
+    const nuevoUsuarioId = resUsuario.rows[0].id;
+    const codigo_estudiante = `EST${String(nuevoUsuarioId).padStart(4, '0')}`;
 
-      nuevoUsuarioId = resultadoUsuario.recordset[0].id;
+    // Insertar en la tabla Estudiantes
+    const insertEstudianteQuery = `
+      INSERT INTO "Estudiantes" (usuario_id, codigo_estudiante, estado)
+      VALUES ($1, $2, 'activo')
+    `;
+    await client.query(insertEstudianteQuery, [nuevoUsuarioId, codigo_estudiante]);
 
-      const codigo_estudiante = `EST${String(nuevoUsuarioId).padStart(4, '0')}`;
-
-      await new sql.Request(transaction)
-        .input('usuario_id', sql.Int, nuevoUsuarioId)
-        .input('codigo_estudiante', sql.VarChar, codigo_estudiante)
-        .query(`INSERT INTO Estudiantes (usuario_id, codigo_estudiante, estado)
-                VALUES (@usuario_id, @codigo_estudiante, 'activo')`);
-
-      await transaction.commit();
-
-    } catch (errTransaccion) {
-      try { await transaction.rollback(); } catch (_) { /* SQL Server ya la había revertido */ }
-      throw errTransaccion;
-    }
+    // Confirmar transacción
+    await client.query('COMMIT');
 
     res.status(201).json({ mensaje: 'Usuario registrado exitosamente.', id: nuevoUsuarioId });
 
   } catch (err) {
-    console.error(err);
+    await client.query('ROLLBACK');
+    console.error('Error en registro:', err);
     res.status(500).json({ mensaje: 'Error en el servidor al registrar usuario.' });
+  } finally {
+    client.release();
   }
 }
 
@@ -86,23 +98,22 @@ async function login(req, res) {
       return res.status(400).json({ mensaje: 'Correo, contraseña y rol son obligatorios.' });
     }
 
-    const pool = await getPool();
+    const query = `
+      SELECT u.id, u.nombre_completo, u.correo, u.contrasena_hash, u.activo,
+             r.nombre AS nombre_rol
+      FROM "Usuarios" u
+      JOIN "Roles" r ON u.rol_id = r.id
+      WHERE LOWER(u.correo) = LOWER($1)
+    `;
+    const result = await pool.query(query, [correo]);
 
-    const result = await pool.request()
-      .input('correo', sql.VarChar, correo)
-      .query(`SELECT u.id, u.nombre_completo, u.correo, u.contrasena_hash, u.activo,
-                     r.nombre AS nombre_rol
-              FROM Usuarios u
-              JOIN Roles r ON u.rol_id = r.id
-              WHERE u.correo = @correo`);
-
-    if (result.recordset.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(401).json({ mensaje: 'Correo o contraseña incorrectos.' });
     }
 
-    const usuario = result.recordset[0];
+    const usuario = result.rows[0];
 
-    if (usuario.nombre_rol !== rol) {
+    if (usuario.nombre_rol.toLowerCase() !== rol.toLowerCase()) {
       return res.status(401).json({ mensaje: 'El rol seleccionado no coincide con el usuario.' });
     }
 
@@ -132,7 +143,7 @@ async function login(req, res) {
       }
     });
   } catch (err) {
-    console.error(err);
+    console.error('Error en login:', err);
     res.status(500).json({ mensaje: 'Error en el servidor al iniciar sesión.' });
   }
 }
