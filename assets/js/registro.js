@@ -8,7 +8,10 @@ const btnSubmit  = document.getElementById('btn-submit');
 const alerta     = document.getElementById('alerta-global');
 const inputPass  = document.getElementById('contrasena');
 const inputPass2 = document.getElementById('confirmar-contrasena');
-const API_URL    = window.location.origin + '/api';
+
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:4000/api'
+    : 'https://american-land-backend.onrender.com/api';
 
 // Si viene desde la inscripción (registro.html?volver=inscripcion), se pasa
 // ese dato al login para que luego regrese a continuar. Solo se aceptan

@@ -8,7 +8,10 @@ const btnSubmit  = document.getElementById('btn-submit');
 const alerta     = document.getElementById('alerta-global');
 const inputPass  = document.getElementById('contrasena');
 const togglePass = document.getElementById('toggle-pass');
-const API_URL = 'http://localhost:4000/api';
+
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:4000/api'
+    : 'https://american-land-backend.onrender.com/api';
 
 // ── VOLVER A LA INSCRIPCIÓN ────────────────────────────────
 // inscripcion.html manda a login.html?volver=inscripcion. Solo se aceptan

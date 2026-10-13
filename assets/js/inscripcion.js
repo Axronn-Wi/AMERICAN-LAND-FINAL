@@ -15,7 +15,9 @@
 
 // ── 0. CONFIGURACIÓN ───────────────────────────────────────
 
-const API = window.location.origin + '/api';
+const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:4000/api'
+    : 'https://american-land-backend.onrender.com/api';
 
 // login.js guarda el token con sessionStorage.setItem('token', ...).
 // Si algún día cambias ese nombre en login.js, cámbialo también aquí.
