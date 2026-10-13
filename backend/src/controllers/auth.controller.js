@@ -1,10 +1,13 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const pool = require('../config/db');
+const db = require('../config/db');
+
+// Detectar si pool viene directo o dentro de una propiedad { pool }
+const pool = db.pool || db;
+
 require('dotenv').config();
 
 async function registro(req, res) {
-  const client = await pool.connect();
   try {
     const { nombre_completo, correo, contrasena, telefono, fecha_nacimiento, pais, ciudad } = req.body;
 
@@ -15,30 +18,30 @@ async function registro(req, res) {
       return res.status(400).json({ mensaje: 'Nombre, correo y contraseña son obligatorios.' });
     }
 
-    // 1. Verificar si el correo ya existe (búsqueda insensible a mayúsculas)
-    const existente = await client.query(
+    // 1. Verificar si el correo ya existe
+    const existente = await pool.query(
       'SELECT id FROM "Usuarios" WHERE LOWER(correo) = LOWER(\$1)', 
       [correo]
     );
-    if (existente.rows.length > 0) {
+    if (existente.rows && existente.rows.length > 0) {
       return res.status(409).json({ mensaje: 'Este correo ya está registrado.' });
     }
 
-    // 2. Buscar el id del rol (búsqueda insensible a mayúsculas)
-    let rolResult = await client.query(
+    // 2. Buscar el id del rol "estudiante"
+    let rolResult = await pool.query(
       'SELECT id FROM "Roles" WHERE LOWER(nombre) = LOWER(\$1)', 
       [rol]
     );
 
-    // Si la tabla o filas usan minúsculas en el esquema
-    if (rolResult.rows.length === 0) {
-      rolResult = await client.query(
+    // Intento alternativo en minúsculas por si la tabla no usa comillas dobles
+    if (!rolResult.rows || rolResult.rows.length === 0) {
+      rolResult = await pool.query(
         'SELECT id FROM roles WHERE LOWER(nombre) = LOWER(\$1)', 
         [rol]
       );
     }
 
-    if (rolResult.rows.length === 0) {
+    if (!rolResult.rows || rolResult.rows.length === 0) {
       return res.status(500).json({ mensaje: 'El rol "estudiante" no existe en la base de datos.' });
     }
     const id_rol = rolResult.rows[0].id;
@@ -46,16 +49,13 @@ async function registro(req, res) {
     // 3. Encriptar contraseña
     const contrasena_hash = await bcrypt.hash(contrasena, 10);
 
-    // 4. Iniciar transacción en PostgreSQL
-    await client.query('BEGIN');
-
-    // Insertar en la tabla Usuarios y obtener el ID generado
+    // 4. Insertar en la tabla Usuarios
     const insertUsuarioQuery = `
       INSERT INTO "Usuarios" (rol_id, nombre_completo, correo, contrasena_hash, telefono, fecha_nacimiento, pais, ciudad)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING id
     `;
-    const resUsuario = await client.query(insertUsuarioQuery, [
+    const resUsuario = await pool.query(insertUsuarioQuery, [
       id_rol,
       nombre_completo,
       correo,
@@ -69,24 +69,18 @@ async function registro(req, res) {
     const nuevoUsuarioId = resUsuario.rows[0].id;
     const codigo_estudiante = `EST${String(nuevoUsuarioId).padStart(4, '0')}`;
 
-    // Insertar en la tabla Estudiantes
+    // 5. Insertar en la tabla Estudiantes
     const insertEstudianteQuery = `
       INSERT INTO "Estudiantes" (usuario_id, codigo_estudiante, estado)
       VALUES ($1, $2, 'activo')
     `;
-    await client.query(insertEstudianteQuery, [nuevoUsuarioId, codigo_estudiante]);
-
-    // Confirmar transacción
-    await client.query('COMMIT');
+    await pool.query(insertEstudianteQuery, [nuevoUsuarioId, codigo_estudiante]);
 
     res.status(201).json({ mensaje: 'Usuario registrado exitosamente.', id: nuevoUsuarioId });
 
   } catch (err) {
-    await client.query('ROLLBACK');
     console.error('Error en registro:', err);
     res.status(500).json({ mensaje: 'Error en el servidor al registrar usuario.' });
-  } finally {
-    client.release();
   }
 }
 
@@ -107,7 +101,7 @@ async function login(req, res) {
     `;
     const result = await pool.query(query, [correo]);
 
-    if (result.rows.length === 0) {
+    if (!result.rows || result.rows.length === 0) {
       return res.status(401).json({ mensaje: 'Correo o contraseña incorrectos.' });
     }
 
