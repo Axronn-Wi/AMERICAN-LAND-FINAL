@@ -185,6 +185,7 @@ nav {
 ============================================================ */
 .contenido {
   flex: 1;
+  min-width: 0;
   margin-left: var(--sidebar-w);
   padding: 28px 28px 40px;
   display: flex; flex-direction: column; gap: 20px;
