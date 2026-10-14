@@ -330,7 +330,7 @@ nav {
 
 @media (max-width: 768px) {
   .sidebar { display: none; }
-  .contenido { margin-left: 0; padding: 16px; }
+  .contenido { margin-left: 0; padding: 16px; min-width: 0; }
   .nav-links { display: none; }
   .grid-medio { grid-template-columns: 1fr; }
   .grid-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; }

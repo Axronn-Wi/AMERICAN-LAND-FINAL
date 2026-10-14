@@ -47,7 +47,7 @@ const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio',
                'Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 // Un color por salón, en el mismo orden que el menú lateral
 const COLORES = ['rojo', 'azul', 'morado'];
-const BLOQUES = ['bloque-canada', 'bloque-nueva-zelanda', 'bloque-miami'];
+const BLOQUES = ['bloque-canada', 'bloque-zelanda', 'bloque-miami'];
 const BADGES  = ['morado', 'azul', 'azul'];
 
 function crear(tag, clase, texto) {
