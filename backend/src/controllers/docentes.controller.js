@@ -1,196 +1,193 @@
 const fs = require('fs');
 const path = require('path');
-const { sql, getPool } = require('../config/db');
+const db = require('../config/db');
+const pool = db.pool || db;
 const { CARPETA_MATERIAL } = require('../config/uploads');
+
+const MENSAJE_SIN_PERFIL = 'No se encontró un perfil de docente para este usuario.';
+const MENSAJE_SIN_SALON = 'Salón no encontrado o no te pertenece.';
+
+// Hora 18:00:00  ->  "1970-01-01T18:00:00.000Z"
+function sqlHora(columna) {
+  return `('1970-01-01T' || left(${columna}::text, 8) || '.000Z')`;
+}
+// Fecha 2026-11-30  ->  "2026-11-30T00:00:00.000Z"
+function sqlFecha(columna) {
+  return `(to_char(${columna}, 'YYYY-MM-DD') || 'T00:00:00.000Z')`;
+}
+
+async function obtenerIdDocente(idUsuario) {
+  const resultado = await pool.query('SELECT id FROM docentes WHERE usuario_id = $1', [idUsuario]);
+  return resultado.rows.length > 0 ? resultado.rows[0].id : null;
+}
+
+// Devuelve { id, nombre } del salón si es de este docente, o null
+async function obtenerSalonDelDocente(idSalon, idDocente) {
+  const resultado = await pool.query(
+    'SELECT id, nombre FROM salones WHERE id = $1 AND docente_id = $2',
+    [idSalon, idDocente]
+  );
+  return resultado.rows.length > 0 ? resultado.rows[0] : null;
+}
 
 async function obtenerMisSalones(req, res) {
   try {
-    const id_usuario = req.usuario.id_usuario;
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
 
-    const id_docente = docenteResult.recordset[0].id;
+    const salonesResult = await pool.query(
+      `SELECT s.id, s.nombre, s.estado, s.ciclo_actual, n.nombre AS nivel,
+              ht.dias_semana,
+              ${sqlHora('ht.hora_inicio')} AS hora_inicio,
+              ${sqlHora('ht.hora_fin')} AS hora_fin,
+              (SELECT COUNT(*)::int FROM matriculas m
+               WHERE m.salon_id = s.id AND m.estado = 'activa') AS total_estudiantes
+       FROM salones s
+       JOIN niveles n ON s.nivel_id = n.id
+       JOIN horarios_tipo ht ON s.horario_tipo_id = ht.id
+       WHERE s.docente_id = $1
+       ORDER BY s.nombre ASC`,
+      [id_docente]
+    );
 
-    const salonesResult = await pool.request()
-      .input('id_docente', sql.Int, id_docente)
-      .query(`SELECT s.id, s.nombre, s.estado, s.ciclo_actual, n.nombre AS nivel,
-                     ht.dias_semana, ht.hora_inicio, ht.hora_fin,
-                     (SELECT COUNT(*) FROM Matriculas m
-                      WHERE m.salon_id = s.id AND m.estado = 'activa') AS total_estudiantes
-              FROM Salones s
-              JOIN Niveles n ON s.nivel_id = n.id
-              JOIN Horarios_Tipo ht ON s.horario_tipo_id = ht.id
-              WHERE s.docente_id = @id_docente
-              ORDER BY s.nombre ASC`);
-
-    res.json({ salones: salonesResult.recordset });
+    res.json({ salones: salonesResult.rows });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al obtener los salones del docente.' });
   }
 }
+
 async function obtenerEstudiantesSalon(req, res) {
   try {
     const { id } = req.params;
-    const id_usuario = req.usuario.id_usuario;
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
 
-    const id_docente = docenteResult.recordset[0].id;
-
-    // Verificar que el salón pertenezca a este docente
-    const salonResult = await pool.request()
-      .input('id_salon', sql.Int, id)
-      .input('id_docente', sql.Int, id_docente)
-      .query('SELECT id, nombre FROM Salones WHERE id = @id_salon AND docente_id = @id_docente');
-
-    if (salonResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'Salón no encontrado o no te pertenece.' });
+    const salon = await obtenerSalonDelDocente(id, id_docente);
+    if (!salon) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_SALON });
     }
 
-    const estudiantesResult = await pool.request()
-      .input('id_salon', sql.Int, id)
-      .query(`SELECT e.id AS id_estudiante, e.codigo_estudiante, u.nombre_completo, u.correo
-              FROM Matriculas m
-              JOIN Estudiantes e ON m.estudiante_id = e.id
-              JOIN Usuarios u ON e.usuario_id = u.id
-              WHERE m.salon_id = @id_salon AND m.estado = 'activa'
-              ORDER BY u.nombre_completo ASC`);
+    const estudiantesResult = await pool.query(
+      `SELECT e.id AS id_estudiante, e.codigo_estudiante, u.nombre_completo, u.correo
+       FROM matriculas m
+       JOIN estudiantes e ON m.estudiante_id = e.id
+       JOIN usuarios u ON e.usuario_id = u.id
+       WHERE m.salon_id = $1 AND m.estado = 'activa'
+       ORDER BY u.nombre_completo ASC`,
+      [id]
+    );
 
-    res.json({ salon: salonResult.recordset[0].nombre, estudiantes: estudiantesResult.recordset });
+    res.json({ salon: salon.nombre, estudiantes: estudiantesResult.rows });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al obtener los estudiantes del salón.' });
   }
 }
+
 async function obtenerNotasSalon(req, res) {
   try {
     const { id } = req.params;
-    const id_usuario = req.usuario.id_usuario;
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
 
-    const id_docente = docenteResult.recordset[0].id;
-
-    // Verificar que el salón pertenezca a este docente
-    const salonResult = await pool.request()
-      .input('id_salon', sql.Int, id)
-      .input('id_docente', sql.Int, id_docente)
-      .query('SELECT id, nombre FROM Salones WHERE id = @id_salon AND docente_id = @id_docente');
-
-    if (salonResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'Salón no encontrado o no te pertenece.' });
+    const salon = await obtenerSalonDelDocente(id, id_docente);
+    if (!salon) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_SALON });
     }
 
     // Ciclos del salón
-    const ciclosResult = await pool.request()
-      .input('id_salon', sql.Int, id)
-      .query(`SELECT id, numero_ciclo
-              FROM Ciclos
-              WHERE salon_id = @id_salon
-              ORDER BY numero_ciclo ASC`);
+    const ciclosResult = await pool.query(
+      `SELECT id, numero_ciclo
+       FROM ciclos
+       WHERE salon_id = $1
+       ORDER BY numero_ciclo ASC`,
+      [id]
+    );
 
     // Estudiantes con matrícula activa
-    const estudiantesResult = await pool.request()
-      .input('id_salon', sql.Int, id)
-      .query(`SELECT e.id AS id_estudiante, e.codigo_estudiante, u.nombre_completo
-              FROM Matriculas m
-              JOIN Estudiantes e ON m.estudiante_id = e.id
-              JOIN Usuarios u ON e.usuario_id = u.id
-              WHERE m.salon_id = @id_salon AND m.estado = 'activa'
-              ORDER BY u.nombre_completo ASC`);
+    const estudiantesResult = await pool.query(
+      `SELECT e.id AS id_estudiante, e.codigo_estudiante, u.nombre_completo
+       FROM matriculas m
+       JOIN estudiantes e ON m.estudiante_id = e.id
+       JOIN usuarios u ON e.usuario_id = u.id
+       WHERE m.salon_id = $1 AND m.estado = 'activa'
+       ORDER BY u.nombre_completo ASC`,
+      [id]
+    );
 
     // Todas las notas registradas en este salón
-    const notasResult = await pool.request()
-      .input('id_salon', sql.Int, id)
-      .query(`SELECT estudiante_id, ciclo_id, nota_ciclo, nota_examen_final, promedio, estado
-              FROM Notas
-              WHERE salon_id = @id_salon`);
+    const notasResult = await pool.query(
+      `SELECT estudiante_id, ciclo_id,
+              nota_ciclo::float8 AS nota_ciclo,
+              nota_examen_final::float8 AS nota_examen_final,
+              promedio::float8 AS promedio,
+              estado
+       FROM notas
+       WHERE salon_id = $1`,
+      [id]
+    );
 
     res.json({
-      salon: salonResult.recordset[0].nombre,
-      ciclos: ciclosResult.recordset,
-      estudiantes: estudiantesResult.recordset,
-      notas: notasResult.recordset
+      salon: salon.nombre,
+      ciclos: ciclosResult.rows,
+      estudiantes: estudiantesResult.rows,
+      notas: notasResult.rows
     });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al obtener las notas del salón.' });
   }
-}async function obtenerTareasSalon(req, res) {
+}
+
+async function obtenerTareasSalon(req, res) {
   try {
     const { id } = req.params;
-    const id_usuario = req.usuario.id_usuario;
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
 
-    const id_docente = docenteResult.recordset[0].id;
-
-    // Verificar que el salón pertenezca a este docente
-    const salonResult = await pool.request()
-      .input('id_salon', sql.Int, id)
-      .input('id_docente', sql.Int, id_docente)
-      .query('SELECT id, nombre FROM Salones WHERE id = @id_salon AND docente_id = @id_docente');
-
-    if (salonResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'Salón no encontrado o no te pertenece.' });
+    const salon = await obtenerSalonDelDocente(id, id_docente);
+    if (!salon) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_SALON });
     }
 
-      const tareasResult = await pool.request()
-      .input('id_salon', sql.Int, id)
-      .query(`SELECT t.id, t.ciclo_id, c.numero_ciclo, t.titulo, t.descripcion,
-                     t.fecha_limite, t.valor_porcentaje, t.tipo,
-                     (SELECT COUNT(*) FROM Matriculas m
-                      WHERE m.salon_id = t.salon_id AND m.estado = 'activa') AS total_estudiantes,
-                     (SELECT COUNT(*) FROM Entregas_Tareas et
-                      WHERE et.tarea_id = t.id) AS total_entregas
-              FROM Tareas t
-              JOIN Ciclos c ON t.ciclo_id = c.id
-              WHERE t.salon_id = @id_salon
-              ORDER BY t.fecha_limite DESC`);
+    const tareasResult = await pool.query(
+      `SELECT t.id, t.ciclo_id, c.numero_ciclo, t.titulo, t.descripcion,
+              ${sqlFecha('t.fecha_limite')} AS fecha_limite,
+              t.valor_porcentaje::float8 AS valor_porcentaje, t.tipo,
+              (SELECT COUNT(*)::int FROM matriculas m
+               WHERE m.salon_id = t.salon_id AND m.estado = 'activa') AS total_estudiantes,
+              (SELECT COUNT(*)::int FROM entregas_tareas et
+               WHERE et.tarea_id = t.id) AS total_entregas
+       FROM tareas t
+       JOIN ciclos c ON t.ciclo_id = c.id
+       WHERE t.salon_id = $1
+       ORDER BY t.fecha_limite DESC`,
+      [id]
+    );
 
-    res.json({ salon: salonResult.recordset[0].nombre, tareas: tareasResult.recordset });
+    res.json({ salon: salon.nombre, tareas: tareasResult.rows });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al obtener las tareas del salón.' });
   }
 }
+
 async function registrarNota(req, res) {
   try {
     const { estudiante_id, salon_id, ciclo_id, nota_ciclo, nota_examen_final } = req.body;
-    const id_usuario = req.usuario.id_usuario;
 
     if (!estudiante_id || !salon_id || !ciclo_id) {
       return res.status(400).json({ mensaje: 'estudiante_id, salon_id y ciclo_id son obligatorios.' });
@@ -204,62 +201,50 @@ async function registrarNota(req, res) {
       return res.status(400).json({ mensaje: 'Las notas deben ser números entre 0 y 5.' });
     }
 
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
 
-    const id_docente = docenteResult.recordset[0].id;
-
     // 1. El salón debe ser de este docente
-    const salonResult = await pool.request()
-      .input('salon_id', sql.Int, salon_id)
-      .input('id_docente', sql.Int, id_docente)
-      .query('SELECT id FROM Salones WHERE id = @salon_id AND docente_id = @id_docente');
-
-    if (salonResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'Salón no encontrado o no te pertenece.' });
+    const salon = await obtenerSalonDelDocente(salon_id, id_docente);
+    if (!salon) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_SALON });
     }
 
     // 2. El ciclo debe pertenecer a ese salón
-    const cicloResult = await pool.request()
-      .input('ciclo_id', sql.Int, ciclo_id)
-      .input('salon_id', sql.Int, salon_id)
-      .query('SELECT id FROM Ciclos WHERE id = @ciclo_id AND salon_id = @salon_id');
-
-    if (cicloResult.recordset.length === 0) {
+    const cicloResult = await pool.query(
+      'SELECT id FROM ciclos WHERE id = $1 AND salon_id = $2',
+      [ciclo_id, salon_id]
+    );
+    if (cicloResult.rows.length === 0) {
       return res.status(404).json({ mensaje: 'Ciclo no encontrado en este salón.' });
     }
 
     // 3. El estudiante debe estar matriculado (activo) en ese salón
-    const matriculaResult = await pool.request()
-      .input('estudiante_id', sql.Int, estudiante_id)
-      .input('salon_id', sql.Int, salon_id)
-      .query(`SELECT id FROM Matriculas
-              WHERE estudiante_id = @estudiante_id AND salon_id = @salon_id AND estado = 'activa'`);
-
-    if (matriculaResult.recordset.length === 0) {
+    const matriculaResult = await pool.query(
+      `SELECT id FROM matriculas
+       WHERE estudiante_id = $1 AND salon_id = $2 AND estado = 'activa'`,
+      [estudiante_id, salon_id]
+    );
+    if (matriculaResult.rows.length === 0) {
       return res.status(404).json({ mensaje: 'El estudiante no está matriculado en este salón.' });
     }
 
     // ¿Ya existe una nota para este estudiante en este ciclo?
-    const existente = await pool.request()
-      .input('estudiante_id', sql.Int, estudiante_id)
-      .input('ciclo_id', sql.Int, ciclo_id)
-      .input('salon_id', sql.Int, salon_id)
-      .query(`SELECT id, nota_ciclo, nota_examen_final FROM Notas
-              WHERE estudiante_id = @estudiante_id AND ciclo_id = @ciclo_id AND salon_id = @salon_id`);
+    // (::float8 para recibir número y no texto)
+    const existente = await pool.query(
+      `SELECT id, nota_ciclo::float8 AS nota_ciclo, nota_examen_final::float8 AS nota_examen_final
+       FROM notas
+       WHERE estudiante_id = $1 AND ciclo_id = $2 AND salon_id = $3`,
+      [estudiante_id, ciclo_id, salon_id]
+    );
 
     let notaCiclo = nota_ciclo ?? null;
     let notaFinal = nota_examen_final ?? null;
 
-    if (existente.recordset.length > 0) {
-      const previa = existente.recordset[0];
+    if (existente.rows.length > 0) {
+      const previa = existente.rows[0];
       notaCiclo = nota_ciclo ?? previa.nota_ciclo;
       notaFinal = nota_examen_final ?? previa.nota_examen_final;
     }
@@ -268,32 +253,34 @@ async function registrarNota(req, res) {
     const promedio = Math.round((valores.reduce((a, b) => a + b, 0) / valores.length) * 10) / 10;
     const estado = promedio >= 3.0 ? 'aprobado' : 'reprobado';
 
-    const request = pool.request()
-      .input('estudiante_id', sql.Int, estudiante_id)
-      .input('ciclo_id', sql.Int, ciclo_id)
-      .input('salon_id', sql.Int, salon_id)
-      .input('nota_ciclo', sql.Decimal(3, 1), notaCiclo)
-      .input('nota_examen_final', sql.Decimal(3, 1), notaFinal)
-      .input('promedio', sql.Decimal(3, 1), promedio)
-      .input('estado', sql.VarChar, estado);
+    const columnasNota = `id, estudiante_id, ciclo_id, salon_id,
+                          nota_ciclo::float8 AS nota_ciclo,
+                          nota_examen_final::float8 AS nota_examen_final,
+                          promedio::float8 AS promedio, estado, actualizado_en`;
 
     let result;
-    if (existente.recordset.length > 0) {
-      result = await request.query(`UPDATE Notas
-        SET nota_ciclo = @nota_ciclo, nota_examen_final = @nota_examen_final,
-            promedio = @promedio, estado = @estado, actualizado_en = GETDATE()
-        OUTPUT INSERTED.*
-        WHERE estudiante_id = @estudiante_id AND ciclo_id = @ciclo_id AND salon_id = @salon_id`);
+    if (existente.rows.length > 0) {
+      result = await pool.query(
+        `UPDATE notas
+         SET nota_ciclo = $1, nota_examen_final = $2,
+             promedio = $3, estado = $4, actualizado_en = CURRENT_TIMESTAMP
+         WHERE estudiante_id = $5 AND ciclo_id = $6 AND salon_id = $7
+         RETURNING ${columnasNota}`,
+        [notaCiclo, notaFinal, promedio, estado, estudiante_id, ciclo_id, salon_id]
+      );
     } else {
-      result = await request.query(`INSERT INTO Notas
-        (estudiante_id, ciclo_id, salon_id, nota_ciclo, nota_examen_final, promedio, estado)
-        OUTPUT INSERTED.*
-        VALUES (@estudiante_id, @ciclo_id, @salon_id, @nota_ciclo, @nota_examen_final, @promedio, @estado)`);
+      result = await pool.query(
+        `INSERT INTO notas
+           (estudiante_id, ciclo_id, salon_id, nota_ciclo, nota_examen_final, promedio, estado)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING ${columnasNota}`,
+        [estudiante_id, ciclo_id, salon_id, notaCiclo, notaFinal, promedio, estado]
+      );
     }
 
-    res.status(existente.recordset.length > 0 ? 200 : 201).json({
+    res.status(existente.rows.length > 0 ? 200 : 201).json({
       mensaje: 'Nota registrada correctamente.',
-      nota: result.recordset[0]
+      nota: result.rows[0]
     });
 
   } catch (err) {
@@ -301,10 +288,10 @@ async function registrarNota(req, res) {
     res.status(500).json({ mensaje: 'Error al registrar la nota.' });
   }
 }
+
 async function crearTarea(req, res) {
   try {
     const { salon_id, ciclo_id, titulo, descripcion, fecha_limite, valor_porcentaje, tipo } = req.body;
-    const id_usuario = req.usuario.id_usuario;
 
     if (!salon_id || !ciclo_id || !titulo || !fecha_limite) {
       return res.status(400).json({ mensaje: 'salon_id, ciclo_id, titulo y fecha_limite son obligatorios.' });
@@ -319,62 +306,47 @@ async function crearTarea(req, res) {
       return res.status(400).json({ mensaje: 'valor_porcentaje debe ser un número entre 0 y 100.' });
     }
 
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
 
-    const id_docente = docenteResult.recordset[0].id;
-
     // 1. El salón debe ser de este docente
-    const salonResult = await pool.request()
-      .input('salon_id', sql.Int, salon_id)
-      .input('id_docente', sql.Int, id_docente)
-      .query('SELECT id FROM Salones WHERE id = @salon_id AND docente_id = @id_docente');
-
-    if (salonResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'Salón no encontrado o no te pertenece.' });
+    const salon = await obtenerSalonDelDocente(salon_id, id_docente);
+    if (!salon) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_SALON });
     }
 
     // 2. El ciclo debe pertenecer a ese salón
-    const cicloResult = await pool.request()
-      .input('ciclo_id', sql.Int, ciclo_id)
-      .input('salon_id', sql.Int, salon_id)
-      .query('SELECT id FROM Ciclos WHERE id = @ciclo_id AND salon_id = @salon_id');
-
-    if (cicloResult.recordset.length === 0) {
+    const cicloResult = await pool.query(
+      'SELECT id FROM ciclos WHERE id = $1 AND salon_id = $2',
+      [ciclo_id, salon_id]
+    );
+    if (cicloResult.rows.length === 0) {
       return res.status(404).json({ mensaje: 'Ciclo no encontrado en este salón.' });
     }
 
-    const result = await pool.request()
-      .input('salon_id', sql.Int, salon_id)
-      .input('ciclo_id', sql.Int, ciclo_id)
-      .input('titulo', sql.VarChar, titulo)
-      .input('descripcion', sql.VarChar, descripcion || null)
-      .input('fecha_limite', sql.Date, fecha_limite)
-      .input('valor_porcentaje', sql.Decimal(5, 2), porcentaje)
-      .input('tipo', sql.VarChar, tipo || null)
-      .query(`INSERT INTO Tareas (salon_id, ciclo_id, titulo, descripcion, fecha_limite, valor_porcentaje, tipo)
-              OUTPUT INSERTED.*
-              VALUES (@salon_id, @ciclo_id, @titulo, @descripcion, @fecha_limite, @valor_porcentaje, @tipo)`);
+    const result = await pool.query(
+      `INSERT INTO tareas (salon_id, ciclo_id, titulo, descripcion, fecha_limite, valor_porcentaje, tipo)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id, salon_id, ciclo_id, titulo, descripcion,
+                 ${sqlFecha('fecha_limite')} AS fecha_limite,
+                 valor_porcentaje::float8 AS valor_porcentaje, tipo`,
+      [salon_id, ciclo_id, titulo, descripcion || null, fecha_limite, porcentaje, tipo || null]
+    );
 
-    res.status(201).json({ mensaje: 'Tarea creada exitosamente.', tarea: result.recordset[0] });
+    res.status(201).json({ mensaje: 'Tarea creada exitosamente.', tarea: result.rows[0] });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al crear la tarea.' });
   }
 }
+
 async function editarTarea(req, res) {
   try {
     const { id } = req.params;
     const { titulo, descripcion, fecha_limite, valor_porcentaje, tipo } = req.body;
-    const id_usuario = req.usuario.id_usuario;
 
     if (!titulo || !fecha_limite) {
       return res.status(400).json({ mensaje: 'titulo y fecha_limite son obligatorios.' });
@@ -389,51 +361,42 @@ async function editarTarea(req, res) {
       return res.status(400).json({ mensaje: 'valor_porcentaje debe ser un número entre 0 y 100.' });
     }
 
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
 
-    const id_docente = docenteResult.recordset[0].id;
-
     // La tarea debe pertenecer a un salón de este docente
-    const tareaResult = await pool.request()
-      .input('id_tarea', sql.Int, id)
-      .input('id_docente', sql.Int, id_docente)
-      .query(`SELECT t.id
-              FROM Tareas t
-              JOIN Salones s ON t.salon_id = s.id
-              WHERE t.id = @id_tarea AND s.docente_id = @id_docente`);
-
-    if (tareaResult.recordset.length === 0) {
+    const tareaResult = await pool.query(
+      `SELECT t.id
+       FROM tareas t
+       JOIN salones s ON t.salon_id = s.id
+       WHERE t.id = $1 AND s.docente_id = $2`,
+      [id, id_docente]
+    );
+    if (tareaResult.rows.length === 0) {
       return res.status(404).json({ mensaje: 'Tarea no encontrada o no te pertenece.' });
     }
 
-    const result = await pool.request()
-      .input('id_tarea', sql.Int, id)
-      .input('titulo', sql.VarChar, titulo)
-      .input('descripcion', sql.VarChar, descripcion || null)
-      .input('fecha_limite', sql.Date, fecha_limite)
-      .input('valor_porcentaje', sql.Decimal(5, 2), porcentaje)
-      .input('tipo', sql.VarChar, tipo || null)
-      .query(`UPDATE Tareas
-              SET titulo = @titulo, descripcion = @descripcion, fecha_limite = @fecha_limite,
-                  valor_porcentaje = @valor_porcentaje, tipo = @tipo
-              OUTPUT INSERTED.*
-              WHERE id = @id_tarea`);
+    const result = await pool.query(
+      `UPDATE tareas
+       SET titulo = $1, descripcion = $2, fecha_limite = $3,
+           valor_porcentaje = $4, tipo = $5
+       WHERE id = $6
+       RETURNING id, salon_id, ciclo_id, titulo, descripcion,
+                 ${sqlFecha('fecha_limite')} AS fecha_limite,
+                 valor_porcentaje::float8 AS valor_porcentaje, tipo`,
+      [titulo, descripcion || null, fecha_limite, porcentaje, tipo || null, id]
+    );
 
-    res.json({ mensaje: 'Tarea actualizada correctamente.', tarea: result.recordset[0] });
+    res.json({ mensaje: 'Tarea actualizada correctamente.', tarea: result.rows[0] });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al actualizar la tarea.' });
   }
 }
+
 async function eliminarTarea(req, res) {
   try {
     const id_tarea = parseInt(req.params.id, 10);
@@ -441,44 +404,33 @@ async function eliminarTarea(req, res) {
       return res.status(400).json({ mensaje: 'Id de tarea inválido.' });
     }
 
-    const id_usuario = req.usuario.id_usuario;
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
 
-    const id_docente = docenteResult.recordset[0].id;
-
     // La tarea debe pertenecer a un salón de este docente
-    const tareaResult = await pool.request()
-      .input('id_tarea', sql.Int, id_tarea)
-      .input('id_docente', sql.Int, id_docente)
-      .query(`SELECT t.id
-              FROM Tareas t
-              JOIN Salones s ON t.salon_id = s.id
-              WHERE t.id = @id_tarea AND s.docente_id = @id_docente`);
-
-    if (tareaResult.recordset.length === 0) {
+    const tareaResult = await pool.query(
+      `SELECT t.id
+       FROM tareas t
+       JOIN salones s ON t.salon_id = s.id
+       WHERE t.id = $1 AND s.docente_id = $2`,
+      [id_tarea, id_docente]
+    );
+    if (tareaResult.rows.length === 0) {
       return res.status(404).json({ mensaje: 'Tarea no encontrada o no te pertenece.' });
     }
 
     // Si ya tiene entregas de estudiantes, no se borra
-    const entregasResult = await pool.request()
-      .input('id_tarea', sql.Int, id_tarea)
-      .query('SELECT COUNT(*) AS total FROM Entregas_Tareas WHERE tarea_id = @id_tarea');
-
-    if (entregasResult.recordset[0].total > 0) {
+    const entregasResult = await pool.query(
+      'SELECT COUNT(*)::int AS total FROM entregas_tareas WHERE tarea_id = $1',
+      [id_tarea]
+    );
+    if (entregasResult.rows[0].total > 0) {
       return res.status(409).json({ mensaje: 'No puedes eliminar esta tarea porque ya tiene entregas de estudiantes.' });
     }
 
-    await pool.request()
-      .input('id_tarea', sql.Int, id_tarea)
-      .query('DELETE FROM Tareas WHERE id = @id_tarea');
+    await pool.query('DELETE FROM tareas WHERE id = $1', [id_tarea]);
 
     res.json({ mensaje: 'Tarea eliminada correctamente.' });
 
@@ -487,63 +439,57 @@ async function eliminarTarea(req, res) {
     res.status(500).json({ mensaje: 'Error al eliminar la tarea.' });
   }
 }
+
 async function obtenerEntregasTarea(req, res) {
   try {
     const { id } = req.params; // id de la tarea
-    const id_usuario = req.usuario.id_usuario;
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
 
-    const id_docente = docenteResult.recordset[0].id;
-
     // La tarea debe pertenecer a un salón de este docente
-    const tareaResult = await pool.request()
-      .input('id_tarea', sql.Int, id)
-      .input('id_docente', sql.Int, id_docente)
-      .query(`SELECT t.id, t.salon_id, t.titulo, t.fecha_limite, t.valor_porcentaje
-              FROM Tareas t
-              JOIN Salones s ON t.salon_id = s.id
-              WHERE t.id = @id_tarea AND s.docente_id = @id_docente`);
-
-    if (tareaResult.recordset.length === 0) {
+    const tareaResult = await pool.query(
+      `SELECT t.id, t.salon_id, t.titulo,
+              ${sqlFecha('t.fecha_limite')} AS fecha_limite,
+              t.valor_porcentaje::float8 AS valor_porcentaje
+       FROM tareas t
+       JOIN salones s ON t.salon_id = s.id
+       WHERE t.id = $1 AND s.docente_id = $2`,
+      [id, id_docente]
+    );
+    if (tareaResult.rows.length === 0) {
       return res.status(404).json({ mensaje: 'Tarea no encontrada o no te pertenece.' });
     }
 
-    const tarea = tareaResult.recordset[0];
+    const tarea = tareaResult.rows[0];
 
     // Todos los alumnos activos del salón, con su entrega si existe
-    const entregasResult = await pool.request()
-      .input('id_tarea', sql.Int, id)
-      .input('id_salon', sql.Int, tarea.salon_id)
-      .query(`SELECT e.id AS id_estudiante, e.codigo_estudiante, u.nombre_completo,
-                     et.id AS id_entrega, et.fecha_entrega, et.estado AS estado_entrega,
-                     et.calificacion, et.retroalimentacion, et.archivo_url
-              FROM Matriculas m
-              JOIN Estudiantes e ON m.estudiante_id = e.id
-              JOIN Usuarios u ON e.usuario_id = u.id
-              LEFT JOIN Entregas_Tareas et ON et.tarea_id = @id_tarea AND et.estudiante_id = e.id
-              WHERE m.salon_id = @id_salon AND m.estado = 'activa'
-              ORDER BY u.nombre_completo ASC`);
+    const entregasResult = await pool.query(
+      `SELECT e.id AS id_estudiante, e.codigo_estudiante, u.nombre_completo,
+              et.id AS id_entrega, et.fecha_entrega, et.estado AS estado_entrega,
+              et.calificacion::float8 AS calificacion, et.retroalimentacion, et.archivo_url
+       FROM matriculas m
+       JOIN estudiantes e ON m.estudiante_id = e.id
+       JOIN usuarios u ON e.usuario_id = u.id
+       LEFT JOIN entregas_tareas et ON et.tarea_id = $1 AND et.estudiante_id = e.id
+       WHERE m.salon_id = $2 AND m.estado = 'activa'
+       ORDER BY u.nombre_completo ASC`,
+      [id, tarea.salon_id]
+    );
 
-    res.json({ tarea: tarea, entregas: entregasResult.recordset });
+    res.json({ tarea: tarea, entregas: entregasResult.rows });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al obtener las entregas de la tarea.' });
   }
 }
+
 async function calificarEntrega(req, res) {
   try {
     const { id } = req.params; // id de la entrega
     const { calificacion, retroalimentacion } = req.body;
-    const id_usuario = req.usuario.id_usuario;
 
     // Si no llega calificación, queda en null (no se cambia la que ya existe)
     const hayNota = calificacion !== undefined && calificacion !== null && calificacion !== '';
@@ -557,50 +503,42 @@ async function calificarEntrega(req, res) {
       return res.status(400).json({ mensaje: 'La calificación debe ser un número entre 0 y 5.' });
     }
 
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
 
-    const id_docente = docenteResult.recordset[0].id;
-
     // La entrega debe ser de una tarea de un salón de este docente
-    const propiaResult = await pool.request()
-      .input('id_entrega', sql.Int, id)
-      .input('id_docente', sql.Int, id_docente)
-      .query(`SELECT et.id
-              FROM Entregas_Tareas et
-              JOIN Tareas t ON et.tarea_id = t.id
-              JOIN Salones s ON t.salon_id = s.id
-              WHERE et.id = @id_entrega AND s.docente_id = @id_docente`);
-
-    if (propiaResult.recordset.length === 0) {
+    const propiaResult = await pool.query(
+      `SELECT et.id
+       FROM entregas_tareas et
+       JOIN tareas t ON et.tarea_id = t.id
+       JOIN salones s ON t.salon_id = s.id
+       WHERE et.id = $1 AND s.docente_id = $2`,
+      [id, id_docente]
+    );
+    if (propiaResult.rows.length === 0) {
       return res.status(404).json({ mensaje: 'Entrega no encontrada o no te pertenece.' });
     }
 
-    const result = await pool.request()
-      .input('id_entrega', sql.Int, id)
-      .input('calificacion', sql.Decimal(4, 2), nota)
-      .input('retroalimentacion', sql.VarChar, retroalimentacion === undefined ? null : retroalimentacion)
-      .query(`UPDATE Entregas_Tareas
-              SET calificacion = COALESCE(@calificacion, calificacion),
-                  retroalimentacion = COALESCE(@retroalimentacion, retroalimentacion),
-                  estado = CASE WHEN @calificacion IS NOT NULL THEN 'calificada' ELSE estado END
-              OUTPUT INSERTED.id, INSERTED.calificacion, INSERTED.retroalimentacion, INSERTED.estado
-              WHERE id = @id_entrega`);
+    const result = await pool.query(
+      `UPDATE entregas_tareas
+       SET calificacion = COALESCE($1::numeric, calificacion),
+           retroalimentacion = COALESCE($2::text, retroalimentacion),
+           estado = CASE WHEN $1::numeric IS NOT NULL THEN 'calificada' ELSE estado END
+       WHERE id = $3
+       RETURNING id, calificacion::float8 AS calificacion, retroalimentacion, estado`,
+      [nota, retroalimentacion === undefined ? null : retroalimentacion, id]
+    );
 
-    res.json({ mensaje: 'Entrega actualizada correctamente.', entrega: result.recordset[0] });
+    res.json({ mensaje: 'Entrega actualizada correctamente.', entrega: result.rows[0] });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al calificar la entrega.' });
   }
 }
+
 // Borra un archivo del disco sin romper nada si ya no existe
 function borrarArchivo(ruta) {
   if (!ruta) return;
@@ -633,37 +571,26 @@ async function crearMaterial(req, res) {
       return res.status(400).json({ mensaje: 'El título no puede superar los 150 caracteres.' });
     }
 
-    const pool = await getPool();
-
     // 3. Perfil de docente
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, req.usuario.id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
       borrarArchivo(rutaArchivo);
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
-    const id_docente = docenteResult.recordset[0].id;
 
     // 4. El salón debe ser de este docente
-    const salonResult = await pool.request()
-      .input('id_salon', sql.Int, id_salon)
-      .input('id_docente', sql.Int, id_docente)
-      .query('SELECT id FROM Salones WHERE id = @id_salon AND docente_id = @id_docente');
-
-    if (salonResult.recordset.length === 0) {
+    const salon = await obtenerSalonDelDocente(id_salon, id_docente);
+    if (!salon) {
       borrarArchivo(rutaArchivo);
-      return res.status(404).json({ mensaje: 'Salón no encontrado o no te pertenece.' });
+      return res.status(404).json({ mensaje: MENSAJE_SIN_SALON });
     }
 
     // 5. El ciclo debe pertenecer a ese salón
-    const cicloResult = await pool.request()
-      .input('id_ciclo', sql.Int, id_ciclo)
-      .input('id_salon', sql.Int, id_salon)
-      .query('SELECT id FROM Ciclos WHERE id = @id_ciclo AND salon_id = @id_salon');
-
-    if (cicloResult.recordset.length === 0) {
+    const cicloResult = await pool.query(
+      'SELECT id FROM ciclos WHERE id = $1 AND salon_id = $2',
+      [id_ciclo, id_salon]
+    );
+    if (cicloResult.rows.length === 0) {
       borrarArchivo(rutaArchivo);
       return res.status(404).json({ mensaje: 'Ciclo no encontrado en este salón.' });
     }
@@ -671,18 +598,14 @@ async function crearMaterial(req, res) {
     // 6. Guardar. El tipo sale de la extensión del archivo (pdf, docx, mp3...)
     const tipo = req.file.filename.split('.').pop();
 
-    const result = await pool.request()
-      .input('salon_id', sql.Int, id_salon)
-      .input('ciclo_id', sql.Int, id_ciclo)
-      .input('titulo', sql.VarChar, tituloLimpio)
-      .input('tipo', sql.VarChar, tipo)
-      .input('archivo_url', sql.VarChar, req.file.filename)
-      .query(`INSERT INTO Material_Apoyo (salon_id, ciclo_id, titulo, tipo, archivo_url, publico, subido_en)
-              OUTPUT INSERTED.id, INSERTED.salon_id, INSERTED.ciclo_id, INSERTED.titulo,
-                     INSERTED.tipo, INSERTED.publico, INSERTED.subido_en
-              VALUES (@salon_id, @ciclo_id, @titulo, @tipo, @archivo_url, 1, GETDATE())`);
+    const result = await pool.query(
+      `INSERT INTO material_apoyo (salon_id, ciclo_id, titulo, tipo, archivo_url, publico, subido_en)
+       VALUES ($1, $2, $3, $4, $5, TRUE, CURRENT_TIMESTAMP)
+       RETURNING id, salon_id, ciclo_id, titulo, tipo, publico, subido_en`,
+      [id_salon, id_ciclo, tituloLimpio, tipo, req.file.filename]
+    );
 
-    res.status(201).json({ mensaje: 'Material subido correctamente.', material: result.recordset[0] });
+    res.status(201).json({ mensaje: 'Material subido correctamente.', material: result.rows[0] });
 
   } catch (err) {
     console.error(err);
@@ -690,6 +613,7 @@ async function crearMaterial(req, res) {
     res.status(500).json({ mensaje: 'Error al subir el material.' });
   }
 }
+
 async function obtenerMaterialSalon(req, res) {
   try {
     const id_salon = parseInt(req.params.id, 10);
@@ -697,42 +621,34 @@ async function obtenerMaterialSalon(req, res) {
       return res.status(400).json({ mensaje: 'Id de salón inválido.' });
     }
 
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, req.usuario.id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
-    const id_docente = docenteResult.recordset[0].id;
 
     // El salón debe ser de este docente
-    const salonResult = await pool.request()
-      .input('id_salon', sql.Int, id_salon)
-      .input('id_docente', sql.Int, id_docente)
-      .query('SELECT id, nombre FROM Salones WHERE id = @id_salon AND docente_id = @id_docente');
-
-    if (salonResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'Salón no encontrado o no te pertenece.' });
+    const salon = await obtenerSalonDelDocente(id_salon, id_docente);
+    if (!salon) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_SALON });
     }
 
-    const materialResult = await pool.request()
-      .input('id_salon', sql.Int, id_salon)
-      .query(`SELECT m.id, m.ciclo_id, c.numero_ciclo, m.titulo, m.tipo, m.publico, m.subido_en
-              FROM Material_Apoyo m
-              JOIN Ciclos c ON m.ciclo_id = c.id
-              WHERE m.salon_id = @id_salon
-              ORDER BY m.subido_en DESC`);
+    const materialResult = await pool.query(
+      `SELECT m.id, m.ciclo_id, c.numero_ciclo, m.titulo, m.tipo, m.publico, m.subido_en
+       FROM material_apoyo m
+       JOIN ciclos c ON m.ciclo_id = c.id
+       WHERE m.salon_id = $1
+       ORDER BY m.subido_en DESC`,
+      [id_salon]
+    );
 
-    res.json({ salon: salonResult.recordset[0], material: materialResult.recordset });
+    res.json({ salon: salon, material: materialResult.rows });
 
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al obtener el material.' });
   }
 }
+
 async function eliminarMaterial(req, res) {
   try {
     const id_material = parseInt(req.params.id, 10);
@@ -740,36 +656,27 @@ async function eliminarMaterial(req, res) {
       return res.status(400).json({ mensaje: 'Id de material inválido.' });
     }
 
-    const pool = await getPool();
-
-    const docenteResult = await pool.request()
-      .input('usuario_id', sql.Int, req.usuario.id_usuario)
-      .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-
-    if (docenteResult.recordset.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de docente para este usuario.' });
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
     }
-    const id_docente = docenteResult.recordset[0].id;
 
     // El material debe pertenecer a un salón de este docente
-    const materialResult = await pool.request()
-      .input('id_material', sql.Int, id_material)
-      .input('id_docente', sql.Int, id_docente)
-      .query(`SELECT m.id, m.archivo_url
-              FROM Material_Apoyo m
-              JOIN Salones s ON m.salon_id = s.id
-              WHERE m.id = @id_material AND s.docente_id = @id_docente`);
-
-    if (materialResult.recordset.length === 0) {
+    const materialResult = await pool.query(
+      `SELECT m.id, m.archivo_url
+       FROM material_apoyo m
+       JOIN salones s ON m.salon_id = s.id
+       WHERE m.id = $1 AND s.docente_id = $2`,
+      [id_material, id_docente]
+    );
+    if (materialResult.rows.length === 0) {
       return res.status(404).json({ mensaje: 'Material no encontrado o no te pertenece.' });
     }
 
-    const archivo = materialResult.recordset[0].archivo_url;
+    const archivo = materialResult.rows[0].archivo_url;
 
     // 1. Borrar la fila de la base de datos
-    await pool.request()
-      .input('id_material', sql.Int, id_material)
-      .query('DELETE FROM Material_Apoyo WHERE id = @id_material');
+    await pool.query('DELETE FROM material_apoyo WHERE id = $1', [id_material]);
 
     // 2. Borrar el archivo del disco (backend/uploads/material/)
     if (archivo) {
@@ -783,4 +690,5 @@ async function eliminarMaterial(req, res) {
     res.status(500).json({ mensaje: 'Error al eliminar el material.' });
   }
 }
+
 module.exports = { obtenerMisSalones, obtenerEstudiantesSalon, obtenerNotasSalon, obtenerTareasSalon, registrarNota, crearTarea, editarTarea, eliminarTarea, obtenerEntregasTarea, calificarEntrega, crearMaterial, obtenerMaterialSalon, eliminarMaterial };
