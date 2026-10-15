@@ -1,5 +1,7 @@
 /* admisiones_comun.js — utilidades compartidas del flujo de admisiones */
-const API_URL = window.location.origin + '/api';
+const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:4000/api'
+    : 'https://american-land-backend.onrender.com/api';
 
 const btnMenu  = document.getElementById('btn-menu');
 const navLinks = document.getElementById('nav-links');
