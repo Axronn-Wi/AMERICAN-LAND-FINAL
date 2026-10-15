@@ -4,7 +4,9 @@
    Ubicación: assets/js/horario_docente.js
 ============================================================ */
 
-const API = window.location.origin + '/api';
+const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? 'http://localhost:4000/api'
+    : 'https://american-land-backend.onrender.com/api';
 
 // ── 1. VERIFICAR SESIÓN ─────────────────────────────────────
 const token = sessionStorage.getItem('token');
