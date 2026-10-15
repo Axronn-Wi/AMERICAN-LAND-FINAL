@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs');
-const { sql, getPool } = require('../config/db');
+const db = require('../config/db');
+const pool = db.pool || db;
 
 // Misma carpeta que usa material.middleware.js (se define en src/config/uploads.js)
 const CARPETA = require('../config/uploads').CARPETA_MATERIAL;
@@ -12,44 +13,41 @@ async function descargarMaterial(req, res) {
       return res.status(400).json({ mensaje: 'Id de material inválido.' });
     }
 
-    const pool = await getPool();
-
     // 1. Datos del material y de quién es dueño del salón
-    const materialResult = await pool.request()
-      .input('id_material', sql.Int, id_material)
-      .query(`SELECT m.archivo_url, m.salon_id, m.publico, s.docente_id
-              FROM Material_Apoyo m
-              JOIN Salones s ON m.salon_id = s.id
-              WHERE m.id = @id_material`);
+    const materialResult = await pool.query(
+      `SELECT m.archivo_url, m.salon_id, m.publico, s.docente_id
+       FROM material_apoyo m
+       JOIN salones s ON m.salon_id = s.id
+       WHERE m.id = $1`,
+      [id_material]
+    );
 
-    if (materialResult.recordset.length === 0) {
+    if (materialResult.rows.length === 0) {
       return res.status(404).json({ mensaje: 'Material no encontrado.' });
     }
-    const material = materialResult.recordset[0];
+    const material = materialResult.rows[0];
 
     // 2. ¿Quién pide el archivo?
     const { id_usuario, rol } = req.usuario;
     let autorizado = false;
 
     if (rol === 'docente') {
-      const r = await pool.request()
-        .input('usuario_id', sql.Int, id_usuario)
-        .query('SELECT id FROM Docentes WHERE usuario_id = @usuario_id');
-      autorizado = r.recordset.length > 0 && r.recordset[0].id === material.docente_id;
+      const r = await pool.query('SELECT id FROM docentes WHERE usuario_id = $1', [id_usuario]);
+      autorizado = r.rows.length > 0 && r.rows[0].id === material.docente_id;
 
     } else if (rol === 'estudiante') {
       // El material debe estar visible
       if (material.publico) {
-        const r = await pool.request()
-          .input('usuario_id', sql.Int, id_usuario)
-          .input('salon_id', sql.Int, material.salon_id)
-          .query(`SELECT m.id
-                  FROM Estudiantes e
-                  JOIN Matriculas m ON m.estudiante_id = e.id
-                  WHERE e.usuario_id = @usuario_id
-                    AND m.salon_id = @salon_id
-                    AND m.estado = 'activa'`);
-        autorizado = r.recordset.length > 0;
+        const r = await pool.query(
+          `SELECT m.id
+           FROM estudiantes e
+           JOIN matriculas m ON m.estudiante_id = e.id
+           WHERE e.usuario_id = $1
+             AND m.salon_id = $2
+             AND m.estado = 'activa'`,
+          [id_usuario, material.salon_id]
+        );
+        autorizado = r.rows.length > 0;
       }
     }
 
