@@ -255,7 +255,25 @@
       </div>
     </div>
   </div>
-
+  <!-- ===== MODAL CONFIRMAR ELIMINACIÓN DEFINITIVA ===== -->
+  <div class="modal-overlay oculto" id="modal-borrar" role="dialog" aria-modal="true">
+    <div class="modal-caja modal-sm">
+      <div class="modal-header">
+        <h2>¿Eliminar alumno?</h2>
+        <button class="btn-cerrar-modal" id="btn-cerrar-borrar">✕</button>
+      </div>
+      <div class="modal-cuerpo">
+        <p class="texto-confirmar">
+          Vas a eliminar definitivamente a <strong id="nombre-a-borrar"></strong>.
+          Esta acción no se puede deshacer.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal-cancelar" id="btn-cancelar-borrar">Cancelar</button>
+        <button class="btn-modal-eliminar" id="btn-confirmar-borrar">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
   <script src="../assets/js/alumnos_admin.js"></script>
   <script src="../assets/js/menu_movil.js"></script>
 </body>

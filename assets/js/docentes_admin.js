@@ -136,6 +136,7 @@ let docentes = [];     // usuarios con rol "docente"
 let salones = [];      // GET /admin/salones
 let matriculas = [];   // GET /admin/matriculas
 let docenteADesactivar = null;
+let docenteABorrar = null;
 let docenteEditando = null;   // null = nuevo; objeto = editar
 
 // ── 7. CARGA DE DATOS ───────────────────────────────────────
@@ -313,6 +314,12 @@ function crearBotonAccion(d) {
     btn.addEventListener('click', function () { cambiarEstado(d, true, btn); });
     acciones.appendChild(btn);
   }
+
+  const btnBorrar = crear('button', 'btn-eliminar', '\u2716');
+  btnBorrar.title = 'Eliminar';
+  btnBorrar.dataset.id = d.id;
+  btnBorrar.addEventListener('click', function () { pedirBorrar(d); });
+  acciones.appendChild(btnBorrar);
   return acciones;
 }
 
@@ -453,6 +460,35 @@ async function cambiarEstado(d, activo, boton) {
 
   if (boton) boton.disabled = false;
   return false;
+}
+
+// ── 11B. ELIMINAR DEFINITIVO ────────────────────────────────
+function pedirBorrar(d) {
+  docenteABorrar = d;
+  setTexto('nombre-a-borrar', d.nombre_completo);
+  porId('modal-borrar').style.display = 'flex';
+}
+
+function cerrarModalBorrar() {
+  porId('modal-borrar').style.display = 'none';
+  docenteABorrar = null;
+}
+
+async function borrarDocente(d) {
+  try {
+    const res = await apiFetch('/admin/usuarios/' + d.id, { method: 'DELETE' });
+    if (res && res.ok) {
+      await cargarUsuarios();
+      pintarStats();
+      pintarTabla();
+      mostrarAlerta('exito', d.nombre_completo + ' fue eliminado.');
+      return;
+    }
+    mostrarAlerta('error', (res && res.datos && res.datos.mensaje) || 'No se pudo eliminar el docente.');
+  } catch (err) {
+    console.error(err);
+    mostrarAlerta('error', 'No se pudo conectar con el servidor.');
+  }
 }
 
 // ── 12. MODAL: NUEVO DOCENTE ────────────────────────────────
@@ -606,10 +642,27 @@ porId('btn-confirmar-eliminar').addEventListener('click', async function () {
   cerrarModalDesactivar();
 });
 
+// Modal eliminar definitivo
+porId('btn-cerrar-borrar').addEventListener('click', cerrarModalBorrar);
+porId('btn-cancelar-borrar').addEventListener('click', cerrarModalBorrar);
+porId('modal-borrar').addEventListener('click', function (e) {
+  if (e.target === this) cerrarModalBorrar();
+});
+porId('btn-confirmar-borrar').addEventListener('click', async function () {
+  if (!docenteABorrar) return;
+  const docente = docenteABorrar;
+  const btn = this;
+  btn.disabled = true;
+  await borrarDocente(docente);
+  btn.disabled = false;
+  cerrarModalBorrar();
+});
+
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') {
     cerrarModalDocente();
     cerrarModalDesactivar();
+    cerrarModalBorrar();
   }
 });
 

@@ -300,6 +300,51 @@
     </div>
   </div>
 
+  <!-- ===== MODAL: EDITAR MATRÍCULA ===== -->
+  <div class="modal-overlay" id="modal-editar">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>Editar matrícula</h2>
+        <button type="button" class="btn-cerrar-modal" id="btn-cerrar-editar" title="Cerrar">&times;</button>
+      </div>
+
+      <form class="modal-form" id="form-editar" novalidate>
+        <div class="form-fila">
+          <div class="form-grupo">
+            <label>Estudiante</label>
+            <span id="editar-estudiante">—</span>
+          </div>
+          <div class="form-grupo">
+            <label>Salón</label>
+            <span id="editar-salon">—</span>
+          </div>
+        </div>
+
+        <div class="form-grupo">
+          <label>Valor total</label>
+          <span id="editar-total">—</span>
+        </div>
+
+        <div class="form-grupo">
+          <label for="editar-descuento">Descuento (COP)</label>
+          <input type="number" id="editar-descuento" min="0" step="1" placeholder="Ej: 20000" />
+        </div>
+
+        <div class="form-grupo">
+          <label for="editar-observaciones">Observaciones (opcional)</label>
+          <input type="text" id="editar-observaciones" maxlength="200" placeholder="Ej: descuento por hermanos" />
+        </div>
+
+        <p id="editar-error" style="color:var(--rojo);font-size:0.8rem;min-height:1em;"></p>
+
+        <div class="modal-acciones">
+          <button type="button" class="btn-modal-cancelar" id="btn-cancelar-editar">Cancelar</button>
+          <button type="submit" class="btn-modal-guardar" id="btn-guardar-editar">Guardar cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="../assets/js/matriculas_admin.js"></script>
     <script src="../assets/js/menu_movil.js"></script>
 </body>
