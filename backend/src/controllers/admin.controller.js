@@ -11,6 +11,22 @@ function sqlFecha(columna) {
   return `(to_char(${columna}, 'YYYY-MM-DD') || 'T00:00:00.000Z')`;
 }
 
+// Devuelve el id del perfil en la tabla admin del usuario logueado.
+// Si el usuario tiene rol admin pero aun no tiene perfil, se crea en el momento.
+async function obtenerIdPerfilAdmin(usuarioId) {
+  const existente = await pool.query('SELECT id FROM admin WHERE usuario_id = $1', [usuarioId]);
+  if (existente.rows.length > 0) {
+    return existente.rows[0].id;
+  }
+  const nuevo = await pool.query(
+    `INSERT INTO admin (usuario_id, cargo, sede, activo)
+     VALUES ($1, NULL, NULL, TRUE)
+     RETURNING id`,
+    [usuarioId]
+  );
+  return nuevo.rows[0].id;
+}
+
 async function obtenerUsuarios(req, res) {
   try {
     const result = await pool.query(
@@ -225,17 +241,8 @@ async function registrarPago(req, res) {
       return res.status(400).json({ mensaje: 'matricula_id, monto y metodo_pago son obligatorios.' });
     }
 
-    // Buscar el id del perfil admin a partir del usuario logueado
-    const secretariaResult = await pool.query(
-      'SELECT id FROM admin WHERE usuario_id = $1',
-      [id_secretaria_usuario]
-    );
-
-    if (secretariaResult.rows.length === 0) {
-      return res.status(404).json({ mensaje: 'No se encontró un perfil de secretaria/admin para este usuario.' });
-    }
-
-    const id_secretaria = secretariaResult.rows[0].id;
+    // Perfil admin del usuario logueado (se crea si todavia no existe)
+    const id_secretaria = await obtenerIdPerfilAdmin(id_secretaria_usuario);
 
     // Verificar que la matrícula exista y traer su saldo actual (como número)
     const matriculaResult = await pool.query(
@@ -589,13 +596,8 @@ async function crearMatricula(req, res) {
       return res.status(409).json({ mensaje: 'Este estudiante ya tiene una matrícula pendiente o activa en este salón.' });
     }
 
-    // Quién registra: el perfil admin del usuario logueado (si no tiene, queda sin registrar)
-    const secretariaResult = await pool.query(
-      'SELECT id FROM admin WHERE usuario_id = $1',
-      [id_admin_usuario]
-    );
-
-    const id_secretaria = secretariaResult.rows.length > 0 ? secretariaResult.rows[0].id : null;
+    // Quién registra: el perfil admin del usuario logueado (se crea si todavia no existe)
+    const id_secretaria = await obtenerIdPerfilAdmin(id_admin_usuario);
 
     const result = await pool.query(
       `INSERT INTO matriculas (estudiante_id, salon_id, secretaria_id, estado, valor_total, descuento, saldo_pendiente, anno)
