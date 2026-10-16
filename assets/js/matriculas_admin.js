@@ -280,6 +280,14 @@ function crearFila(m) {
     acciones.appendChild(btnPago);
   }
 
+  const btnEditar = crear('button', 'btn-aprobar', 'Editar');
+  btnEditar.addEventListener('click', function () { abrirModalEditar(m); });
+  acciones.appendChild(btnEditar);
+
+  const btnBorrar = crear('button', 'btn-rechazar', 'Eliminar');
+  btnBorrar.addEventListener('click', function () { eliminarMatricula(m); });
+  acciones.appendChild(btnBorrar);
+
   tdAccion.appendChild(acciones);
   tr.appendChild(tdAccion);
 
@@ -526,6 +534,90 @@ async function enviarNueva(e) {
   }
 }
 
+// ── 10D. EDITAR MATRÍCULA (descuento y observaciones) ───────
+let matriculaEditando = null;
+
+function abrirModalEditar(m) {
+  matriculaEditando = m;
+  setTexto('editar-estudiante', m.estudiante);
+  setTexto('editar-salon', m.salon);
+  setTexto('editar-total', formatoPesos.format(Number(m.valor_total) || 0));
+  document.getElementById('editar-descuento').value = Number(m.descuento) || 0;
+  document.getElementById('editar-observaciones').value = m.observaciones || '';
+  setTexto('editar-error', '');
+  document.getElementById('btn-guardar-editar').disabled = false;
+  document.getElementById('modal-editar').classList.add('abierto');
+  document.getElementById('editar-descuento').focus();
+}
+
+function cerrarModalEditar() {
+  document.getElementById('modal-editar').classList.remove('abierto');
+  matriculaEditando = null;
+}
+
+async function enviarEditar(e) {
+  e.preventDefault();
+  if (!matriculaEditando) return;
+
+  const descuento = Number(document.getElementById('editar-descuento').value) || 0;
+  const observaciones = document.getElementById('editar-observaciones').value.trim();
+
+  if (descuento < 0) {
+    setTexto('editar-error', 'El descuento no puede ser negativo.');
+    return;
+  }
+
+  const btn = document.getElementById('btn-guardar-editar');
+  btn.disabled = true;
+  setTexto('editar-error', '');
+
+  try {
+    const res = await apiFetch('/admin/matriculas/' + matriculaEditando.id, {
+      method: 'PUT',
+      body: { descuento: descuento, observaciones: observaciones }
+    });
+
+    if (res && res.ok) {
+      const estudiante = matriculaEditando.estudiante;
+      cerrarModalEditar();
+      await cargarMatriculas();
+      pintarStats();
+      pintarTabla();
+      mostrarAlerta('exito', 'Matrícula de ' + estudiante + ' actualizada.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      setTexto('editar-error', (res && res.datos && res.datos.mensaje) || 'No se pudo actualizar la matrícula.');
+      btn.disabled = false;
+    }
+  } catch (err) {
+    console.error(err);
+    setTexto('editar-error', 'No se pudo conectar con el servidor.');
+    btn.disabled = false;
+  }
+}
+
+// ── 10E. ELIMINAR MATRÍCULA ─────────────────────────────────
+async function eliminarMatricula(m) {
+  if (!confirm('¿Eliminar definitivamente la matrícula de ' + m.estudiante + ' en ' + m.salon + '? Esta acción no se puede deshacer.')) {
+    return;
+  }
+  try {
+    const res = await apiFetch('/admin/matriculas/' + m.id, { method: 'DELETE' });
+    if (res && res.ok) {
+      await cargarMatriculas();
+      pintarStats();
+      pintarTabla();
+      mostrarAlerta('exito', 'Matrícula de ' + m.estudiante + ' eliminada.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      mostrarAlerta('error', (res && res.datos && res.datos.mensaje) || 'No se pudo eliminar la matrícula.');
+    }
+  } catch (err) {
+    console.error(err);
+    mostrarAlerta('error', 'No se pudo conectar con el servidor.');
+  }
+}
+
 // ── 11. EVENTOS ─────────────────────────────────────────────
 document.getElementById('btn-abrir-modal').addEventListener('click', abrirModalNueva);
 document.getElementById('form-nueva').addEventListener('submit', enviarNueva);
@@ -540,8 +632,14 @@ document.getElementById('btn-cancelar-pago').addEventListener('click', cerrarMod
 document.getElementById('modal-pago').addEventListener('click', function (e) {
   if (e.target === this) cerrarModalPago();   // clic en el fondo oscuro
 });
+document.getElementById('form-editar').addEventListener('submit', enviarEditar);
+document.getElementById('btn-cerrar-editar').addEventListener('click', cerrarModalEditar);
+document.getElementById('btn-cancelar-editar').addEventListener('click', cerrarModalEditar);
+document.getElementById('modal-editar').addEventListener('click', function (e) {
+  if (e.target === this) cerrarModalEditar();
+});
 document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') { cerrarModalPago(); cerrarModalNueva(); }
+  if (e.key === 'Escape') { cerrarModalPago(); cerrarModalNueva(); cerrarModalEditar(); }
 });
 
 function alCambiarFiltro() {

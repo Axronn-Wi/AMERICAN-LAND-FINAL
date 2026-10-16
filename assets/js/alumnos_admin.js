@@ -129,6 +129,7 @@ let filtroEstado = 'todos';       // todos | activo | inactivo
 let orden = { col: 'nombre', dir: 'asc' };
 let vista = 'tabla';              // tabla | cards
 let alumnoADesactivar = null;
+let alumnoABorrar = null;
 let alumnoEditando = null;        // null = agregar; objeto = editar
 let codigos = {};                 // usuario_id -> codigo_estudiante
 
@@ -219,6 +220,12 @@ function crearBotonAccion(a) {
   return btn;
 }
 
+function crearBotonBorrar(a) {
+  const btn = crear('button', 'btn-eliminar-fila', 'Eliminar');
+  btn.addEventListener('click', function () { pedirBorrar(a); });
+  return btn;
+}
+
 function crearFila(a) {
   const tr = crear('tr');
 
@@ -255,6 +262,7 @@ function crearFila(a) {
   const btns = crear('div', 'btns-accion');
   btns.appendChild(crearBotonEditar(a));
   btns.appendChild(crearBotonAccion(a));
+  btns.appendChild(crearBotonBorrar(a));
   tdAcc.appendChild(btns);
   tr.appendChild(tdAcc);
 
@@ -290,6 +298,7 @@ function crearCard(a) {
   const btns = crear('div', 'card-btns');
   btns.appendChild(crearBotonEditar(a));
   btns.appendChild(crearBotonAccion(a));
+  btns.appendChild(crearBotonBorrar(a));
   pie.appendChild(btns);
   card.appendChild(pie);
 
@@ -391,7 +400,33 @@ async function cambiarEstado(a, activo, boton) {
   if (boton) boton.disabled = false;
   return false;
 }
+function pedirBorrar(a) {
+  alumnoABorrar = a;
+  setTexto('nombre-a-borrar', a.nombre_completo);
+  porId('modal-borrar').classList.remove('oculto');
+}
 
+function cerrarModalBorrar() {
+  porId('modal-borrar').classList.add('oculto');
+  alumnoABorrar = null;
+}
+
+async function borrarAlumno(a) {
+  try {
+    const res = await apiFetch('/admin/usuarios/' + a.id, { method: 'DELETE' });
+    if (res && res.ok) {
+      await cargarAlumnos();
+      pintarStats();
+      pintarLista();
+      mostrarAlerta('exito', a.nombre_completo + ' fue eliminado.');
+      return;
+    }
+    mostrarAlerta('error', (res && res.datos && res.datos.mensaje) || 'No se pudo eliminar el alumno.');
+  } catch (err) {
+    console.error(err);
+    mostrarAlerta('error', 'No se pudo conectar con el servidor.');
+  }
+}
 // ── 12. MODAL: AGREGAR ALUMNO ───────────────────────────────
 const CAMPOS_MODAL = ['m-nombre', 'm-correo', 'm-contrasena', 'm-telefono', 'm-fecha-nac', 'm-pais', 'm-ciudad'];
 const ERRORES_MODAL = ['e-nombre', 'e-correo', 'e-contrasena', 'e-telefono', 'e-fecha-nac', 'e-general'];
@@ -575,11 +610,26 @@ porId('btn-confirmar-eliminar').addEventListener('click', async function () {
   btn.disabled = false;
   cerrarModalDesactivar();
 });
-
+// Modal eliminar definitivo
+porId('btn-cerrar-borrar').addEventListener('click', cerrarModalBorrar);
+porId('btn-cancelar-borrar').addEventListener('click', cerrarModalBorrar);
+porId('modal-borrar').addEventListener('click', function (e) {
+  if (e.target === this) cerrarModalBorrar();
+});
+porId('btn-confirmar-borrar').addEventListener('click', async function () {
+  if (!alumnoABorrar) return;
+  const alumno = alumnoABorrar;
+  const btn = this;
+  btn.disabled = true;
+  await borrarAlumno(alumno);
+  btn.disabled = false;
+  cerrarModalBorrar();
+});
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') {
     cerrarModalAlumno();
     cerrarModalDesactivar();
+    cerrarModalBorrar();
   }
 });
 

@@ -165,6 +165,7 @@ async function obtenerMatriculas(req, res) {
       `SELECT m.id, ${sqlFecha('m.fecha_matricula')} AS fecha_matricula, m.estado,
               m.valor_total::float8 AS valor_total, m.descuento::float8 AS descuento,
               m.saldo_pendiente::float8 AS saldo_pendiente, m.anno,
+              m.observaciones,
               ue.nombre_completo AS estudiante, s.nombre AS salon, us.nombre_completo AS registrado_por
        FROM matriculas m
        JOIN estudiantes e ON m.estudiante_id = e.id
@@ -610,5 +611,111 @@ async function crearMatricula(req, res) {
     res.status(500).json({ mensaje: 'Error al crear la matrícula.' });
   }
 }
+async function eliminarUsuario(req, res) {
+  const client = await pool.connect();
+  try {
+    const { id } = req.params;
 
-module.exports = { obtenerUsuarios, cambiarEstadoUsuario, crearUsuario, editarUsuario, obtenerEstudiantes, obtenerDocentes, obtenerHorariosTipo, obtenerNiveles, obtenerSalones, crearSalon, actualizarSalon, eliminarSalon, obtenerMatriculas, crearMatricula, cambiarEstadoMatricula, registrarPago };
+    if (Number(id) === req.usuario.id_usuario) {
+      return res.status(400).json({ mensaje: 'No puedes eliminar tu propia cuenta.' });
+    }
+
+    await client.query('BEGIN');
+
+    const usuario = await client.query(
+      `SELECT u.id, r.nombre AS rol
+       FROM usuarios u
+       JOIN roles r ON u.rol_id = r.id
+       WHERE u.id = $1`,
+      [id]
+    );
+
+    if (usuario.rows.length === 0) {
+      await client.query('ROLLBACK');
+      return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
+    }
+
+    if (usuario.rows[0].rol === 'admin') {
+      await client.query('ROLLBACK');
+      return res.status(403).json({ mensaje: 'No se puede eliminar a un administrador.' });
+    }
+
+    await client.query('DELETE FROM estudiantes WHERE usuario_id = $1', [id]);
+    await client.query('DELETE FROM docentes WHERE usuario_id = $1', [id]);
+    await client.query('DELETE FROM usuarios WHERE id = $1', [id]);
+
+    await client.query('COMMIT');
+    res.json({ mensaje: 'Usuario eliminado correctamente.' });
+
+  } catch (err) {
+    await client.query('ROLLBACK').catch(() => {});
+    console.error(err);
+    if (err.code === '23503') {
+      return res.status(409).json({ mensaje: 'No se puede eliminar: tiene matrículas, salones u otros datos asociados. Desactívalo en su lugar.' });
+    }
+    res.status(500).json({ mensaje: 'Error al eliminar el usuario.' });
+  } finally {
+    client.release();
+  }
+}
+
+async function actualizarMatricula(req, res) {
+  try {
+    const { id } = req.params;
+    const descuento = Number(req.body.descuento);
+    const observaciones = req.body.observaciones ? String(req.body.observaciones).trim() : null;
+
+    if (Number.isNaN(descuento) || descuento < 0) {
+      return res.status(400).json({ mensaje: 'El descuento debe ser un número mayor o igual a 0.' });
+    }
+
+    const result = await pool.query(
+      `UPDATE matriculas
+       SET descuento = $1,
+           saldo_pendiente = saldo_pendiente + descuento - $1,
+           observaciones = $2
+       WHERE id = $3
+         AND $1 <= valor_total
+         AND saldo_pendiente + descuento - $1 >= 0
+       RETURNING id, estado, valor_total::float8 AS valor_total, descuento::float8 AS descuento,
+                 saldo_pendiente::float8 AS saldo_pendiente, observaciones`,
+      [descuento, observaciones, id]
+    );
+
+    if (result.rows.length === 0) {
+      const existe = await pool.query('SELECT id FROM matriculas WHERE id = $1', [id]);
+      if (existe.rows.length === 0) {
+        return res.status(404).json({ mensaje: 'Matrícula no encontrada.' });
+      }
+      return res.status(400).json({ mensaje: 'Descuento inválido: supera el valor de la matrícula o el saldo ya pagado.' });
+    }
+
+    res.json({ mensaje: 'Matrícula actualizada correctamente.', matricula: result.rows[0] });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al actualizar la matrícula.' });
+  }
+}
+
+async function eliminarMatricula(req, res) {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query('DELETE FROM matriculas WHERE id = $1 RETURNING id', [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ mensaje: 'Matrícula no encontrada.' });
+    }
+
+    res.json({ mensaje: 'Matrícula eliminada correctamente.' });
+
+  } catch (err) {
+    console.error(err);
+    if (err.code === '23503') {
+      return res.status(409).json({ mensaje: 'No se puede eliminar: la matrícula tiene pagos o notas asociados. Cancélala en su lugar.' });
+    }
+    res.status(500).json({ mensaje: 'Error al eliminar la matrícula.' });
+  }
+}
+module.exports = { obtenerUsuarios, cambiarEstadoUsuario, crearUsuario, editarUsuario, eliminarUsuario, obtenerEstudiantes, obtenerDocentes, obtenerHorariosTipo, obtenerNiveles, obtenerSalones, crearSalon, actualizarSalon, eliminarSalon, obtenerMatriculas, crearMatricula, actualizarMatricula, cambiarEstadoMatricula, eliminarMatricula, registrarPago };

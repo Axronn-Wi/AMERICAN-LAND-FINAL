@@ -236,6 +236,21 @@
     </div>
   </div>
 
+  <!-- MODAL CONFIRMAR ELIMINACIÓN DEFINITIVA -->
+  <div class="modal-overlay" id="modal-borrar" role="dialog" aria-modal="true" style="display:none">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <h2 class="modal-titulo">¿Eliminar docente?</h2>
+        <button class="btn-cerrar-modal" id="btn-cerrar-borrar">&#10005;</button>
+      </div>
+      <p class="modal-aviso">Vas a eliminar definitivamente a <strong id="nombre-a-borrar"></strong>. Esta acción no se puede deshacer.</p>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancelar" id="btn-cancelar-borrar">Cancelar</button>
+        <button type="button" class="btn-modal-eliminar" id="btn-confirmar-borrar">Sí, eliminar</button>
+      </div>
+    </div>
+  </div>
+
   <script src="../assets/js/docentes_admin.js"></script>
     <script src="../assets/js/menu_movil.js"></script>
 </body>
