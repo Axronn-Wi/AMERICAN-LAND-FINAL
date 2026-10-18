@@ -12,6 +12,7 @@ if (!process.env.JWT_SECRET) {
 }
 
 const db = require('./src/config/db');
+const { aplicarMigraciones } = require('./src/config/migraciones');
 const authRoutes = require('./src/routes/auth.routes');
 const alumnosRoutes = require('./src/routes/alumnos.routes');
 const adminRoutes = require('./src/routes/admin.routes');
@@ -105,7 +106,28 @@ app.use((err, req, res, next) => {
   res.status(500).json({ mensaje: 'Error interno del servidor.' });
 });
 
+// Deja la base al día en cada despliegue. Si una migración falla se registra
+// y el servidor arranca igual: /api/status sigue respondiendo.
+async function migrarAlIniciar() {
+  if (process.env.MIGRAR_AL_INICIAR === 'false') {
+    console.log('ℹ️ Migraciones automáticas desactivadas (MIGRAR_AL_INICIAR=false)');
+    return;
+  }
+  try {
+    const { aplicadas, total } = await aplicarMigraciones(db.pool);
+    if (aplicadas.length) {
+      console.log(`✅ Migraciones aplicadas: ${aplicadas.join(', ')}`);
+    } else {
+      console.log(`✅ Base de datos al día (${total} migraciones ya aplicadas)`);
+    }
+  } catch (err) {
+    console.error('❌ Falló la migración', err.message);
+  }
+}
+
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+migrarAlIniciar().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  });
 });
