@@ -1,7 +1,14 @@
 /* ============================================================
-   recuperar-contrasena.js — Instituto American Land
+   recover_pass.js — Instituto American Land
+   Pide al backend el enlace de recuperación (POST /auth/recuperar).
    Mismo patrón de validación que login.js
 ============================================================ */
+
+const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:4000/api'
+  : 'https://american-land-backend.onrender.com/api';
+
+const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const formRecuperar = document.getElementById('form-recuperar');
 const btnEnviar     = document.getElementById('btn-enviar');
@@ -11,6 +18,9 @@ const paso1         = document.getElementById('paso-1');
 const paso2         = document.getElementById('paso-2');
 const correoEnvEl   = document.getElementById('correo-enviado');
 const contadorEl    = document.getElementById('contador-reenvio');
+const inputCorreo   = document.getElementById('correo');
+
+let correoSolicitado = '';
 
 /* ── Validación reutilizable (= login.js) ── */
 function validarCampo(input, errorId, condicion, mensaje) {
@@ -20,56 +30,79 @@ function validarCampo(input, errorId, condicion, mensaje) {
     msgError.textContent = mensaje;
     msgError.classList.add('visible');
     return false;
-  } else {
-    input.classList.remove('invalido');
-    msgError.classList.remove('visible');
-    return true;
   }
+  input.classList.remove('invalido');
+  msgError.classList.remove('visible');
+  return true;
+}
+
+function mostrarAlerta(texto, tipo) {
+  alerta.textContent = texto;
+  alerta.className = 'alerta ' + tipo + ' visible';
+}
+
+/* ── Llamada al backend ── */
+async function solicitarEnlace(correo) {
+  const respuesta = await fetch(API + '/auth/recuperar', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ correo: correo })
+  });
+  const datos = await respuesta.json().catch(function () { return {}; });
+  if (!respuesta.ok) {
+    throw new Error(datos.mensaje || 'No se pudo enviar el enlace. Intenta de nuevo.');
+  }
+  return datos;
 }
 
 /* ── Validación blur (= login.js) ── */
-document.getElementById('correo').addEventListener('blur', function () {
-  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  validarCampo(this, 'error-correo', regex.test(this.value), 'Ingresa un correo electrónico válido.');
+inputCorreo.addEventListener('blur', function () {
+  validarCampo(this, 'error-correo', REGEX_CORREO.test(this.value.trim()), 'Ingresa un correo electrónico válido.');
 });
 
 /* ── Envío del formulario ── */
-formRecuperar.addEventListener('submit', function (e) {
+formRecuperar.addEventListener('submit', async function (e) {
   e.preventDefault();
 
-  const correo = document.getElementById('correo');
-  const regex  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const valido = validarCampo(correo, 'error-correo', regex.test(correo.value), 'Ingresa un correo electrónico válido.');
-  if (!valido) return;
+  const correo = inputCorreo.value.trim();
+  if (!validarCampo(inputCorreo, 'error-correo', REGEX_CORREO.test(correo), 'Ingresa un correo electrónico válido.')) return;
 
-  // Estado cargando (= login.js)
   btnEnviar.classList.add('cargando');
+  btnEnviar.disabled = true;
   btnEnviar.textContent = 'Enviando...';
+  alerta.className = 'alerta';
 
-  setTimeout(function () {
-    btnEnviar.classList.remove('cargando');
-    btnEnviar.textContent = 'Enviar enlace de recuperación';
-
-    correoEnvEl.textContent = correo.value.trim();
+  try {
+    await solicitarEnlace(correo);
+    correoSolicitado = correo;
+    correoEnvEl.textContent = correo;
     paso1.style.display = 'none';
     paso2.classList.remove('paso-oculto');
     paso2.style.display = 'block';
-
     iniciarContador();
-  }, 1400);
+  } catch (err) {
+    mostrarAlerta(err.message, 'error');
+  } finally {
+    btnEnviar.classList.remove('cargando');
+    btnEnviar.disabled = false;
+    btnEnviar.textContent = 'Enviar enlace de recuperación';
+  }
 });
 
 /* ── Reenviar correo ── */
-btnReenviar.addEventListener('click', function () {
+btnReenviar.addEventListener('click', async function () {
+  if (this.classList.contains('bloqueado') || !correoSolicitado) return;
   this.textContent = 'Reenviando...';
   this.classList.add('bloqueado');
 
-  setTimeout(function () {
-    alerta.textContent = '✓ Correo reenviado correctamente.';
-    alerta.className   = 'alerta exito visible';
-    setTimeout(function () { alerta.className = 'alerta'; }, 3000);
-    iniciarContador();
-  }, 1000);
+  try {
+    await solicitarEnlace(correoSolicitado);
+    mostrarAlerta('✓ Te enviamos un enlace nuevo. El anterior ya no funciona.', 'exito');
+    setTimeout(function () { alerta.className = 'alerta'; }, 4000);
+  } catch (err) {
+    mostrarAlerta(err.message, 'error');
+  }
+  iniciarContador();
 });
 
 /* ── Contador de reenvío (30 s) ── */

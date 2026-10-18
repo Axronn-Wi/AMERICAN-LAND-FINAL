@@ -1,5 +1,8 @@
 const db = require('../config/db');
 const pool = db.pool || db;
+const crypto = require('crypto');
+const { transaccion } = require('../utils/sql');
+const { notificar, usuariosAdmin } = require('../utils/notificar');
 
 async function obtenerNiveles(req, res) {
   try {
@@ -139,47 +142,74 @@ async function procesarPago(req, res) {
 
     const id_estudiante = estudianteResult.rows[0].id;
 
-    // La matrícula debe existir Y ser de este estudiante
-    const matriculaResult = await pool.query(
-      `SELECT id, estado, saldo_pendiente::float8 AS saldo_pendiente FROM matriculas
-       WHERE id = $1 AND estudiante_id = $2`,
-      [matricula_id, id_estudiante]
-    );
+    // Transacción + FOR UPDATE: si el estudiante hace doble clic en "Pagar",
+    // el segundo intento espera al primero y ya no encuentra saldo pendiente
+    const resultado = await transaccion(async (cliente) => {
+      // La matrícula debe existir Y ser de este estudiante
+      const matriculaResult = await cliente.query(
+        `SELECT id, estado, saldo_pendiente::float8 AS saldo_pendiente FROM matriculas
+         WHERE id = $1 AND estudiante_id = $2
+         FOR UPDATE`,
+        [matricula_id, id_estudiante]
+      );
 
-    if (matriculaResult.rows.length === 0) {
-      return res.status(404).json({ mensaje: 'Matrícula no encontrada.' });
-    }
+      if (matriculaResult.rows.length === 0) {
+        return { status: 404, cuerpo: { mensaje: 'Matrícula no encontrada.' } };
+      }
 
-    const matricula = matriculaResult.rows[0];
+      const matricula = matriculaResult.rows[0];
 
-    if (matricula.estado !== 'pendiente' || matricula.saldo_pendiente <= 0) {
-      return res.status(409).json({ mensaje: 'Esta matrícula no tiene un pago pendiente.' });
-    }
+      if (matricula.estado !== 'pendiente' || matricula.saldo_pendiente <= 0) {
+        return { status: 409, cuerpo: { mensaje: 'Esta matrícula no tiene un pago pendiente.' } };
+      }
 
-    // El monto lo decide la base de datos, nunca el cliente
-    const monto = matricula.saldo_pendiente;
-    const referencia = `ONL-${Date.now()}`;
+      // El monto lo decide la base de datos, nunca el cliente
+      const monto = matricula.saldo_pendiente;
+      const referencia = `ONL-${Date.now()}-${crypto.randomBytes(3).toString('hex').toUpperCase()}`;
 
-    const pagoResult = await pool.query(
-      `INSERT INTO pagos (matricula_id, monto, metodo_pago, referencia_transaccion, estado)
-       VALUES ($1, $2, $3, $4, 'exitoso')
-       RETURNING id`,
-      [matricula_id, monto, metodo_pago, referencia]
-    );
+      const pagoResult = await cliente.query(
+        `INSERT INTO pagos (matricula_id, monto, metodo_pago, referencia_transaccion, estado)
+         VALUES ($1, $2, $3, $4, 'exitoso')
+         RETURNING id`,
+        [matricula_id, monto, metodo_pago, referencia]
+      );
 
-    await pool.query(
-      `UPDATE matriculas SET saldo_pendiente = 0, estado = 'activa'
-       WHERE id = $1`,
-      [matricula_id]
-    );
+      await cliente.query(
+        `UPDATE matriculas SET saldo_pendiente = 0, estado = 'activa'
+         WHERE id = $1`,
+        [matricula_id]
+      );
 
-    res.status(201).json({
-      mensaje: 'Pago aprobado. Tu matrícula está activa.',
-      id_pago: pagoResult.rows[0].id,
-      referencia,
-      monto,
-      estado_matricula: 'activa'
+      return {
+        status: 201,
+        cuerpo: {
+          mensaje: 'Pago aprobado. Tu matrícula está activa.',
+          id_pago: pagoResult.rows[0].id,
+          referencia,
+          monto,
+          estado_matricula: 'activa'
+        }
+      };
     });
+
+    if (resultado.status === 201) {
+      notificar([id_usuario], {
+        tipo: 'pago',
+        titulo: 'Pago aprobado',
+        mensaje: `Tu pago (ref. ${resultado.cuerpo.referencia}) fue aprobado. Tu matrícula ya está activa.`,
+        enlace: '/alumnos/inicio.html'
+      });
+      usuariosAdmin()
+        .then((ids) => notificar(ids, {
+          tipo: 'pago',
+          titulo: 'Pago en línea recibido',
+          mensaje: `${req.usuario.correo} pagó su matrícula en línea (ref. ${resultado.cuerpo.referencia}).`,
+          enlace: '/admin/matriculas.html'
+        }))
+        .catch(() => {});
+    }
+
+    res.status(resultado.status).json(resultado.cuerpo);
 
   } catch (err) {
     console.error(err);

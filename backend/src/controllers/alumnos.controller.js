@@ -1,21 +1,10 @@
 const fs = require('fs');
 const db = require('../config/db');
 const pool = db.pool || db;
+const { sqlHora, sqlFecha } = require('../utils/sql');
+const { notificar } = require('../utils/notificar');
 
 const MENSAJE_SIN_PERFIL = 'No se encontró un perfil de estudiante para este usuario.';
-
-// ---------------------------------------------------------------
-// Formatos que el frontend ya espera (los mismos que daba SQL Server)
-// ---------------------------------------------------------------
-// Hora 18:00:00  ->  "1970-01-01T18:00:00.000Z"
-function sqlHora(columna) {
-  return `('1970-01-01T' || left(${columna}::text, 8) || '.000Z')`;
-}
-
-// Fecha 2026-11-30  ->  "2026-11-30T00:00:00.000Z"
-function sqlFecha(columna) {
-  return `(to_char(${columna}, 'YYYY-MM-DD') || 'T00:00:00.000Z')`;
-}
 
 // Día y minutos actuales en Colombia (el servidor de Render trabaja en UTC)
 function ahoraEnBogota() {
@@ -265,8 +254,13 @@ async function entregarTarea(req, res) {
 
     // 4. La tarea debe ser de un salón donde tenga matrícula activa
     const tareaResult = await pool.query(
-      `SELECT t.id, to_char(t.fecha_limite, 'YYYY-MM-DD') AS fecha_limite
+      `SELECT t.id, t.titulo, to_char(t.fecha_limite, 'YYYY-MM-DD') AS fecha_limite,
+              d.usuario_id AS usuario_docente, s.nombre AS salon,
+              (SELECT u.nombre_completo FROM estudiantes e JOIN usuarios u ON u.id = e.usuario_id
+               WHERE e.id = $2) AS estudiante
        FROM tareas t
+       JOIN salones s ON s.id = t.salon_id
+       JOIN docentes d ON d.id = s.docente_id
        JOIN matriculas m ON m.salon_id = t.salon_id
        WHERE t.id = $1
          AND m.estudiante_id = $2
@@ -304,6 +298,13 @@ async function entregarTarea(req, res) {
        RETURNING id`,
       [id_tarea, id_estudiante, req.file.filename]
     );
+
+    notificar([tarea.usuario_docente], {
+      tipo: 'entrega',
+      titulo: 'Nueva entrega',
+      mensaje: `${tarea.estudiante} entregó "${tarea.titulo}" (${tarea.salon}).`,
+      enlace: '/docentes/tareas.html'
+    });
 
     res.status(201).json({
       mensaje: 'Tarea entregada correctamente.',

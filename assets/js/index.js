@@ -78,3 +78,7 @@ document.querySelectorAll('a[href^="#"]').forEach(function (enlace) {
     }
   });
 });
+
+// ── 5. AÑO ACTUAL EN EL PIE DE PÁGINA ──────────────────────
+const anioActual = document.getElementById('anio-actual');
+if (anioActual) anioActual.textContent = new Date().getFullYear();

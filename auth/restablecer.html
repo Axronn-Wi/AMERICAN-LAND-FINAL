@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nueva Contraseña - Instituto American Land</title>
+  <link rel="icon" type="image/png" href="../assets/img/Logo.png" />
+  <!-- Comparte el diseño de la página de recuperar contraseña -->
+  <link rel="stylesheet" href="../assets/css/recover_pass.css" />
+</head>
+<body>
+
+  <!-- Estrellas decorativas -->
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+  <span class="estrella">&#9733;</span>
+
+  <a href="login.html" class="btn-volver">&#8592; Inicio de sesión</a>
+
+  <main>
+    <div class="card-login">
+
+      <div class="login-logo">
+        <img src="../assets/img/Logo.png" alt="Logo Instituto American Land" />
+      </div>
+
+      <h1 class="login-titulo">Nueva Contraseña</h1>
+      <p class="login-subtitulo">Escribe tu nueva contraseña. Debe tener al menos 6 caracteres.</p>
+
+      <div class="alerta" id="alerta-global" role="alert"></div>
+
+      <!-- PASO 1: formulario -->
+      <div id="paso-1">
+        <form id="form-restablecer" action="#" method="POST" novalidate>
+
+          <div class="campo">
+            <label for="contrasena">
+              <span class="star">&#9733;</span> Nueva contraseña
+            </label>
+            <div class="input-wrapper">
+              <span class="icono-campo">&#128274;</span>
+              <input type="password" id="contrasena" name="contrasena"
+                     placeholder="Mínimo 6 caracteres" required minlength="6"
+                     autocomplete="new-password" />
+            </div>
+            <span class="msg-error" id="error-contrasena"></span>
+          </div>
+
+          <div class="campo">
+            <label for="confirmar">
+              <span class="star">&#9733;</span> Confirmar contraseña
+            </label>
+            <div class="input-wrapper">
+              <span class="icono-campo">&#128274;</span>
+              <input type="password" id="confirmar" name="confirmar"
+                     placeholder="Repite la contraseña" required
+                     autocomplete="new-password" />
+            </div>
+            <span class="msg-error" id="error-confirmar"></span>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btn-guardar">
+            Guardar contraseña
+          </button>
+
+        </form>
+      </div>
+
+      <!-- PASO 2: listo -->
+      <div id="paso-2" class="paso-oculto">
+        <div class="exito-bloque">
+          <div class="exito-icono">&#10003;</div>
+          <h2 class="exito-titulo">¡Contraseña actualizada!</h2>
+          <p class="exito-texto">Ya puedes iniciar sesión con tu nueva contraseña.</p>
+        </div>
+        <a href="login.html" class="btn-submit" style="display:block;text-align:center;text-decoration:none">
+          Ir a iniciar sesión
+        </a>
+      </div>
+
+      <div class="login-links">
+        <a href="recover_pass.html">¿El enlace venció? <strong>Pide uno nuevo</strong></a>
+      </div>
+
+    </div>
+  </main>
+
+  <script src="../assets/js/restablecer.js"></script>
+</body>
+</html>

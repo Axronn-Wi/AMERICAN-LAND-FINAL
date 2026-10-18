@@ -4,8 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Portal Estudiante - Instituto American Land</title>
+  <link rel="icon" type="image/png" href="../assets/img/Logo.png" />
   <link rel="stylesheet" href="../assets/css/inicio_alumnos.css" />
   <link rel="stylesheet" href="../assets/css/menu_movil.css" />
+  <link rel="stylesheet" href="../assets/css/portal_comun.css" />
+  <link rel="stylesheet" href="../assets/css/comunicaciones.css" />
 </head>
 <body>
 
@@ -33,7 +36,6 @@
 
       <!-- Acciones -->
       <div class="nav-acciones">
-        <button class="btn-nav-icon" title="Mensajes">&#128172;</button>
         <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
       </div>
 
@@ -51,7 +53,7 @@
         <ul>
           <li class="clase-item activa">
             <span class="clase-dot"></span>
-            <a href="salon_virtual.html">Salón Canada</a>
+            <a href="salon_virtual.html">Cargando…</a>
           </li>
         </ul>
       </section>
@@ -85,8 +87,8 @@
       <!-- Encabezado salón -->
       <section class="encabezado-salon">
         <div class="encabezado-info">
-          <h1>Salón Canada</h1>
-          <p>L-M-M-J &nbsp;&#183;&nbsp; 8:00AM - 12:00PM &nbsp;&#183;&nbsp; Prof. Luis P.</p>
+          <h1>Mi Salón</h1>
+          <p>Cargando información de tu clase…</p>
         </div>
         <a href="salon_virtual.html" class="btn-entrar">&#128187; Entrar al salón</a>
       </section>
@@ -97,8 +99,9 @@
         <div class="stat-card">
           <div class="stat-icono">&#128336;</div>
           <div class="stat-info">
-            <h3>Horas Completadas</h3>
-            <p class="stat-valor" id="horas-valor">20/50</p>
+            <h3>Mi Nivel</h3>
+            <p class="stat-valor" id="nivel-valor">—</p>
+            <span class="stat-sub">Nivel actual</span>
           </div>
         </div>
 
@@ -106,7 +109,7 @@
           <div class="stat-icono">&#11088;</div>
           <div class="stat-info">
             <h3>Mi Promedio</h3>
-            <p class="stat-valor" id="promedio-valor">4.5</p>
+            <p class="stat-valor" id="promedio-valor">—</p>
             <span class="stat-sub">Sobre 5.0</span>
           </div>
         </div>
@@ -114,9 +117,9 @@
         <div class="stat-card">
           <div class="stat-icono">&#128203;</div>
           <div class="stat-info">
-            <h3>Asistencia</h3>
-            <p class="stat-valor" id="asistencia-valor">90%</p>
-            <span class="stat-sub">Este Ciclo</span>
+            <h3>Entregadas</h3>
+            <p class="stat-valor" id="entregadas-valor">—</p>
+            <span class="stat-sub">Tareas enviadas</span>
           </div>
         </div>
 
@@ -124,7 +127,7 @@
           <div class="stat-icono">&#128218;</div>
           <div class="stat-info">
             <h3>Tareas</h3>
-            <p class="stat-valor" id="tareas-valor">3</p>
+            <p class="stat-valor" id="tareas-valor">—</p>
             <span class="stat-sub">Por Entregar</span>
           </div>
         </div>
@@ -148,14 +151,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Exposición Oral</td>
-                <td><span class="badge badge-entregado">Entregado</span></td>
-              </tr>
-              <tr>
-                <td>Introducción</td>
-                <td><span class="badge badge-pendiente">Pendiente</span></td>
-              </tr>
+              <tr><td colspan="2" class="celda-vacia">Cargando tareas…</td></tr>
             </tbody>
           </table>
         </section>
@@ -174,14 +170,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>Ciclo 1</td>
-                <td><span class="nota-badge">5.0</span></td>
-              </tr>
-              <tr>
-                <td>Examen Ciclo 1</td>
-                <td><span class="nota-badge">4.2</span></td>
-              </tr>
+              <tr><td colspan="2" class="celda-vacia">Cargando notas…</td></tr>
             </tbody>
           </table>
         </section>
@@ -193,6 +182,7 @@
   </div>
 
   <script src="../assets/js/inicio_alumnos.js"></script>
+  <script src="../assets/js/comunicaciones.js"></script>
   <script src="../assets/js/menu_movil.js"></script>
 </body>
 </html>
