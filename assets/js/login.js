@@ -125,7 +125,8 @@ form.addEventListener('submit', async function (e) {
       const destinos = {
         estudiante: '../alumnos/inicio.html',
         docente:    '../docentes/inicio.html',
-        admin:      '../admin/inicio.html'
+        admin:      '../admin/inicio.html',
+        secretaria: '../admin/inicio.html'
       };
       let destino = destinos[rol.value] || '../index.html';
       // Si venía de la inscripción, el estudiante regresa a continuar

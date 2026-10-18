@@ -11,7 +11,8 @@ const API = window.location.hostname === 'localhost' || window.location.hostname
 // ── 1. VERIFICAR SESIÓN ─────────────────────────────────────
 const token = sessionStorage.getItem('token');
 const rol   = sessionStorage.getItem('rol');
-const sesionValida = !!token && rol === 'admin';
+// Admin y secretaría comparten esta página (panel_roles.js ajusta el menú)
+const sesionValida = !!token && (rol === 'admin' || rol === 'secretaria');
 
 if (!sesionValida) {
   window.location.href = '../auth/login.html';

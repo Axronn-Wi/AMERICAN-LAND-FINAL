@@ -27,7 +27,8 @@
 
   const ICONOS_TIPO = {
     tarea: '📝', entrega: '📥', calificacion: '✅', nota: '⭐',
-    material: '📚', matricula: '🎓', pago: '💳', salon: '🏫', general: '🔔'
+    material: '📚', matricula: '🎓', pago: '💳', salon: '🏫', anuncio: '📣',
+    asistencia: '🗓️', contacto: '✉️', general: '🔔'
   };
 
   const SVG = {
@@ -345,7 +346,7 @@
   let ultimoDia = '';
   let temporizadorChat = null;
 
-  const NOMBRES_ROL = { estudiante: 'Estudiante', docente: 'Docente', admin: 'Administración' };
+  const NOMBRES_ROL = { estudiante: 'Estudiante', docente: 'Docente', admin: 'Administración', secretaria: 'Secretaría' };
 
   function pintarContactos() {
     const filtro = inputBuscar.value.trim().toLowerCase();

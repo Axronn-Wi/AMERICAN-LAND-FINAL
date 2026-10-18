@@ -7,12 +7,12 @@ const MAX_MENSAJE = 2000;
 // Con quién puede chatear cada rol (ids de la tabla usuarios)
 //   estudiante -> docentes de sus salones activos + administración
 //   docente    -> estudiantes activos de sus salones + administración
-//   admin      -> cualquier usuario activo
+//   admin y secretaria -> cualquier usuario activo
 // Además, siempre se puede responder a quien ya nos escribió.
 // ---------------------------------------------------------------
 const SQL_ADMINS = `
   SELECT u.id FROM usuarios u JOIN roles r ON u.rol_id = r.id
-  WHERE r.nombre = 'admin' AND u.activo = TRUE`;
+  WHERE r.nombre IN ('admin', 'secretaria') AND u.activo = TRUE`;
 
 const SQL_CONTACTOS = {
   estudiante: `
@@ -33,7 +33,8 @@ const SQL_CONTACTOS = {
     JOIN usuarios eu ON eu.id = e.usuario_id
     WHERE d.usuario_id = $1
     UNION ${SQL_ADMINS}`,
-  admin: `SELECT id FROM usuarios WHERE activo = TRUE`
+  admin: `SELECT id FROM usuarios WHERE activo = TRUE`,
+  secretaria: `SELECT id FROM usuarios WHERE activo = TRUE`
 };
 
 function sqlIdsPermitidos(rol) {

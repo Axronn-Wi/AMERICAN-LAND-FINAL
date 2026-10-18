@@ -1,0 +1,177 @@
+/* ============================================================
+   gestion_admin.css — Páginas de Gestión del panel
+   (Personal, Anuncios y Contactos)
+   Instituto American Land
+   Ubicación: assets/css/gestion_admin.css
+   Se carga después de inicio_admin.css y docentes_admin.css,
+   de donde toma tablas, modales y botones.
+============================================================ */
+
+/* ── Pestañas de Gestión ───────────────────────────────────── */
+.gestion-tabs {
+  align-self: flex-start;
+  max-width: 100%;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  background: var(--blanco);
+  border-radius: 12px;
+  box-shadow: var(--sombra);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.gestion-tabs::-webkit-scrollbar { display: none; }
+.gestion-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border-radius: 9px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--gris-texto);
+  white-space: nowrap;
+  transition: background 0.2s, color 0.2s;
+}
+.gestion-tab svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.gestion-tab:hover { background: var(--gris-claro); color: var(--morado); }
+.gestion-tab.activo { background: var(--morado); color: var(--blanco); }
+.gestion-tab .tab-contador {
+  min-width: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: var(--rojo);
+  color: var(--blanco);
+  font-size: 0.7rem;
+  line-height: 20px;
+  text-align: center;
+}
+.gestion-tab .tab-contador[hidden] { display: none; }
+
+/* Tarjetas de resumen: 2 (personal) o 3 (contactos) por fila */
+.grid-stats.dos  { grid-template-columns: repeat(2, 1fr); }
+.grid-stats.tres { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 640px) { .grid-stats.tres { grid-template-columns: 1fr; } }
+
+/* ── Chips de rol y estado ─────────────────────────────────── */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.chip-admin      { background: rgba(75,0,130,0.09);  color: var(--morado);  border: 1px solid rgba(75,0,130,0.2); }
+.chip-secretaria { background: rgba(41,128,185,0.1); color: var(--azul);    border: 1px solid rgba(41,128,185,0.25); }
+.chip-todos      { background: rgba(39,174,96,0.1);  color: #1e8449;        border: 1px solid rgba(39,174,96,0.25); }
+.chip-estudiantes{ background: rgba(243,156,18,0.12);color: #b7770d;        border: 1px solid rgba(243,156,18,0.3); }
+.chip-docentes   { background: rgba(41,128,185,0.1); color: var(--azul);    border: 1px solid rgba(41,128,185,0.25); }
+.chip-salon      { background: rgba(192,57,43,0.08); color: var(--rojo);    border: 1px solid rgba(192,57,43,0.22); }
+.chip-nuevo      { background: rgba(192,57,43,0.1);  color: var(--rojo);    border: 1px solid rgba(192,57,43,0.25); }
+.chip-en_proceso { background: rgba(243,156,18,0.12);color: #b7770d;        border: 1px solid rgba(243,156,18,0.3); }
+.chip-atendido   { background: rgba(39,174,96,0.1);  color: #1e8449;        border: 1px solid rgba(39,174,96,0.25); }
+.chip-inactivo   { background: rgba(102,102,102,0.1);color: var(--gris-texto); border: 1px solid rgba(102,102,102,0.2); }
+.chip-yo         { background: var(--gris-claro);   color: var(--gris-texto); border: 1px dashed var(--gris-borde); }
+
+/* ── Tarjetas en lista (anuncios y contactos) ──────────────── */
+.lista-tarjetas { display: flex; flex-direction: column; gap: 12px; }
+
+.tarjeta-item {
+  position: relative;
+  padding: 16px 18px;
+  border: 1px solid var(--gris-borde);
+  border-left: 4px solid var(--morado-claro);
+  border-radius: var(--radio);
+  background: var(--blanco);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.tarjeta-item:hover { box-shadow: 0 6px 20px rgba(75,0,130,0.09); }
+.tarjeta-item.inactivo { opacity: 0.6; border-left-color: var(--gris-borde); }
+.tarjeta-item.es-nuevo { border-left-color: var(--rojo); }
+.tarjeta-item.es-en_proceso { border-left-color: var(--amarillo); }
+.tarjeta-item.es-atendido { border-left-color: var(--verde); }
+
+.tarjeta-cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.tarjeta-titulo { font-size: 0.98rem; font-weight: 700; color: var(--negro); line-height: 1.35; overflow-wrap: anywhere; }
+.tarjeta-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px; }
+.tarjeta-texto {
+  font-size: 0.86rem;
+  color: #3a3a4a;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.tarjeta-pie {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  font-size: 0.75rem;
+  color: var(--gris-texto);
+}
+.tarjeta-datos { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.tarjeta-datos a { color: var(--morado-claro); font-weight: 600; }
+.tarjeta-datos a:hover { text-decoration: underline; }
+
+/* Botones con texto (más claros que solo un ícono) */
+.btn-texto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1.5px solid var(--gris-borde);
+  background: var(--blanco);
+  color: var(--negro);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.btn-texto:hover { border-color: var(--morado-claro); color: var(--morado); }
+.btn-texto.peligro:hover { border-color: var(--rojo); color: var(--rojo); background: rgba(192,57,43,0.05); }
+.btn-texto.exito:hover { border-color: var(--verde); color: #1e8449; background: rgba(39,174,96,0.06); }
+.btn-texto svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.btn-texto:disabled { opacity: 0.5; }
+
+/* ── Estado vacío ──────────────────────────────────────────── */
+.vacio-grande {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--gris-texto);
+}
+.vacio-grande .vacio-icono { font-size: 2.6rem; display: block; margin-bottom: 10px; opacity: 0.55; }
+.vacio-grande p { font-size: 0.9rem; max-width: 380px; margin: 0 auto; line-height: 1.5; }
+
+/* ── Formularios de los modales ────────────────────────────── */
+.modal-box > form { padding: 22px 26px; display: flex; flex-direction: column; gap: 14px; }
+.modal-campo textarea { min-height: 120px; resize: vertical; font-family: inherit; }
+.modal-campo .ayuda { font-size: 0.74rem; color: var(--gris-texto); }
+.modal-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.86rem;
+  color: var(--negro);
+  cursor: pointer;
+}
+.modal-campo .modal-check input,
+.modal-check input { width: 18px; height: 18px; padding: 0; margin: 0; border: none; border-radius: 4px; flex: none; accent-color: var(--morado); }
+
+/* ── Celular ──────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .tarjeta-cabecera { flex-direction: column; }
+  .tarjeta-pie { flex-direction: column; align-items: flex-start; }
+}
+

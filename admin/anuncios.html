@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anuncios - Panel Admin - Instituto American Land</title>
+  <link rel="icon" type="image/png" href="../assets/img/Logo.png" />
+  <link rel="stylesheet" href="../assets/css/inicio_admin.css" />
+  <link rel="stylesheet" href="../assets/css/docentes_admin.css" />
+  <link rel="stylesheet" href="../assets/css/gestion_admin.css" />
+  <link rel="stylesheet" href="../assets/css/menu_movil.css" />
+  <link rel="stylesheet" href="../assets/css/portal_comun.css" />
+  <link rel="stylesheet" href="../assets/css/comunicaciones.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">A</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Administrador</span>
+          <span class="nav-rol">Admin</span>
+        </div>
+      </div>
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="docentes.html">Docentes</a></li>
+        <li><a href="alumnos.html">Alumnos</a></li>
+        <li><a href="salones.html">Salones</a></li>
+        <li><a href="matriculas.html">Matrículas</a></li>
+        <li><a href="personal.html" class="activo">Gestión</a></li>
+      </ul>
+      <div class="nav-acciones">
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Panel Admin</h3>
+        <ul>
+          <li class="menu-item"><span class="menu-icono">&#127968;</span><a href="inicio.html">Inicio</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128104;&#8205;&#127979;</span><a href="docentes.html">Docentes</a></li>
+          <li class="menu-item"><span class="menu-icono">&#127891;</span><a href="alumnos.html">Alumnos</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128198;</span><a href="salones.html">Salones</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128203;</span><a href="matriculas.html">Matrículas</a></li>
+        </ul>
+      </section>
+      <section class="sidebar-seccion">
+        <h3>Gestión</h3>
+        <ul>
+          <li class="menu-item solo-admin"><span class="menu-icono">&#128101;</span><a href="personal.html">Personal</a></li>
+          <li class="menu-item activo"><span class="menu-icono">&#128227;</span><a href="anuncios.html">Anuncios</a></li>
+          <li class="menu-item"><span class="menu-icono">&#9993;&#65039;</span><a href="contactos.html">Contactos</a></li>
+        </ul>
+      </section>
+      <div class="sidebar-footer">
+        <p>Instituto American Land</p>
+        <p>Pitalito, Huila &bull; Desde 2009</p>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main class="contenido">
+
+      <div class="gestion-tabs" role="navigation" aria-label="Secciones de gestión">
+        <a href="personal.html" class="gestion-tab solo-admin"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><path d="M17 11.5l1.6 1.6 3.4-3.6"/></svg>Personal</a>
+        <a href="anuncios.html" class="gestion-tab activo" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>Anuncios</a>
+        <a href="contactos.html" class="gestion-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>Contactos<span class="tab-contador" id="tab-contador-contactos" hidden></span></a>
+      </div>
+
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Anuncios</h1>
+          <p>Publica avisos para estudiantes, docentes o todo el instituto</p>
+        </div>
+        <button class="btn-accion-header" id="btn-nuevo">&#43; Nuevo anuncio</button>
+      </div>
+
+      <div class="alerta" id="alerta" role="status"></div>
+
+      <div class="card-seccion">
+        <div class="barra-filtros">
+          <div class="busqueda-wrapper">
+            <span class="busqueda-icono">&#128269;</span>
+            <input type="text" id="input-busqueda" class="input-busqueda" placeholder="Buscar en anuncios..." />
+          </div>
+          <div class="filtros-grupo">
+            <select id="filtro-dirigido" class="filtro-select" aria-label="Filtrar por destinatarios">
+              <option value="">Todos los destinatarios</option>
+              <option value="todos">Todo el instituto</option>
+              <option value="estudiantes">Estudiantes</option>
+              <option value="docentes">Docentes</option>
+              <option value="salon">Un salón</option>
+            </select>
+            <select id="filtro-estado" class="filtro-select" aria-label="Filtrar por estado">
+              <option value="">Vigentes y ocultos</option>
+              <option value="vigente">Solo vigentes</option>
+              <option value="oculto">Ocultos o vencidos</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-seccion">
+        <div class="card-header">
+          <h2>Publicaciones</h2>
+          <span class="badge-conteo" id="badge-total">—</span>
+        </div>
+        <div class="lista-tarjetas" id="lista-anuncios">
+          <p class="gris-texto" style="padding:24px;text-align:center;">Cargando anuncios...</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL CREAR / EDITAR -->
+  <div class="modal-overlay" id="modal-anuncio" role="dialog" aria-modal="true" aria-labelledby="modal-anuncio-titulo" style="display:none">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-titulo" id="modal-anuncio-titulo">Nuevo anuncio</h2>
+        <button class="btn-cerrar-modal" id="btn-cerrar-anuncio" aria-label="Cerrar">&#10005;</button>
+      </div>
+      <form id="form-anuncio" novalidate>
+        <div class="modal-campo">
+          <label for="anu-titulo">Título <span class="req">*</span></label>
+          <input type="text" id="anu-titulo" maxlength="150" placeholder="Ej: Cierre por festivo el lunes" />
+        </div>
+        <div class="modal-campo">
+          <label for="anu-contenido">Mensaje <span class="req">*</span></label>
+          <textarea id="anu-contenido" maxlength="2000" placeholder="Escribe el anuncio..."></textarea>
+          <span class="ayuda"><span id="anu-contador">0</span>/2000</span>
+        </div>
+        <div class="modal-fila">
+          <div class="modal-campo">
+            <label for="anu-dirigido">Para</label>
+            <select id="anu-dirigido">
+              <option value="todos">Todo el instituto</option>
+              <option value="estudiantes">Solo estudiantes</option>
+              <option value="docentes">Solo docentes</option>
+            </select>
+          </div>
+          <div class="modal-campo">
+            <label for="anu-salon">Salón (opcional)</label>
+            <select id="anu-salon">
+              <option value="">Todos los salones</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-fila">
+          <div class="modal-campo">
+            <label for="anu-expira">Visible hasta (opcional)</label>
+            <input type="date" id="anu-expira" />
+          </div>
+          <div class="modal-campo" style="justify-content:flex-end">
+            <label class="modal-check"><input type="checkbox" id="anu-activo" checked /> Publicado (visible)</label>
+          </div>
+        </div>
+        <span class="campo-error" id="err-anuncio"></span>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancelar" id="btn-cancelar-anuncio">Cancelar</button>
+          <button type="submit" class="btn-modal-guardar" id="btn-guardar-anuncio">Publicar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAR (genérico) -->
+  <div class="modal-overlay" id="modal-confirmar" role="dialog" aria-modal="true" style="display:none">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <h2 class="modal-titulo">¿Confirmar?</h2>
+        <button class="btn-cerrar-modal" data-cancelar aria-label="Cerrar">&#10005;</button>
+      </div>
+      <p class="modal-aviso"></p>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancelar" data-cancelar>Cancelar</button>
+        <button type="button" class="btn-modal-eliminar" data-confirmar>Sí, continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/panel_roles.js"></script>
+  <script src="../assets/js/admin_comun.js"></script>
+  <script src="../assets/js/anuncios_admin.js"></script>
+  <script src="../assets/js/comunicaciones.js"></script>
+  <script src="../assets/js/menu_movil.js"></script>
+</body>
+</html>

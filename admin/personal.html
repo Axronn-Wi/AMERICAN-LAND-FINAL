@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Personal - Panel Admin - Instituto American Land</title>
+  <link rel="icon" type="image/png" href="../assets/img/Logo.png" />
+  <link rel="stylesheet" href="../assets/css/inicio_admin.css" />
+  <link rel="stylesheet" href="../assets/css/docentes_admin.css" />
+  <link rel="stylesheet" href="../assets/css/gestion_admin.css" />
+  <link rel="stylesheet" href="../assets/css/menu_movil.css" />
+  <link rel="stylesheet" href="../assets/css/portal_comun.css" />
+  <link rel="stylesheet" href="../assets/css/comunicaciones.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">A</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Administrador</span>
+          <span class="nav-rol">Admin</span>
+        </div>
+      </div>
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="docentes.html">Docentes</a></li>
+        <li><a href="alumnos.html">Alumnos</a></li>
+        <li><a href="salones.html">Salones</a></li>
+        <li><a href="matriculas.html">Matrículas</a></li>
+        <li><a href="personal.html" class="activo">Gestión</a></li>
+      </ul>
+      <div class="nav-acciones">
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Panel Admin</h3>
+        <ul>
+          <li class="menu-item"><span class="menu-icono">&#127968;</span><a href="inicio.html">Inicio</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128104;&#8205;&#127979;</span><a href="docentes.html">Docentes</a></li>
+          <li class="menu-item"><span class="menu-icono">&#127891;</span><a href="alumnos.html">Alumnos</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128198;</span><a href="salones.html">Salones</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128203;</span><a href="matriculas.html">Matrículas</a></li>
+        </ul>
+      </section>
+      <section class="sidebar-seccion">
+        <h3>Gestión</h3>
+        <ul>
+          <li class="menu-item activo solo-admin"><span class="menu-icono">&#128101;</span><a href="personal.html">Personal</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128227;</span><a href="anuncios.html">Anuncios</a></li>
+          <li class="menu-item"><span class="menu-icono">&#9993;&#65039;</span><a href="contactos.html">Contactos</a></li>
+        </ul>
+      </section>
+      <div class="sidebar-footer">
+        <p>Instituto American Land</p>
+        <p>Pitalito, Huila &bull; Desde 2009</p>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main class="contenido">
+
+      <div class="gestion-tabs" role="navigation" aria-label="Secciones de gestión">
+        <a href="personal.html" class="gestion-tab activo solo-admin" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><path d="M17 11.5l1.6 1.6 3.4-3.6"/></svg>Personal</a>
+        <a href="anuncios.html" class="gestion-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>Anuncios</a>
+        <a href="contactos.html" class="gestion-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>Contactos<span class="tab-contador" id="tab-contador-contactos" hidden></span></a>
+      </div>
+
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Personal administrativo</h1>
+          <p>Administradores y secretarias con acceso al panel</p>
+        </div>
+        <button class="btn-accion-header" id="btn-nuevo">&#43; Nuevo miembro</button>
+      </div>
+
+      <div class="alerta" id="alerta" role="status"></div>
+
+      <div class="grid-stats dos">
+        <div class="stat-card stat-alumnos">
+          <div class="stat-icono">&#128081;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-admins">0</span>
+            <span class="stat-label">Administradores</span>
+          </div>
+          <span class="stat-delta neutro" id="delta-admins">&#8212; Activos</span>
+        </div>
+        <div class="stat-card stat-docentes">
+          <div class="stat-icono">&#128105;&#8205;&#128188;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-secretarias">0</span>
+            <span class="stat-label">Secretarias</span>
+          </div>
+          <span class="stat-delta neutro" id="delta-secretarias">&#8212; Activas</span>
+        </div>
+      </div>
+
+      <div class="card-seccion">
+        <div class="barra-filtros">
+          <div class="busqueda-wrapper">
+            <span class="busqueda-icono">&#128269;</span>
+            <input type="text" id="input-busqueda" class="input-busqueda" placeholder="Buscar por nombre o correo..." />
+          </div>
+          <div class="filtros-grupo">
+            <select id="filtro-rol" class="filtro-select" aria-label="Filtrar por rol">
+              <option value="">Todos los roles</option>
+              <option value="admin">Administradores</option>
+              <option value="secretaria">Secretarias</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-seccion">
+        <div class="card-header">
+          <h2>Equipo</h2>
+          <span class="badge-conteo" id="badge-total">—</span>
+        </div>
+        <div class="tabla-wrap">
+          <table class="tabla-docentes">
+            <thead>
+              <tr>
+                <th>Nombre</th>
+                <th>Rol</th>
+                <th>Cargo y sede</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-personal">
+              <tr><td colspan="6" style="padding:24px;text-align:center;">Cargando personal...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL CREAR / EDITAR -->
+  <div class="modal-overlay" id="modal-personal" role="dialog" aria-modal="true" aria-labelledby="modal-personal-titulo" style="display:none">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 class="modal-titulo" id="modal-personal-titulo">Nuevo miembro</h2>
+        <button class="btn-cerrar-modal" id="btn-cerrar-personal" aria-label="Cerrar">&#10005;</button>
+      </div>
+      <form id="form-personal" novalidate>
+        <div class="modal-fila">
+          <div class="modal-campo">
+            <label for="per-rol">Rol <span class="req">*</span></label>
+            <select id="per-rol">
+              <option value="secretaria">Secretaria</option>
+              <option value="admin">Administrador</option>
+            </select>
+            <span class="ayuda" id="ayuda-rol">Puede gestionar estudiantes, matrículas, pagos, anuncios y contactos.</span>
+          </div>
+          <div class="modal-campo">
+            <label for="per-nombre">Nombre completo <span class="req">*</span></label>
+            <input type="text" id="per-nombre" maxlength="150" placeholder="Ej: Laura Gómez" />
+          </div>
+        </div>
+        <div class="modal-fila">
+          <div class="modal-campo">
+            <label for="per-correo">Correo electrónico <span class="req">*</span></label>
+            <input type="email" id="per-correo" maxlength="150" placeholder="correo@americanland.edu.co" />
+          </div>
+          <div class="modal-campo">
+            <label for="per-contrasena">Contraseña <span class="req" id="per-contrasena-req">*</span></label>
+            <input type="password" id="per-contrasena" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+          </div>
+        </div>
+        <div class="modal-fila">
+          <div class="modal-campo">
+            <label for="per-cargo">Cargo</label>
+            <input type="text" id="per-cargo" maxlength="100" placeholder="Ej: Secretaria académica" />
+          </div>
+          <div class="modal-campo">
+            <label for="per-sede">Sede</label>
+            <input type="text" id="per-sede" maxlength="100" placeholder="Ej: Pitalito" />
+          </div>
+        </div>
+        <div class="modal-fila">
+          <div class="modal-campo">
+            <label for="per-telefono">Teléfono</label>
+            <input type="tel" id="per-telefono" maxlength="20" placeholder="Ej: 3001234567" />
+          </div>
+          <div class="modal-campo"></div>
+        </div>
+        <span class="gris-texto" id="ayuda-edicion" style="display:none;font-size:0.76rem;">Al editar, deja vacía la contraseña para conservar la actual. El rol no se puede cambiar.</span>
+        <span class="campo-error" id="err-personal"></span>
+        <div class="modal-footer">
+          <button type="button" class="btn-modal-cancelar" id="btn-cancelar-personal">Cancelar</button>
+          <button type="submit" class="btn-modal-guardar" id="btn-guardar-personal">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAR (genérico) -->
+  <div class="modal-overlay" id="modal-confirmar" role="dialog" aria-modal="true" style="display:none">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <h2 class="modal-titulo">¿Confirmar?</h2>
+        <button class="btn-cerrar-modal" data-cancelar aria-label="Cerrar">&#10005;</button>
+      </div>
+      <p class="modal-aviso"></p>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancelar" data-cancelar>Cancelar</button>
+        <button type="button" class="btn-modal-eliminar" data-confirmar>Sí, continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/panel_roles.js"></script>
+  <script src="../assets/js/admin_comun.js"></script>
+  <script src="../assets/js/personal_admin.js"></script>
+  <script src="../assets/js/comunicaciones.js"></script>
+  <script src="../assets/js/menu_movil.js"></script>
+</body>
+</html>

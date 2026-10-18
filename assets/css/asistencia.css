@@ -1,0 +1,212 @@
+/* ============================================================
+   asistencia.css — Toma de asistencia (docente) y resumen (estudiante)
+   Instituto American Land
+   Ubicación: assets/css/asistencia.css
+   Se carga después de notas_docente.css (docente) o notas.css (estudiante).
+============================================================ */
+
+:root {
+  --asis-presente: #27AE60;
+  --asis-ausente:  #C0392B;
+  --asis-tarde:    #E67E22;
+  --asis-excusa:   #2980B9;
+}
+
+/* Botón principal apagado mientras no hay nada que guardar */
+.btn-accion:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; transform: none; }
+
+/* ── Controles de fecha ────────────────────────────────────── */
+.asis-controles {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.asis-fecha { display: flex; align-items: flex-end; gap: 8px; flex-wrap: wrap; }
+.asis-fecha-campo { display: flex; flex-direction: column; gap: 4px; font-size: 0.74rem; font-weight: 700; color: var(--gris-texto); text-transform: uppercase; letter-spacing: 0.6px; }
+.asis-fecha-campo input {
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1.5px solid var(--gris-borde);
+  font: inherit;
+  font-size: 0.9rem;
+  color: var(--negro);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.asis-fecha-campo input:focus { outline: none; border-color: var(--morado-claro); }
+.asis-flecha, .asis-hoy, .asis-todos {
+  height: 40px;
+  border-radius: 10px;
+  border: 1.5px solid var(--gris-borde);
+  background: var(--blanco);
+  color: var(--negro);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.asis-flecha { width: 40px; font-size: 1.3rem; line-height: 1; }
+.asis-hoy { padding: 0 14px; font-size: 0.82rem; }
+.asis-todos { padding: 0 16px; font-size: 0.82rem; color: var(--asis-presente); border-color: rgba(39,174,96,0.4); }
+.asis-flecha:hover, .asis-hoy:hover { border-color: var(--morado-claro); color: var(--morado); }
+.asis-todos:hover { background: rgba(39,174,96,0.08); }
+.asis-flecha:disabled { opacity: 0.4; cursor: not-allowed; }
+.asis-rapido { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.asis-estado-guardado { font-size: 0.78rem; color: var(--gris-texto); }
+.asis-estado-guardado.pendiente { color: var(--asis-tarde); font-weight: 700; }
+
+/* ── Resumen del día ──────────────────────────────────────── */
+.asis-resumen-dia { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.asis-contador {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--blanco);
+  border: 1px solid var(--gris-borde);
+  box-shadow: var(--sombra);
+}
+.asis-contador strong { font-size: 1.5rem; line-height: 1; }
+.asis-contador span { font-size: 0.78rem; color: var(--gris-texto); font-weight: 600; }
+.asis-contador.presente strong { color: var(--asis-presente); }
+.asis-contador.ausente strong { color: var(--asis-ausente); }
+.asis-contador.tarde strong { color: var(--asis-tarde); }
+.asis-contador.excusa strong { color: var(--asis-excusa); }
+
+/* ── Chips de la leyenda ──────────────────────────────────── */
+.asis-leyenda { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.asis-chip {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #fff;
+  margin-left: 6px;
+}
+.asis-chip.presente { background: var(--asis-presente); }
+.asis-chip.ausente { background: var(--asis-ausente); }
+.asis-chip.tarde { background: var(--asis-tarde); }
+.asis-chip.excusa { background: var(--asis-excusa); }
+
+/* ── Lista de estudiantes ─────────────────────────────────── */
+.asis-lista { display: flex; flex-direction: column; }
+.asis-fila {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto minmax(160px, 260px);
+  align-items: center;
+  gap: 14px;
+  padding: 12px 6px;
+  border-bottom: 1px solid var(--gris-borde);
+}
+.asis-fila:last-child { border-bottom: none; }
+.asis-alumno { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.asis-alumno-nombre { font-size: 0.88rem; font-weight: 600; color: var(--negro); }
+.asis-alumno-codigo { font-size: 0.72rem; color: var(--gris-texto); }
+
+.asis-opciones { display: flex; gap: 6px; }
+.asis-opcion {
+  min-width: 44px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1.5px solid var(--gris-borde);
+  background: var(--blanco);
+  color: var(--gris-texto);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.asis-opcion:active { transform: scale(0.94); }
+.asis-opcion:hover { border-color: currentColor; }
+.asis-opcion.presente:hover, .asis-opcion.presente[aria-pressed="true"] { color: var(--asis-presente); }
+.asis-opcion.ausente:hover,  .asis-opcion.ausente[aria-pressed="true"]  { color: var(--asis-ausente); }
+.asis-opcion.tarde:hover,    .asis-opcion.tarde[aria-pressed="true"]    { color: var(--asis-tarde); }
+.asis-opcion.excusa:hover,   .asis-opcion.excusa[aria-pressed="true"]   { color: var(--asis-excusa); }
+.asis-opcion[aria-pressed="true"] { background: currentColor; border-color: currentColor; }
+.asis-opcion[aria-pressed="true"] span { color: #fff; }
+
+.asis-observacion {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--gris-borde);
+  font: inherit;
+  font-size: 0.8rem;
+}
+.asis-observacion:focus { outline: none; border-color: var(--morado-claro); }
+.asis-vacio { padding: 24px; text-align: center; color: var(--gris-texto); font-size: 0.88rem; }
+.asis-nota { margin-top: 12px; font-size: 0.75rem; color: var(--gris-texto); }
+
+/* Porcentaje con barra */
+.asis-porcentaje { display: flex; align-items: center; gap: 8px; min-width: 120px; }
+.asis-barra { flex: 1; height: 6px; border-radius: 3px; background: var(--gris-borde); overflow: hidden; }
+.asis-barra span { display: block; height: 100%; border-radius: 3px; background: var(--asis-presente); }
+.asis-barra.media span { background: var(--asis-tarde); }
+.asis-barra.baja span { background: var(--asis-ausente); }
+.asis-porcentaje strong { font-size: 0.85rem; min-width: 44px; text-align: right; }
+
+/* ── Vista del estudiante ─────────────────────────────────── */
+.asis-alumno-resumen { display: grid; grid-template-columns: 180px 1fr; gap: 20px; align-items: center; }
+.asis-anillo {
+  --valor: 0;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  background: conic-gradient(var(--asis-color, var(--asis-presente)) calc(var(--valor) * 1%), var(--gris-borde) 0);
+}
+.asis-anillo-centro {
+  width: 116px;
+  height: 116px;
+  border-radius: 50%;
+  background: var(--blanco);
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.asis-anillo-centro strong { font-size: 1.7rem; color: var(--negro); display: block; line-height: 1; }
+.asis-anillo-centro span { font-size: 0.72rem; color: var(--gris-texto); }
+.asis-historial { list-style: none; display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; margin-top: 14px; }
+.asis-historial li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: var(--gris-claro);
+  font-size: 0.83rem;
+}
+.asis-historial small { color: var(--gris-texto); display: block; }
+.asis-etiqueta { font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 50px; color: #fff; white-space: nowrap; }
+.asis-etiqueta.presente { background: var(--asis-presente); }
+.asis-etiqueta.ausente { background: var(--asis-ausente); }
+.asis-etiqueta.tarde { background: var(--asis-tarde); }
+.asis-etiqueta.excusa { background: var(--asis-excusa); }
+
+/* ── Celular ──────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .asis-fila { grid-template-columns: 1fr; gap: 8px; }
+  .asis-opciones { flex-wrap: wrap; }
+  .asis-opcion { flex: 1; }
+}
+@media (max-width: 640px) {
+  .asis-resumen-dia { grid-template-columns: repeat(2, 1fr); }
+  .asis-alumno-resumen { grid-template-columns: 1fr; }
+  .asis-controles { flex-direction: column; align-items: stretch; }
+  .asis-fecha { flex-wrap: nowrap; }
+  .asis-fecha-campo { flex: 1; min-width: 0; }
+  .asis-fecha-campo input { width: 100%; }
+  .asis-hoy { padding: 0 10px; }
+  .asis-rapido { justify-content: space-between; }
+}

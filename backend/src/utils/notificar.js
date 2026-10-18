@@ -29,11 +29,11 @@ async function usuariosDelSalon(salonId) {
   return r.rows.map((f) => f.usuario_id);
 }
 
-// Usuarios con rol admin activos
+// Usuarios de administración activos (admin y secretaría)
 async function usuariosAdmin() {
   const r = await pool.query(
     `SELECT u.id FROM usuarios u JOIN roles r ON u.rol_id = r.id
-     WHERE r.nombre = 'admin' AND u.activo = TRUE`
+     WHERE r.nombre IN ('admin', 'secretaria') AND u.activo = TRUE`
   );
   return r.rows.map((f) => f.id);
 }

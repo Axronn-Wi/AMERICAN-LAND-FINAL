@@ -14,6 +14,7 @@
 
   <!-- Enlace al CSS externo -->
   <link rel="stylesheet" href="assets/css/index.css" />
+  <link rel="stylesheet" href="assets/css/contacto_web.css" />
 </head>
 <body>
 
@@ -128,8 +129,67 @@
     </div>
   </section>
 
+  <!-- ===== CONTACTO (formulario: assets/js/contacto_web.js) ===== -->
+  <section class="contacto-web" id="contacto" aria-labelledby="contacto-titulo">
+    <div class="contacto-grid">
+
+      <div class="contacto-info animar-entrada">
+        <span class="contacto-etiqueta">Contáctanos</span>
+        <h2 id="contacto-titulo">¿Tienes preguntas? Escríbenos</h2>
+        <p>Cuéntanos qué nivel te interesa o en qué horario puedes estudiar y te asesoramos sin compromiso.</p>
+        <ul class="contacto-medios">
+          <li>
+            <span class="contacto-icono" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
+            </span>
+            <div><strong>Llámanos o escríbenos por WhatsApp</strong><a href="https://wa.me/573138132388" target="_blank" rel="noopener noreferrer">313 813 2388</a></div>
+          </li>
+          <li>
+            <span class="contacto-icono" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>
+            </span>
+            <div><strong>Correo</strong><a href="mailto:ventasymarketing.al@gmail.com">ventasymarketing.al@gmail.com</a></div>
+          </li>
+          <li>
+            <span class="contacto-icono" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            </span>
+            <div><strong>Visítanos</strong><span>Calle 3 # 1-45, barrio Quinche, Pitalito (Huila)</span></div>
+          </li>
+        </ul>
+      </div>
+
+      <form class="contacto-form animar-entrada" id="form-contacto" novalidate>
+        <div class="contacto-fila">
+          <label class="contacto-campo">
+            <span>Nombre y apellido <em aria-hidden="true">*</em></span>
+            <input type="text" name="nombre_apellido" maxlength="150" autocomplete="name" required placeholder="Ej: Laura Gómez" />
+          </label>
+          <label class="contacto-campo">
+            <span>Teléfono</span>
+            <input type="tel" name="telefono" maxlength="20" autocomplete="tel" placeholder="Ej: 3001234567" />
+          </label>
+        </div>
+        <label class="contacto-campo">
+          <span>Correo electrónico <em aria-hidden="true">*</em></span>
+          <input type="email" name="correo" maxlength="150" autocomplete="email" required placeholder="tucorreo@ejemplo.com" />
+        </label>
+        <label class="contacto-campo">
+          <span>Mensaje <em aria-hidden="true">*</em></span>
+          <textarea name="mensaje" rows="4" maxlength="2000" required placeholder="Hola, quiero información sobre el nivel A1 en horario de la noche..."></textarea>
+        </label>
+        <!-- Campo trampa para robots: las personas no lo ven -->
+        <label class="contacto-trampa" aria-hidden="true">Sitio web<input type="text" name="sitio_web" tabindex="-1" autocomplete="off" /></label>
+        <p class="contacto-aviso" id="contacto-aviso" role="status" aria-live="polite"></p>
+        <button type="submit" class="btn-primario contacto-enviar" id="contacto-enviar">Enviar mensaje</button>
+        <p class="contacto-legal">Usaremos tus datos solo para responderte.</p>
+      </form>
+
+    </div>
+  </section>
+
   <!-- ===== FOOTER ===== -->
-  <footer id="contacto">
+  <footer id="pie">
     <div class="footer-grid">
 
       <div class="footer-col">
@@ -181,5 +241,6 @@
   <!-- Enlace al JS externo -->
   <script src="assets/js/index.js"></script>
 
+  <script src="assets/js/contacto_web.js"></script>
 </body>
 </html>
