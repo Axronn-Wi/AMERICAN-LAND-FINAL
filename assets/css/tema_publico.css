@@ -1,0 +1,190 @@
+/* ============================================================
+   tema_publico.css — Diseño Púrpura Americana para las páginas
+   de admisiones (selección, niveles, estudiantes, inscripción)
+   y de acceso (login, registro, recuperar contraseña).
+   Instituto American Land
+   Ubicación: assets/css/tema_publico.css
+
+   Se carga DESPUÉS del CSS propio de cada página y de tema_j.css.
+   Criterio: encabezado, portada y pie oscuros (como la página
+   principal); formularios y tarjetas claros para leer cómodo.
+============================================================ */
+
+/* ── Paleta y tipografías: reemplazan las variables de cada página ── */
+:root {
+  --morado: #7E22CE;
+  --morado-nav: #0A0518;
+  --morado-claro: #C026D3;
+  --rojo: #E11D48;
+  --gris-claro: #F6F2FD;
+  --gris-borde: #E6DDF5;
+  --negro: #1B1030;
+  --font: var(--j-cuerpo);
+  --font-cuerpo: var(--j-cuerpo);
+  --font-titulo: var(--j-titulo);
+}
+
+body { font-family: var(--j-cuerpo); background-color: var(--gris-claro); }
+h1, h2, .titulo, .login-titulo { font-family: var(--j-titulo); letter-spacing: -0.02em; }
+
+/* Barra oscura de borde a borde (la píldora de vidrio va encima) */
+header.j-header { background: var(--j-fondo); }
+
+/* Menú móvil: los scripts de estas páginas usan .abierto en la lista */
+@media (max-width: 1040px) {
+  header.j-header nav:has(.nav-links.abierto) { flex-wrap: wrap; }
+  header.j-header .nav-links.abierto,
+  header.j-header .nav-auth.abierto {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    order: 3;
+    margin: 10px 0 0;
+    flex: 0 0 100%;
+    max-width: none;
+    padding: 6px;
+    box-shadow: none;
+    border-top: 0;
+  }
+  header.j-header .nav-links.abierto { background: rgba(255, 255, 255, 0.04); }
+  header.j-header .nav-links.abierto a { padding: 13px 14px; }
+  header.j-header .nav-auth.abierto { order: 4; margin-top: 0; background: transparent; border: 0; gap: 8px; }
+  header.j-header .nav-auth.abierto .btn-login,
+  header.j-header .nav-auth.abierto .btn-signup { justify-content: center; text-align: center; }
+  header.j-header .nav-auth.abierto .btn-login { background: rgba(255, 255, 255, 0.06); }
+}
+
+/* ── Portadas de admisiones: aurora oscura con estrellas ── */
+.hero-admisiones,
+.hero-niveles,
+.hero-estudiantes,
+.hero-inscripcion {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(126, 34, 206, 0.55), transparent 45%),
+    radial-gradient(circle at 92% 30%, rgba(192, 38, 211, 0.38), transparent 45%),
+    var(--j-fondo);
+  color: var(--j-texto);
+}
+.hero-admisiones::before,
+.hero-niveles::before,
+.hero-estudiantes::before,
+.hero-inscripcion::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(250, 204, 21, 0.28) 1.2px, transparent 1.2px);
+  background-size: 34px 34px;
+  mask-image: radial-gradient(ellipse at 70% 30%, #000, transparent 75%);
+  -webkit-mask-image: radial-gradient(ellipse at 70% 30%, #000, transparent 75%);
+}
+.hero-admisiones > *,
+.hero-niveles > *,
+.hero-estudiantes > *,
+.hero-inscripcion > * { position: relative; }
+.hero-admisiones h1,
+.hero-niveles h1,
+.hero-estudiantes h1,
+.hero-inscripcion h1 { font-family: var(--j-titulo); font-weight: 800; }
+.hero-admisiones p,
+.hero-niveles p,
+.hero-estudiantes p,
+.hero-inscripcion p { color: var(--j-texto-2); }
+.hero-admisiones .etiqueta,
+.hero-niveles .etiqueta,
+.hero-estudiantes .etiqueta {
+  background: rgba(250, 204, 21, 0.12);
+  color: var(--j-dorado);
+  border: 1px solid rgba(250, 204, 21, 0.3);
+}
+
+/* ── Botones de las páginas públicas ── */
+.btn-primario,
+.btn-submit,
+.btn-continuar,
+.btn-pagar {
+  background: var(--j-degradado) !important;
+  border-color: transparent !important;
+  color: #fff !important;
+  box-shadow: 0 12px 30px -12px rgba(192, 38, 211, 0.75);
+}
+.btn-primario:hover,
+.btn-submit:hover,
+.btn-continuar:hover,
+.btn-pagar:hover { filter: brightness(1.08); }
+.btn-secundario {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: #fff !important;
+}
+
+/* ══════════════════════════════════════════
+   PÁGINAS DE ACCESO (login, registro, recuperar)
+   Tarjeta clara sobre fondo aurora oscuro
+══════════════════════════════════════════ */
+body.j-acceso {
+  background:
+    radial-gradient(circle at 10% 10%, rgba(126, 34, 206, 0.6), transparent 42%),
+    radial-gradient(circle at 90% 85%, rgba(192, 38, 211, 0.4), transparent 45%),
+    radial-gradient(circle at 70% 10%, rgba(225, 29, 72, 0.22), transparent 35%),
+    var(--j-fondo);
+  background-attachment: fixed;
+}
+body.j-acceso::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(250, 204, 21, 0.28) 1.2px, transparent 1.2px);
+  background-size: 34px 34px;
+}
+body.j-acceso .estrella { color: rgba(250, 204, 21, 0.55); }
+body.j-acceso .card-login,
+body.j-acceso .card-registro,
+body.j-acceso .contenedor-exito,
+body.j-acceso .card,
+body.j-acceso .tarjeta {
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 30px 80px -24px rgba(0, 0, 0, 0.65), 0 0 0 6px rgba(255, 255, 255, 0.06);
+}
+body.j-acceso .btn-volver {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  backdrop-filter: blur(10px);
+}
+body.j-acceso .btn-volver:hover { background: rgba(255, 255, 255, 0.16); }
+body.j-acceso a:not(.btn-volver):not(.btn-submit) { color: var(--morado); }
+
+/* ── Franjas y llamados finales: degradado del diseño en vez de rojo plano ── */
+.cifras-estudiantes,
+.cta-final {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #3B0764, #6B21A8 50%, #9F1239) !important;
+  color: #fff;
+}
+.cifras-estudiantes::before,
+.cta-final::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(250, 204, 21, 0.3) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+  opacity: 0.55;
+}
+.cifras-estudiantes > *,
+.cta-final > * { position: relative; }
+.cta-final h2 { font-family: var(--j-titulo); }
+
+/* Números de pasos y detalles puntuales con el degradado */
+.paso-numero,
+.punto-carrusel.activo,
+.badge-nivel-mini { background: var(--j-degradado) !important; }
+.chip:hover { background: var(--j-degradado); border-color: transparent; }

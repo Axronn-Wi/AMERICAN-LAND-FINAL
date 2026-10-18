@@ -3,244 +3,239 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Instituto American Land | Aprende inglés en Pitalito, Huila</title>
-  <meta name="description" content="Instituto American Land: cursos de inglés del nivel A1 al C2 en Pitalito, Huila. Horarios flexibles, salones virtuales y certificación. Inscríbete en línea." />
-  <meta name="theme-color" content="#3B0072" />
+  <title>Instituto American Land | Inglés del A1 al C2 en Pitalito, Huila</title>
+  <meta name="description" content="Instituto American Land: programas de inglés del A1 al C2 alineados al Marco Común Europeo, con docentes calificados, seguimiento académico en línea y tres jornadas. Pitalito, Huila." />
+  <meta name="theme-color" content="#0A0518" />
   <meta property="og:title" content="Instituto American Land" />
-  <meta property="og:description" content="Aprende inglés del nivel A1 al C2 con horarios flexibles y certificación." />
+  <meta property="og:description" content="Domina el inglés con un estándar internacional. Programas del A1 al C2 en Pitalito, Huila." />
   <meta property="og:image" content="assets/img/Logo.png" />
   <meta property="og:type" content="website" />
-  <link rel="icon" type="image/png" href="assets/img/Logo.png" />
-
-  <!-- Enlace al CSS externo -->
-  <link rel="stylesheet" href="assets/css/index.css" />
-  <link rel="stylesheet" href="assets/css/contacto_web.css" />
+  <link rel="icon" type="image/png" href="assets/img/logo_circulo.png" />
+  <link rel="stylesheet" href="assets/css/tema_j.css" />
+  <link rel="stylesheet" href="assets/css/landing.css" />
 </head>
-<body>
+<body class="j-fondo-aurora">
 
-  <!-- ===== NAVBAR ===== -->
-  <header>
-    <nav>
+  <!-- ===== FRANJA DE CONTACTO ===== -->
+  <div class="j-topbar">
+    <div class="j-topbar-in">
+      <span class="j-topbar-izq">📍 Calle 3 # 1-45, barrio Quinche · Pitalito, Huila</span>
+      <span class="j-topbar-der">
+        <a href="tel:+573138132388">📞 313 813 2388</a>
+        <a href="mailto:ventasymarketing.al@gmail.com">✉ ventasymarketing.al@gmail.com</a>
+      </span>
+    </div>
+  </div>
 
+  <!-- ===== BARRA DE NAVEGACIÓN ===== -->
+  <header class="j-header" id="encabezado">
+    <nav id="nav">
       <a href="#inicio" class="nav-marca">
-        <img src="assets/img/Logo.png" alt="Logo" class="nav-marca-logo" />
+        <img src="assets/img/logo_circulo.png" alt="Logo Instituto American Land" class="nav-marca-logo" />
         <div class="nav-marca-texto">
           <strong>American Land</strong>
-          <span>Since 2009</span>
+          <span>Instituto de inglés · Desde 2009</span>
         </div>
       </a>
 
-      <div class="nav-divider"></div>
-
       <ul class="nav-links" id="nav-links">
         <li><a href="#inicio" class="activo">Inicio</a></li>
-        <li><a href="admisiones/seleccion.html">Admisión</a></li>
+        <li><a href="#programas">Programas</a></li>
+        <li><a href="admisiones/seleccion.html">Admisiones</a></li>
         <li><a href="admisiones/estudiantes.html">Estudiantes</a></li>
         <li><a href="#contacto">Contacto</a></li>
       </ul>
 
       <div class="nav-auth" id="nav-auth">
-        <a href="auth/login.html" class="btn-login">Log In</a>
-        <a href="auth/registro.html" class="btn-signup">Sign Up</a>
+        <a href="auth/login.html" class="btn-login">Ingresar</a>
+        <a href="admisiones/seleccion.html" class="btn-signup">Inscríbete</a>
       </div>
 
-      <button class="btn-hamburguesa" id="btn-menu" aria-label="Abrir menú">&#9776;</button>
-
+      <button class="btn-hamburguesa" id="btn-menu" aria-label="Abrir menú" aria-expanded="false">&#9776;</button>
     </nav>
   </header>
 
-  <!-- ===== HERO ===== -->
-  <section class="hero" id="inicio">
-    <div class="hero-inner">
-
-      <div class="hero-logo">
-        <img src="assets/img/EEUU.png" alt="Logo Instituto American Land" />
-      </div>
-
+  <main>
+    <!-- ===== HERO ===== -->
+    <section class="hero contenedor" id="inicio">
       <div class="hero-texto">
-        <h1>Bienvenidos al Instituto American Land</h1>
-        <p>Aprende inglés con los mejores niveles desde A1 hasta C2</p>
-        <div class="hero-botones">
-          <a href="auth/registro.html" class="btn-primario">Inscribirse Ahora</a>
-          <a href="admisiones/niveles.html" class="btn-secundario">Ver Niveles</a>
+        <span class="sello"><b>2027-I</b> Inscripciones abiertas para todos los niveles</span>
+        <h1>Domina el inglés con un <i>estándar internacional</i>.</h1>
+        <p>Programas del A1 al C2 alineados al Marco Común Europeo, con docentes calificados, seguimiento académico en línea y horarios en tres jornadas. Más de 15 años formando estudiantes y profesionales en el Huila.</p>
+        <div class="botones">
+          <a href="admisiones/seleccion.html" class="j-btn j-btn-primario">Solicitar inscripción →</a>
+          <a href="#programas" class="j-btn j-btn-vidrio">Conocer programas</a>
         </div>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ===== CARACTERÍSTICAS ===== -->
-  <section class="caracteristicas" id="caracteristicas">
-    <div class="grid-caracteristicas">
-
-      <div class="card-caracteristica animar-entrada">
-        <span class="icono">🎓</span>
-        <h2>Educación de Calidad</h2>
-        <p>Programas de inglés reconocidos internacionalmente</p>
-      </div>
-
-      <div class="card-caracteristica animar-entrada">
-        <span class="icono">🏆</span>
-        <h2>Excelencia Académica</h2>
-        <p>Certificación internacional en inglés</p>
-      </div>
-
-      <div class="card-caracteristica animar-entrada">
-        <span class="icono">👥</span>
-        <h2>Comunidad Diversa</h2>
-        <p>Estudiantes de toda Colombia</p>
-      </div>
-
-      <div class="card-caracteristica animar-entrada">
-        <span class="icono">📚</span>
-        <h2>Recursos Modernos</h2>
-        <p>Salones virtuales y material digital</p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ===== CAMINO AL ÉXITO ===== -->
-  <section class="camino-exito">
-    <h2>El Camino al Éxito</h2>
-    <p class="subtitulo">Únete a cientos de estudiantes que han transformado sus vidas aprendiendo inglés con nosotros.</p>
-
-    <div class="grid-estadisticas">
-      <div class="stat-item animar-entrada">
-        <h3>Certificación Internacional</h3>
-        <p>Certificados reconocidos mundialmente</p>
-      </div>
-      <div class="stat-item animar-entrada">
-        <h3>Profesores Nativos</h3>
-        <p>Aprende con hablantes nativos</p>
-      </div>
-      <div class="stat-item animar-entrada">
-        <h3>Horarios Flexibles</h3>
-        <p>Mañana, tarde y noche</p>
-      </div>
-      <div class="stat-item animar-entrada">
-        <h3>+500 Estudiantes</h3>
-        <p>Comunidad en crecimiento</p>
-      </div>
-      <div class="stat-item animar-entrada">
-        <h3>Desde 2009</h3>
-        <p>Más de 15 años de trayectoria</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== CONTACTO (formulario: assets/js/contacto_web.js) ===== -->
-  <section class="contacto-web" id="contacto" aria-labelledby="contacto-titulo">
-    <div class="contacto-grid">
-
-      <div class="contacto-info animar-entrada">
-        <span class="contacto-etiqueta">Contáctanos</span>
-        <h2 id="contacto-titulo">¿Tienes preguntas? Escríbenos</h2>
-        <p>Cuéntanos qué nivel te interesa o en qué horario puedes estudiar y te asesoramos sin compromiso.</p>
-        <ul class="contacto-medios">
-          <li>
-            <span class="contacto-icono" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg>
-            </span>
-            <div><strong>Llámanos o escríbenos por WhatsApp</strong><a href="https://wa.me/573138132388" target="_blank" rel="noopener noreferrer">313 813 2388</a></div>
-          </li>
-          <li>
-            <span class="contacto-icono" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>
-            </span>
-            <div><strong>Correo</strong><a href="mailto:ventasymarketing.al@gmail.com">ventasymarketing.al@gmail.com</a></div>
-          </li>
-          <li>
-            <span class="contacto-icono" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
-            </span>
-            <div><strong>Visítanos</strong><span>Calle 3 # 1-45, barrio Quinche, Pitalito (Huila)</span></div>
-          </li>
+        <ul class="garantias">
+          <li>Programas alineados al MCER</li>
+          <li>Docentes calificados</li>
+          <li>Plataforma académica propia</li>
         </ul>
       </div>
 
-      <form class="contacto-form animar-entrada" id="form-contacto" novalidate>
-        <div class="contacto-fila">
-          <label class="contacto-campo">
-            <span>Nombre y apellido <em aria-hidden="true">*</em></span>
-            <input type="text" name="nombre_apellido" maxlength="150" autocomplete="name" required placeholder="Ej: Laura Gómez" />
-          </label>
-          <label class="contacto-campo">
-            <span>Teléfono</span>
-            <input type="tel" name="telefono" maxlength="20" autocomplete="tel" placeholder="Ej: 3001234567" />
-          </label>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="orbita"></div>
+        <div class="halo"></div>
+        <img src="assets/img/EEUU.png" alt="" />
+        <div class="flotante f1"><strong>+15</strong>años de trayectoria</div>
+        <div class="flotante f2"><strong>A1 → C2</strong>todos los niveles</div>
+      </div>
+    </section>
+
+    <!-- ===== NIVELES ===== -->
+    <section class="contenedor" id="programas" aria-label="Niveles">
+      <div class="niveles">
+        <a class="nivel animar-entrada" href="admisiones/niveles.html#nivel-a1"><strong>A1</strong><span>Principiante</span></a>
+        <a class="nivel animar-entrada" href="admisiones/niveles.html#nivel-a2"><strong>A2</strong><span>Básico</span></a>
+        <a class="nivel animar-entrada" href="admisiones/niveles.html#nivel-b1"><strong>B1</strong><span>Intermedio</span></a>
+        <a class="nivel animar-entrada" href="admisiones/niveles.html#nivel-b2"><strong>B2</strong><span>Intermedio alto</span></a>
+        <a class="nivel animar-entrada" href="admisiones/niveles.html#nivel-c1"><strong>C1</strong><span>Avanzado</span></a>
+        <a class="nivel animar-entrada" href="admisiones/niveles.html#nivel-c2"><strong>C2</strong><span>Maestría</span></a>
+      </div>
+    </section>
+
+    <!-- ===== CINTA ===== -->
+    <div class="cinta" aria-hidden="true"><div>
+      <span>Speak English</span><span>Estándar internacional</span><span>Tres jornadas</span><span>Plataforma académica</span>
+      <span>Speak English</span><span>Estándar internacional</span><span>Tres jornadas</span><span>Plataforma académica</span>
+    </div></div>
+
+    <!-- ===== POR QUÉ NOSOTROS ===== -->
+    <section class="seccion contenedor" id="beneficios">
+      <div class="encabezado">
+        <small>POR QUÉ AMERICAN LAND</small>
+        <h2>Formación integral con resultados medibles</h2>
+      </div>
+      <div class="beneficios">
+        <article class="beneficio animar-entrada">
+          <div class="icono"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 9 12 4.5 21.5 9 12 13.5Z"/><path d="M6.5 11.2v4.3c0 1.4 2.5 2.8 5.5 2.8s5.5-1.4 5.5-2.8v-4.3"/></svg></div>
+          <h3>Estándar internacional</h3>
+          <p>Contenidos y evaluaciones alineados al Marco Común Europeo de Referencia, que te preparan para certificar tu nivel.</p>
+        </article>
+        <article class="beneficio animar-entrada">
+          <div class="icono"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12" rx="2"/><path d="M8 20.5h8M12 16.5v4"/></svg></div>
+          <h3>Seguimiento académico</h3>
+          <p>Consulta notas, tareas, asistencia y comunícate con tu docente desde nuestra plataforma.</p>
+        </article>
+        <article class="beneficio animar-entrada">
+          <div class="icono"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></div>
+          <h3>Tres jornadas</h3>
+          <p>Grupos en la mañana, la tarde y la noche para que estudies sin interrumpir tu trabajo o tu colegio.</p>
+        </article>
+      </div>
+
+      <div class="cifras">
+        <div><strong class="j-degradado-texto">+500</strong><span>estudiantes formados</span></div>
+        <div><strong class="j-degradado-texto">15+</strong><span>años de trayectoria</span></div>
+        <div><strong class="j-degradado-texto">6</strong><span>niveles del MCER</span></div>
+        <div><strong class="j-degradado-texto">3</strong><span>jornadas al día</span></div>
+      </div>
+    </section>
+
+    <!-- ===== CONTACTO (formulario: assets/js/contacto_web.js) ===== -->
+    <section class="contacto-web contenedor" id="contacto" aria-labelledby="contacto-titulo">
+      <div class="contacto-grid">
+        <div class="contacto-info animar-entrada">
+          <span class="contacto-etiqueta">Contáctanos</span>
+          <h2 id="contacto-titulo">Recibe asesoría <i>personalizada</i></h2>
+          <p>Cuéntanos qué nivel te interesa y en qué jornada puedes estudiar. Un asesor académico te contactará para orientarte.</p>
+          <ul class="contacto-medios">
+            <li>
+              <span class="contacto-icono" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></span>
+              <div><strong>Teléfono y WhatsApp</strong><a href="https://wa.me/573138132388" target="_blank" rel="noopener noreferrer">313 813 2388</a></div>
+            </li>
+            <li>
+              <span class="contacto-icono" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg></span>
+              <div><strong>Correo</strong><a href="mailto:ventasymarketing.al@gmail.com">ventasymarketing.al@gmail.com</a></div>
+            </li>
+            <li>
+              <span class="contacto-icono" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21Z"/><circle cx="12" cy="9.5" r="2.5"/></svg></span>
+              <div><strong>Sede</strong><span>Calle 3 # 1-45, barrio Quinche, Pitalito (Huila)</span></div>
+            </li>
+          </ul>
         </div>
-        <label class="contacto-campo">
-          <span>Correo electrónico <em aria-hidden="true">*</em></span>
-          <input type="email" name="correo" maxlength="150" autocomplete="email" required placeholder="tucorreo@ejemplo.com" />
-        </label>
-        <label class="contacto-campo">
-          <span>Mensaje <em aria-hidden="true">*</em></span>
-          <textarea name="mensaje" rows="4" maxlength="2000" required placeholder="Hola, quiero información sobre el nivel A1 en horario de la noche..."></textarea>
-        </label>
-        <!-- Campo trampa para robots: las personas no lo ven -->
-        <label class="contacto-trampa" aria-hidden="true">Sitio web<input type="text" name="sitio_web" tabindex="-1" autocomplete="off" /></label>
-        <p class="contacto-aviso" id="contacto-aviso" role="status" aria-live="polite"></p>
-        <button type="submit" class="btn-primario contacto-enviar" id="contacto-enviar">Enviar mensaje</button>
-        <p class="contacto-legal">Usaremos tus datos solo para responderte.</p>
-      </form>
 
-    </div>
-  </section>
+        <form class="contacto-form animar-entrada" id="form-contacto" novalidate>
+          <div class="contacto-fila">
+            <label class="contacto-campo">
+              <span>Nombre y apellido <em aria-hidden="true">*</em></span>
+              <input type="text" name="nombre_apellido" maxlength="150" autocomplete="name" required placeholder="Ej: Laura Gómez" />
+            </label>
+            <label class="contacto-campo">
+              <span>Teléfono</span>
+              <input type="tel" name="telefono" maxlength="20" autocomplete="tel" placeholder="Ej: 3001234567" />
+            </label>
+          </div>
+          <label class="contacto-campo">
+            <span>Correo electrónico <em aria-hidden="true">*</em></span>
+            <input type="email" name="correo" maxlength="150" autocomplete="email" required placeholder="tucorreo@ejemplo.com" />
+          </label>
+          <label class="contacto-campo">
+            <span>Mensaje <em aria-hidden="true">*</em></span>
+            <textarea name="mensaje" rows="4" maxlength="2000" required placeholder="Quisiera información sobre el nivel B1 en la jornada de la noche."></textarea>
+          </label>
+          <label class="contacto-trampa" aria-hidden="true">Sitio web<input type="text" name="sitio_web" tabindex="-1" autocomplete="off" /></label>
+          <p class="contacto-aviso" id="contacto-aviso" role="status" aria-live="polite"></p>
+          <button type="submit" class="j-btn j-btn-primario contacto-enviar" id="contacto-enviar">Enviar mensaje</button>
+          <p class="contacto-legal">Usaremos tus datos únicamente para responder tu solicitud.</p>
+        </form>
+      </div>
+    </section>
 
-  <!-- ===== FOOTER ===== -->
-  <footer id="pie">
+    <!-- ===== LLAMADO FINAL ===== -->
+    <section class="contenedor">
+      <div class="cta">
+        <h2>Da el siguiente paso en tu formación</h2>
+        <p>Realiza tu inscripción en línea y elige el nivel y la jornada que mejor se ajustan a ti.</p>
+        <a href="admisiones/seleccion.html" class="j-btn j-btn-primario">Iniciar inscripción →</a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== PIE DE PÁGINA ===== -->
+  <footer class="j-footer" id="pie">
     <div class="footer-grid">
-
       <div class="footer-col">
         <h4>Instituto American Land</h4>
-        <p>Aprende inglés con los mejores profesores</p>
+        <p>Formación en inglés con estándar internacional en Pitalito, Huila, desde 2009.</p>
         <div class="footer-redes">
           <a href="https://www.facebook.com" target="_blank" rel="noopener noreferrer">Facebook</a>
           <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer">Instagram</a>
         </div>
       </div>
-
       <div class="footer-col">
-        <h4>Enlaces Rápidos</h4>
+        <h4>Enlaces</h4>
         <ul>
-          <li><a href="admisiones/niveles.html">Niveles</a></li>
+          <li><a href="admisiones/niveles.html">Programas y niveles</a></li>
           <li><a href="admisiones/seleccion.html">Admisiones</a></li>
           <li><a href="admisiones/estudiantes.html">Estudiantes</a></li>
-          <li><a href="#contacto">Contacto</a></li>
+          <li><a href="auth/login.html">Plataforma académica</a></li>
         </ul>
       </div>
-
       <div class="footer-col">
         <h4>Contacto</h4>
         <ul>
           <li><a href="mailto:ventasymarketing.al@gmail.com">ventasymarketing.al@gmail.com</a></li>
-          <li><a href="tel:+573138132388">3138132388</a></li>
-          <li>Calle 3 # 1-45 barrio Quinche</li>
+          <li><a href="tel:+573138132388">313 813 2388</a></li>
+          <li>Calle 3 # 1-45, barrio Quinche</li>
           <li>Pitalito, Huila, Colombia</li>
         </ul>
       </div>
-
       <div class="footer-col">
         <h4>Legal</h4>
         <ul>
-          <li><a href="#privacidad">Política de Privacidad</a></li>
-          <li><a href="#accesibilidad">Declaración de Accesibilidad</a></li>
-          <li><a href="#terminos">Términos y Condiciones</a></li>
-          <li><a href="#reembolso">Política de Reembolso</a></li>
+          <li><a href="#privacidad">Política de privacidad</a></li>
+          <li><a href="#terminos">Términos y condiciones</a></li>
+          <li><a href="#reembolso">Política de reembolso</a></li>
         </ul>
       </div>
-
     </div>
-
     <div class="footer-copy">
       <p>&copy; 2009&ndash;<span id="anio-actual">2026</span> Instituto American Land. Todos los derechos reservados.</p>
     </div>
   </footer>
 
-  <!-- Enlace al JS externo -->
-  <script src="assets/js/index.js"></script>
-
+  <script src="assets/js/sitio_publico.js"></script>
   <script src="assets/js/contacto_web.js"></script>
 </body>
 </html>

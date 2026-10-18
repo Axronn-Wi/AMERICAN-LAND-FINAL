@@ -1,0 +1,213 @@
+/* ============================================================
+   tema_portal.css — Diseño Púrpura Americana para los portales
+   (admin / secretaría, docente y estudiante)
+   Instituto American Land
+   Ubicación: assets/css/tema_portal.css
+
+   Se carga al FINAL de cada página del portal. Reemplaza las
+   variables de color y tipografía de cada hoja y da el estilo J a
+   la barra superior, el menú lateral y los botones principales.
+   El área de trabajo queda clara para leer tablas y formularios.
+============================================================ */
+
+@import url('tema_j.css');
+
+:root {
+  --morado: #7E22CE;
+  --morado-nav: #120A26;
+  --morado-claro: #A21CAF;
+  --rojo: #E11D48;
+  --gris-claro: #F6F2FD;
+  --gris-borde: #EAE2F7;
+  --negro: #1B1030;
+  --font: var(--j-cuerpo);
+  --sombra: 0 2px 14px rgba(76, 29, 149, 0.08);
+}
+
+body {
+  font-family: var(--j-cuerpo);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(192, 38, 211, 0.06), transparent 40%),
+    var(--gris-claro);
+}
+
+/* Títulos de página con la tipografía del sitio */
+.encabezado-pagina h1,
+.encabezado-salon h1,
+.encabezado-info h1 {
+  font-family: var(--j-titulo);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.card-header h2,
+.anuncios-cabecera h2 { font-family: var(--j-cuerpo); font-weight: 700; }
+
+/* ══════════════════════════════════════════
+   BARRA SUPERIOR
+══════════════════════════════════════════ */
+header {
+  background:
+    radial-gradient(circle at 12% -60%, rgba(126, 34, 206, 0.75), transparent 55%),
+    radial-gradient(circle at 88% 160%, rgba(192, 38, 211, 0.55), transparent 50%),
+    var(--j-fondo);
+  box-shadow: 0 10px 30px -12px rgba(10, 5, 24, 0.6);
+}
+/* Franja de la bandera arriba en vez de la línea roja de abajo */
+header::after {
+  top: 0;
+  bottom: auto;
+  height: 3px;
+  background: repeating-linear-gradient(90deg, var(--j-rojo) 0 26px, #fff 26px 52px);
+  opacity: 0.75;
+}
+
+.nav-avatar {
+  background: var(--j-degradado);
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.55);
+  font-family: var(--j-titulo);
+}
+.nav-nombre { font-weight: 700; }
+.nav-rol { color: var(--j-dorado); opacity: 0.9; letter-spacing: 1.5px; }
+
+.nav-links { gap: 4px; }
+.nav-links a {
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  color: var(--j-texto-2);
+  transition: color 0.2s, background 0.2s;
+}
+.nav-links a::after { display: none; }
+.nav-links a:hover { color: #fff; background: rgba(255, 255, 255, 0.07); }
+.nav-links a.activo {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(126, 34, 206, 0.6), rgba(192, 38, 211, 0.5));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+}
+
+.btn-nav-icon,
+.com-btn {
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.btn-nav-icon:hover,
+.com-btn:hover { background: rgba(255, 255, 255, 0.14); }
+.com-contador { box-shadow: 0 0 0 2px var(--j-fondo); }
+
+/* ══════════════════════════════════════════
+   MENÚ LATERAL
+══════════════════════════════════════════ */
+.sidebar { background: #fff; border-right-color: var(--gris-borde); }
+.sidebar-seccion h3 { color: #8B7FA8; letter-spacing: 1.6px; }
+
+.menu-item,
+.clase-item,
+.acceso-link { border-radius: 10px; }
+.menu-item:hover,
+.clase-item:hover,
+.acceso-link:hover { background: #F4EEFD; }
+.menu-item.activo,
+.clase-item.activa {
+  position: relative;
+  background: linear-gradient(90deg, rgba(126, 34, 206, 0.12), rgba(192, 38, 211, 0.05));
+}
+.menu-item.activo::before,
+.clase-item.activa::before {
+  content: '';
+  position: absolute;
+  left: -16px;
+  top: 8px;
+  bottom: 8px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--j-degradado);
+}
+.menu-item.activo a,
+.clase-item.activa a { color: var(--morado); font-weight: 700; }
+.menu-item.activo .menu-icono { color: var(--morado); }
+
+.acceso-btn {
+  border-style: solid;
+  border-color: var(--gris-borde);
+  color: var(--morado);
+  font-weight: 700;
+}
+.acceso-btn:hover { background: #F4EEFD; border-color: var(--morado-claro); }
+
+/* ══════════════════════════════════════════
+   BOTONES PRINCIPALES
+══════════════════════════════════════════ */
+.btn-accion-header,
+.btn-accion,
+.btn-entrar,
+.btn-modal-guardar,
+.btn-guardar,
+.btn-nueva-tarea,
+.btn-entregar,
+.btn-confirmar,
+.anuncio-modal-pie button:not(.secundario) {
+  background: var(--j-degradado);
+  border: none;
+  color: #fff;
+  box-shadow: 0 10px 26px -12px rgba(192, 38, 211, 0.8);
+}
+.btn-accion-header:hover,
+.btn-accion:hover,
+.btn-entrar:hover,
+.btn-modal-guardar:hover,
+.btn-guardar:hover,
+.btn-nueva-tarea:hover,
+.btn-entregar:hover,
+.btn-confirmar:hover { background: var(--j-degradado); filter: brightness(1.08); }
+
+.btn-filtro.activo,
+.btn-ciclo.activo,
+.btn-semana.activo,
+.gestion-tab.activo { background: var(--j-degradado); border-color: transparent; color: #fff; }
+
+/* Tarjetas: bordes y sombras más suaves con tinte púrpura */
+.stat-card,
+.card-seccion,
+.anuncios-portal,
+.tarjeta-item {
+  border-color: var(--gris-borde);
+  box-shadow: var(--sombra);
+}
+.stat-card:hover { box-shadow: 0 10px 28px -10px rgba(126, 34, 206, 0.28); }
+/* Con la tipografía nueva los textos son un poco más anchos: las tarjetas pueden encogerse */
+.grid-stats > *,
+.grid-inferior > * { min-width: 0; }
+.stat-valor { overflow-wrap: anywhere; }
+
+/* Encabezado del salón (portal docente y estudiante) */
+.encabezado-salon {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(126, 34, 206, 0.6), transparent 55%),
+    radial-gradient(circle at 100% 100%, rgba(192, 38, 211, 0.45), transparent 55%),
+    var(--j-fondo);
+  border: none;
+  color: #fff;
+}
+.encabezado-salon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(250, 204, 21, 0.3) 1.2px, transparent 1.2px);
+  background-size: 28px 28px;
+  mask-image: linear-gradient(90deg, transparent, #000 70%);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 70%);
+}
+.encabezado-salon > * { position: relative; }
+.encabezado-salon h1,
+.encabezado-salon .encabezado-info h1 { color: #fff; }
+.encabezado-salon p,
+.encabezado-salon .encabezado-info p { color: var(--j-texto-2); }
+
+/* Chat y notificaciones con la misma cabecera oscura */
+.com-chat-cabecera { background: var(--j-fondo); }
+.com-burbuja.com-mia { background: var(--j-degradado); }
+.com-enviar { background: var(--j-degradado); }
