@@ -70,3 +70,7 @@ itemsFaq.forEach(function (item) {
     }
   });
 });
+
+// Año actual en el pie de página
+const anioPie = document.getElementById('anio-actual');
+if (anioPie) anioPie.textContent = new Date().getFullYear();

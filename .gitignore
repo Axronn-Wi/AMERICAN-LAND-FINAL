@@ -1,3 +1,7 @@
 backend/node_modules/
-backend/.envbackend/node_modules/
+node_modules/
 backend/.env
+.env
+
+# Archivos subidos por usuarios (no deben ir al repositorio)
+backend/uploads/

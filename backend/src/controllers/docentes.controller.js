@@ -2,19 +2,25 @@ const fs = require('fs');
 const path = require('path');
 const db = require('../config/db');
 const pool = db.pool || db;
+const { sqlHora, sqlFecha } = require('../utils/sql');
 const { CARPETA_MATERIAL } = require('../config/uploads');
+const { notificar, usuariosDelSalon } = require('../utils/notificar');
+
+// Avisa a todos los estudiantes activos del salón (sin bloquear la respuesta)
+function notificarSalon(idSalon, datos) {
+  usuariosDelSalon(idSalon)
+    .then((ids) => notificar(ids, datos))
+    .catch((err) => console.error('No se pudo notificar al salón:', err.message));
+}
+
+// Usuario (tabla usuarios) de un estudiante
+async function usuarioDeEstudiante(idEstudiante) {
+  const r = await pool.query('SELECT usuario_id FROM estudiantes WHERE id = $1', [idEstudiante]);
+  return r.rows.length > 0 ? r.rows[0].usuario_id : null;
+}
 
 const MENSAJE_SIN_PERFIL = 'No se encontró un perfil de docente para este usuario.';
 const MENSAJE_SIN_SALON = 'Salón no encontrado o no te pertenece.';
-
-// Hora 18:00:00  ->  "1970-01-01T18:00:00.000Z"
-function sqlHora(columna) {
-  return `('1970-01-01T' || left(${columna}::text, 8) || '.000Z')`;
-}
-// Fecha 2026-11-30  ->  "2026-11-30T00:00:00.000Z"
-function sqlFecha(columna) {
-  return `(to_char(${columna}, 'YYYY-MM-DD') || 'T00:00:00.000Z')`;
-}
 
 async function obtenerIdDocente(idUsuario) {
   const resultado = await pool.query('SELECT id FROM docentes WHERE usuario_id = $1', [idUsuario]);
@@ -278,6 +284,13 @@ async function registrarNota(req, res) {
       );
     }
 
+    usuarioDeEstudiante(estudiante_id).then((idUsuario) => notificar([idUsuario], {
+      tipo: 'nota',
+      titulo: 'Nueva calificación',
+      mensaje: `Tu docente registró tu nota en "${salon.nombre}". Promedio del ciclo: ${promedio.toFixed(1)}.`,
+      enlace: '/alumnos/notas.html'
+    })).catch(() => {});
+
     res.status(existente.rows.length > 0 ? 200 : 201).json({
       mensaje: 'Nota registrada correctamente.',
       nota: result.rows[0]
@@ -334,6 +347,13 @@ async function crearTarea(req, res) {
                  valor_porcentaje::float8 AS valor_porcentaje, tipo`,
       [salon_id, ciclo_id, titulo, descripcion || null, fecha_limite, porcentaje, tipo || null]
     );
+
+    notificarSalon(salon_id, {
+      tipo: 'tarea',
+      titulo: 'Nueva tarea',
+      mensaje: `"${titulo}" en ${salon.nombre}. Fecha límite: ${String(fecha_limite).slice(0, 10)}.`,
+      enlace: '/alumnos/tareas.html'
+    });
 
     res.status(201).json({ mensaje: 'Tarea creada exitosamente.', tarea: result.rows[0] });
 
@@ -510,7 +530,7 @@ async function calificarEntrega(req, res) {
 
     // La entrega debe ser de una tarea de un salón de este docente
     const propiaResult = await pool.query(
-      `SELECT et.id
+      `SELECT et.id, et.estudiante_id, t.titulo
        FROM entregas_tareas et
        JOIN tareas t ON et.tarea_id = t.id
        JOIN salones s ON t.salon_id = s.id
@@ -530,6 +550,16 @@ async function calificarEntrega(req, res) {
        RETURNING id, calificacion::float8 AS calificacion, retroalimentacion, estado`,
       [nota, retroalimentacion === undefined ? null : retroalimentacion, id]
     );
+
+    const propia = propiaResult.rows[0];
+    usuarioDeEstudiante(propia.estudiante_id).then((idUsuario) => notificar([idUsuario], {
+      tipo: 'calificacion',
+      titulo: hayNota ? 'Tarea calificada' : 'Comentario en tu tarea',
+      mensaje: hayNota
+        ? `Tu entrega de "${propia.titulo}" recibió ${nota.toFixed(1)}.`
+        : `Tu docente dejó un comentario en "${propia.titulo}".`,
+      enlace: '/alumnos/tareas.html'
+    })).catch(() => {});
 
     res.json({ mensaje: 'Entrega actualizada correctamente.', entrega: result.rows[0] });
 
@@ -604,6 +634,13 @@ async function crearMaterial(req, res) {
        RETURNING id, salon_id, ciclo_id, titulo, tipo, publico, subido_en`,
       [id_salon, id_ciclo, tituloLimpio, tipo, req.file.filename]
     );
+
+    notificarSalon(id_salon, {
+      tipo: 'material',
+      titulo: 'Nuevo material de apoyo',
+      mensaje: `"${tituloLimpio}" ya está disponible en ${salon.nombre}.`,
+      enlace: '/alumnos/salon_virtual.html'
+    });
 
     res.status(201).json({ mensaje: 'Material subido correctamente.', material: result.rows[0] });
 

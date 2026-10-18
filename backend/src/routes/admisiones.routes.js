@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { validarId } = require('../middleware/validar.middleware');
+
+// Todo :id de estas rutas debe ser un entero positivo
+router.param('id', validarId);
 const { obtenerNiveles, obtenerSalonesPorNivel, crearMatricula, procesarPago } = require('../controllers/admisiones.controller');
 const { verificarToken, permitirRoles } = require('../middleware/auth.middleware');
 

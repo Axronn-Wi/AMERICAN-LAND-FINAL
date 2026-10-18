@@ -300,6 +300,10 @@ nav {
   .contenido { margin-left: 0; padding: 16px; min-width: 0; }
   .nav-links { display: none; }
   .encabezado-salon { flex-direction: column; align-items: flex-start; gap: 12px; }
+  /* Las tarjetas no se estiran más que la pantalla: el correo largo baja de línea */
+  .grid-inferior > * { min-width: 0; }
+  .tabla-datos td:last-child { overflow-wrap: anywhere; }
+  .card-header { flex-wrap: wrap; gap: 6px; }
 }
 
 @media (max-width: 480px) {

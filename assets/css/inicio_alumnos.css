@@ -451,3 +451,12 @@ nav {
 @media (max-width: 480px) {
   .grid-stats { grid-template-columns: 1fr 1fr; }
 }
+.badge-revisado { background: rgba(75,0,130,0.08); color: var(--morado); border: 1px solid rgba(75,0,130,0.2); }
+
+/* Fila de "cargando" / "sin datos" en las tablas del panel */
+.celda-vacia {
+  text-align: center;
+  color: var(--gris-texto, #777);
+  font-size: 0.85rem;
+  padding: 18px 8px !important;
+}

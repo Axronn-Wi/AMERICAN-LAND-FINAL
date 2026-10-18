@@ -39,7 +39,7 @@ body {
 
 /* Ritmo tipográfico común a todas las páginas */
 p { line-height: 1.65; }
-h1, h2, h3 { letter-spacing: -0.01em; }
+h1, h2, h3 { letter-spacing: -0.01em; text-wrap: balance; }
 
 /* ============================================================
    NAVBAR

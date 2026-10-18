@@ -208,4 +208,54 @@ async function cargarInicio() {
   }
 }
 
+// ── ACTIVIDAD RECIENTE (últimas notificaciones del docente) ──
+const ICONOS_ACTIVIDAD = {
+  entrega: { clase: 'verde', texto: '✓' },
+  salon:   { clase: 'morado', texto: '★' },
+  pago:    { clase: 'azul', texto: '$' }
+};
+
+function haceCuanto(fecha) {
+  const min = Math.round((Date.now() - new Date(fecha).getTime()) / 60000);
+  if (min < 1) return 'Justo ahora';
+  if (min < 60) return 'Hace ' + min + ' min';
+  const horas = Math.round(min / 60);
+  if (horas < 24) return 'Hace ' + horas + (horas === 1 ? ' hora' : ' horas');
+  const dias = Math.round(horas / 24);
+  return dias === 1 ? 'Ayer' : 'Hace ' + dias + ' días';
+}
+
+async function cargarActividad() {
+  const lista = document.getElementById('lista-actividad');
+  if (!lista) return;
+
+  let notificaciones = [];
+  try {
+    const data = await apiFetch('/comunicaciones/notificaciones?limite=6');
+    notificaciones = (data && data.notificaciones) ? data.notificaciones : [];
+  } catch (err) {
+    console.error('Error al cargar la actividad:', err);
+  }
+
+  lista.textContent = '';
+  if (notificaciones.length === 0) {
+    const vacio = crear('li', 'act-tiempo', 'Aún no hay actividad. Aquí verás las entregas de tus estudiantes y otros avisos.');
+    vacio.style.cssText = 'padding:24px;text-align:center';
+    lista.appendChild(vacio);
+    return;
+  }
+
+  notificaciones.forEach(function (n) {
+    const icono = ICONOS_ACTIVIDAD[n.tipo] || { clase: 'amarillo', texto: '!' };
+    const li = crear('li', 'actividad-item');
+    li.appendChild(crear('span', 'act-icono ' + icono.clase, icono.texto));
+    const cuerpo = crear('div');
+    cuerpo.appendChild(crear('p', 'act-texto', n.mensaje || n.titulo));
+    cuerpo.appendChild(crear('span', 'act-tiempo', n.titulo + ' · ' + haceCuanto(n.creada_en)));
+    li.appendChild(cuerpo);
+    lista.appendChild(li);
+  });
+}
+
 cargarInicio();
+cargarActividad();

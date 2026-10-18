@@ -1,15 +1,9 @@
 const db = require('../config/db');
 const pool = db.pool || db;
+const { sqlHora, sqlFecha, transaccion, normalizarCorreo, REGEX_CORREO } = require('../utils/sql');
 const bcrypt = require('bcrypt');
-
-// Hora 18:00:00  ->  "1970-01-01T18:00:00.000Z"
-function sqlHora(columna) {
-  return `('1970-01-01T' || left(${columna}::text, 8) || '.000Z')`;
-}
-// Fecha 2026-11-30  ->  "2026-11-30T00:00:00.000Z"
-function sqlFecha(columna) {
-  return `(to_char(${columna}, 'YYYY-MM-DD') || 'T00:00:00.000Z')`;
-}
+const { notificar } = require('../utils/notificar');
+const { olvidarUsuario } = require('../middleware/auth.middleware');
 
 // Devuelve el id del perfil en la tabla admin del usuario logueado.
 // Si el usuario tiene rol admin pero aun no tiene perfil, se crea en el momento.
@@ -55,6 +49,10 @@ async function cambiarEstadoUsuario(req, res) {
       return res.status(400).json({ mensaje: 'El campo activo debe ser true o false.' });
     }
 
+    if (Number(id) === req.usuario.id_usuario && activo === false) {
+      return res.status(400).json({ mensaje: 'No puedes desactivar tu propia cuenta.' });
+    }
+
     const result = await pool.query(
       `UPDATE usuarios SET activo = $1, actualizado_en = CURRENT_TIMESTAMP
        WHERE id = $2
@@ -66,6 +64,7 @@ async function cambiarEstadoUsuario(req, res) {
       return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
     }
 
+    olvidarUsuario(id);
     res.json({ mensaje: 'Estado actualizado correctamente.', usuario: result.rows[0] });
 
   } catch (err) {
@@ -109,17 +108,65 @@ async function crearSalon(req, res) {
       return res.status(400).json({ mensaje: 'docente_id, nivel_id, horario_tipo_id, nombre y anno son obligatorios.' });
     }
 
-    const result = await pool.query(
-      `INSERT INTO salones (docente_id, nivel_id, horario_tipo_id, nombre, capacidad_max, anno, fecha_inicio, fecha_fin)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-       RETURNING id`,
-      [docente_id, nivel_id, horario_tipo_id, nombre, capacidad_max || 20, anno, fecha_inicio || null, fecha_fin || null]
-    );
+    const capacidad = capacidad_max === undefined || capacidad_max === null || capacidad_max === '' ? 20 : Number(capacidad_max);
+    if (!Number.isInteger(capacidad) || capacidad < 1 || capacidad > 100) {
+      return res.status(400).json({ mensaje: 'La capacidad debe ser un número entero entre 1 y 100.' });
+    }
+    if (fecha_inicio && fecha_fin && fecha_fin < fecha_inicio) {
+      return res.status(400).json({ mensaje: 'La fecha de fin no puede ser anterior a la fecha de inicio.' });
+    }
 
-    res.status(201).json({ mensaje: 'Salón creado exitosamente.', id: result.rows[0].id });
+    // Salón + sus ciclos se crean juntos: sin ciclos el docente no puede crear tareas ni notas
+    const resultado = await transaccion(async (cliente) => {
+      const nivel = await cliente.query('SELECT ciclos_totales FROM niveles WHERE id = $1', [nivel_id]);
+      if (nivel.rows.length === 0) {
+        return { status: 404, cuerpo: { mensaje: 'El nivel seleccionado no existe.' } };
+      }
+      const docente = await cliente.query('SELECT usuario_id FROM docentes WHERE id = $1 AND activo = TRUE', [docente_id]);
+      if (docente.rows.length === 0) {
+        return { status: 404, cuerpo: { mensaje: 'El docente no existe o está inactivo.' } };
+      }
+
+      const salon = await cliente.query(
+        `INSERT INTO salones (docente_id, nivel_id, horario_tipo_id, nombre, capacidad_max, anno, fecha_inicio, fecha_fin)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+         RETURNING id`,
+        [docente_id, nivel_id, horario_tipo_id, String(nombre).trim(), capacidad, anno, fecha_inicio || null, fecha_fin || null]
+      );
+      const idSalon = salon.rows[0].id;
+      const totalCiclos = Math.max(1, nivel.rows[0].ciclos_totales || 1);
+
+      // Un ciclo por cada ciclos_totales del nivel; solo el primero queda "en curso"
+      await cliente.query(
+        `INSERT INTO ciclos (salon_id, numero_ciclo, estado)
+         SELECT $1, g, CASE WHEN g = 1 THEN 'en curso' ELSE 'pendiente' END
+         FROM generate_series(1, $2::int) AS g`,
+        [idSalon, totalCiclos]
+      );
+
+      return {
+        status: 201,
+        cuerpo: { mensaje: `Salón creado con ${totalCiclos} ciclos.`, id: idSalon, ciclos: totalCiclos },
+        usuarioDocente: docente.rows[0].usuario_id
+      };
+    });
+
+    if (resultado.usuarioDocente) {
+      notificar([resultado.usuarioDocente], {
+        tipo: 'salon',
+        titulo: 'Nuevo salón asignado',
+        mensaje: `Se te asignó el salón "${String(nombre).trim()}".`,
+        enlace: '/docentes/inicio.html'
+      });
+    }
+
+    res.status(resultado.status).json(resultado.cuerpo);
 
   } catch (err) {
     console.error(err);
+    if (err.code === '23503') {
+      return res.status(400).json({ mensaje: 'El docente, nivel u horario seleccionado no existe.' });
+    }
     res.status(500).json({ mensaje: 'Error al crear el salón.' });
   }
 }
@@ -127,25 +174,70 @@ async function crearSalon(req, res) {
 async function actualizarSalon(req, res) {
   try {
     const { id } = req.params;
-    const { nombre, capacidad_max, estado, ciclo_actual, fecha_inicio, fecha_fin } = req.body;
+    const { nombre, estado, fecha_inicio, fecha_fin } = req.body;
+    const capacidad = Number(req.body.capacidad_max);
+    const ciclo = Number(req.body.ciclo_actual);
 
-    const result = await pool.query(
-      `UPDATE salones
-       SET nombre = $1, capacidad_max = $2, estado = $3,
-           ciclo_actual = $4, fecha_inicio = $5, fecha_fin = $6
-       WHERE id = $7
-       RETURNING id, docente_id, nivel_id, horario_tipo_id, nombre, capacidad_max, estado,
-                 ciclo_actual, anno,
-                 ${sqlFecha('fecha_inicio')} AS fecha_inicio,
-                 ${sqlFecha('fecha_fin')} AS fecha_fin`,
-      [nombre, capacidad_max, estado, ciclo_actual, fecha_inicio || null, fecha_fin || null, id]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ mensaje: 'Salón no encontrado.' });
+    if (!nombre || !String(nombre).trim()) {
+      return res.status(400).json({ mensaje: 'El nombre del salón es obligatorio.' });
+    }
+    if (!Number.isInteger(capacidad) || capacidad < 1 || capacidad > 100) {
+      return res.status(400).json({ mensaje: 'La capacidad debe ser un número entero entre 1 y 100.' });
+    }
+    if (!estado) {
+      return res.status(400).json({ mensaje: 'El estado del salón es obligatorio.' });
+    }
+    if (fecha_inicio && fecha_fin && fecha_fin < fecha_inicio) {
+      return res.status(400).json({ mensaje: 'La fecha de fin no puede ser anterior a la fecha de inicio.' });
     }
 
-    res.json({ mensaje: 'Salón actualizado correctamente.', salon: result.rows[0] });
+    const resultado = await transaccion(async (cliente) => {
+      const actual = await cliente.query(
+        `SELECT s.id, n.ciclos_totales,
+                (SELECT COUNT(*)::int FROM matriculas m
+                 WHERE m.salon_id = s.id AND m.estado IN ('pendiente', 'activa')) AS ocupados
+         FROM salones s JOIN niveles n ON s.nivel_id = n.id
+         WHERE s.id = $1 FOR UPDATE OF s`,
+        [id]
+      );
+      if (actual.rows.length === 0) {
+        return { status: 404, cuerpo: { mensaje: 'Salón no encontrado.' } };
+      }
+      const { ciclos_totales, ocupados } = actual.rows[0];
+
+      if (!Number.isInteger(ciclo) || ciclo < 1 || ciclo > ciclos_totales) {
+        return { status: 400, cuerpo: { mensaje: `El ciclo actual debe estar entre 1 y ${ciclos_totales}.` } };
+      }
+      if (capacidad < ocupados) {
+        return { status: 409, cuerpo: { mensaje: `La capacidad no puede ser menor que los ${ocupados} cupos ya ocupados.` } };
+      }
+
+      const result = await cliente.query(
+        `UPDATE salones
+         SET nombre = $1, capacidad_max = $2, estado = $3,
+             ciclo_actual = $4, fecha_inicio = $5, fecha_fin = $6
+         WHERE id = $7
+         RETURNING id, docente_id, nivel_id, horario_tipo_id, nombre, capacidad_max, estado,
+                   ciclo_actual, anno,
+                   ${sqlFecha('fecha_inicio')} AS fecha_inicio,
+                   ${sqlFecha('fecha_fin')} AS fecha_fin`,
+        [String(nombre).trim(), capacidad, estado, ciclo, fecha_inicio || null, fecha_fin || null, id]
+      );
+
+      // Los ciclos acompañan al ciclo actual: anteriores finalizados, el actual en curso
+      await cliente.query(
+        `UPDATE ciclos
+         SET estado = CASE WHEN numero_ciclo < $2 THEN 'finalizado'
+                           WHEN numero_ciclo = $2 THEN 'en curso'
+                           ELSE 'pendiente' END
+         WHERE salon_id = $1`,
+        [id, ciclo]
+      );
+
+      return { status: 200, cuerpo: { mensaje: 'Salón actualizado correctamente.', salon: result.rows[0] } };
+    });
+
+    res.status(resultado.status).json(resultado.cuerpo);
 
   } catch (err) {
     console.error(err);
@@ -157,9 +249,15 @@ async function eliminarSalon(req, res) {
   try {
     const { id } = req.params;
 
-    const result = await pool.query('DELETE FROM salones WHERE id = $1 RETURNING id', [id]);
+    // Los ciclos vacíos se borran con el salón; si hay tareas, notas o material,
+    // la llave foránea lo impide y se revierte todo
+    const eliminado = await transaccion(async (cliente) => {
+      await cliente.query('DELETE FROM ciclos WHERE salon_id = $1', [id]);
+      const result = await cliente.query('DELETE FROM salones WHERE id = $1 RETURNING id', [id]);
+      return result.rows.length > 0;
+    });
 
-    if (result.rows.length === 0) {
+    if (!eliminado) {
       return res.status(404).json({ mensaje: 'Salón no encontrado.' });
     }
 
@@ -234,52 +332,89 @@ async function cambiarEstadoMatricula(req, res) {
 
 async function registrarPago(req, res) {
   try {
-    const { matricula_id, monto, metodo_pago, referencia_transaccion } = req.body;
+    const { matricula_id, metodo_pago, referencia_transaccion } = req.body;
+    const monto = Number(req.body.monto);
     const id_secretaria_usuario = req.usuario.id_usuario;
 
-    if (!matricula_id || !monto || !metodo_pago) {
+    if (!matricula_id || !metodo_pago || req.body.monto === undefined || req.body.monto === null || req.body.monto === '') {
       return res.status(400).json({ mensaje: 'matricula_id, monto y metodo_pago son obligatorios.' });
+    }
+
+    if (!Number.isFinite(monto) || monto <= 0) {
+      return res.status(400).json({ mensaje: 'El monto debe ser un número mayor que 0.' });
     }
 
     // Perfil admin del usuario logueado (se crea si todavia no existe)
     const id_secretaria = await obtenerIdPerfilAdmin(id_secretaria_usuario);
 
-    // Verificar que la matrícula exista y traer su saldo actual (como número)
-    const matriculaResult = await pool.query(
-      'SELECT id, saldo_pendiente::float8 AS saldo_pendiente FROM matriculas WHERE id = $1',
-      [matricula_id]
-    );
+    // Todo en una transacción: FOR UPDATE bloquea la matrícula para que dos pagos
+    // simultáneos no descuenten el mismo saldo dos veces
+    const resultado = await transaccion(async (cliente) => {
+      const matriculaResult = await cliente.query(
+        `SELECT m.id, m.estado, m.saldo_pendiente::float8 AS saldo_pendiente, e.usuario_id
+         FROM matriculas m JOIN estudiantes e ON e.id = m.estudiante_id
+         WHERE m.id = $1 FOR UPDATE OF m`,
+        [matricula_id]
+      );
 
-    if (matriculaResult.rows.length === 0) {
-      return res.status(404).json({ mensaje: 'Matrícula no encontrada.' });
-    }
+      if (matriculaResult.rows.length === 0) {
+        return { status: 404, cuerpo: { mensaje: 'Matrícula no encontrada.' } };
+      }
 
-    const saldoActual = matriculaResult.rows[0].saldo_pendiente;
+      const matricula = matriculaResult.rows[0];
 
-    if (monto > saldoActual) {
-      return res.status(400).json({ mensaje: `El monto supera el saldo pendiente ($${saldoActual}).` });
-    }
+      if (matricula.estado === 'cancelada') {
+        return { status: 409, cuerpo: { mensaje: 'No se pueden registrar pagos en una matrícula cancelada.' } };
+      }
 
-    // Registrar el pago
-    const pagoResult = await pool.query(
-      `INSERT INTO pagos (matricula_id, secretaria_id, monto, metodo_pago, referencia_transaccion, estado)
-       VALUES ($1, $2, $3, $4, $5, 'exitoso')
-       RETURNING id`,
-      [matricula_id, id_secretaria, monto, metodo_pago, referencia_transaccion || null]
-    );
+      if (monto > matricula.saldo_pendiente) {
+        return { status: 400, cuerpo: { mensaje: `El monto supera el saldo pendiente ($${matricula.saldo_pendiente}).` } };
+      }
 
-    // Descontar el pago del saldo pendiente de la matrícula
-    const nuevoSaldo = Math.round((saldoActual - monto) * 100) / 100;
-    await pool.query(
-      'UPDATE matriculas SET saldo_pendiente = $1 WHERE id = $2',
-      [nuevoSaldo, matricula_id]
-    );
+      const pagoResult = await cliente.query(
+        `INSERT INTO pagos (matricula_id, secretaria_id, monto, metodo_pago, referencia_transaccion, estado)
+         VALUES ($1, $2, $3, $4, $5, 'exitoso')
+         RETURNING id`,
+        [matricula_id, id_secretaria, monto, metodo_pago, referencia_transaccion || null]
+      );
 
-    res.status(201).json({
-      mensaje: 'Pago registrado exitosamente.',
-      id_pago: pagoResult.rows[0].id,
-      saldo_pendiente_restante: nuevoSaldo
+      // Descontar el pago; si el saldo queda en 0 la matrícula pendiente se activa
+      const nuevoSaldo = Math.round((matricula.saldo_pendiente - monto) * 100) / 100;
+      const actualizada = await cliente.query(
+        `UPDATE matriculas
+         SET saldo_pendiente = $1,
+             estado = CASE WHEN $1 = 0 AND estado = 'pendiente' THEN 'activa' ELSE estado END
+         WHERE id = $2
+         RETURNING estado`,
+        [nuevoSaldo, matricula_id]
+      );
+
+      return {
+        status: 201,
+        usuarioEstudiante: matricula.usuario_id,
+        nuevoSaldo,
+        cuerpo: {
+          mensaje: nuevoSaldo === 0 ? 'Pago registrado. La matrícula quedó paga y activa.' : 'Pago registrado exitosamente.',
+          id_pago: pagoResult.rows[0].id,
+          saldo_pendiente_restante: nuevoSaldo,
+          estado_matricula: actualizada.rows[0].estado
+        }
+      };
     });
+
+    if (resultado.usuarioEstudiante) {
+      const formato = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 });
+      notificar([resultado.usuarioEstudiante], {
+        tipo: 'pago',
+        titulo: 'Pago registrado',
+        mensaje: resultado.nuevoSaldo === 0
+          ? `Recibimos tu pago de ${formato.format(monto)}. Tu matrícula está paga y activa.`
+          : `Recibimos tu pago de ${formato.format(monto)}. Saldo pendiente: ${formato.format(resultado.nuevoSaldo)}.`,
+        enlace: '/alumnos/inicio.html'
+      });
+    }
+
+    res.status(resultado.status).json(resultado.cuerpo);
 
   } catch (err) {
     console.error(err);
@@ -289,10 +424,15 @@ async function registrarPago(req, res) {
 
 async function crearUsuario(req, res) {
   try {
-    const { nombre_completo, correo, contrasena, rol, telefono, fecha_nacimiento, pais, ciudad, datosPerfil } = req.body;
+    const { nombre_completo, contrasena, rol, telefono, fecha_nacimiento, pais, ciudad, datosPerfil } = req.body;
+    const correo = normalizarCorreo(req.body.correo);
 
     if (!nombre_completo || !correo || !contrasena || !rol) {
       return res.status(400).json({ mensaje: 'nombre_completo, correo, contrasena y rol son obligatorios.' });
+    }
+
+    if (!REGEX_CORREO.test(correo)) {
+      return res.status(400).json({ mensaje: 'El correo electrónico no es válido.' });
     }
 
     const rolesValidos = ['estudiante', 'docente', 'admin'];
@@ -305,7 +445,7 @@ async function crearUsuario(req, res) {
     }
 
     // Verificar que el correo no esté repetido
-    const existente = await pool.query('SELECT id FROM usuarios WHERE correo = $1', [correo]);
+    const existente = await pool.query('SELECT id FROM usuarios WHERE LOWER(correo) = $1', [correo]);
 
     if (existente.rows.length > 0) {
       return res.status(409).json({ mensaje: 'Este correo ya está registrado.' });
@@ -434,10 +574,15 @@ async function obtenerNiveles(req, res) {
 async function editarUsuario(req, res) {
   try {
     const { id } = req.params;
-    const { nombre_completo, correo, telefono, fecha_nacimiento, pais, ciudad, contrasena, datosPerfil } = req.body;
+    const { nombre_completo, telefono, fecha_nacimiento, pais, ciudad, contrasena, datosPerfil } = req.body;
+    const correo = normalizarCorreo(req.body.correo);
 
     if (!nombre_completo || !correo) {
       return res.status(400).json({ mensaje: 'nombre_completo y correo son obligatorios.' });
+    }
+
+    if (!REGEX_CORREO.test(correo)) {
+      return res.status(400).json({ mensaje: 'El correo electrónico no es válido.' });
     }
 
     if (contrasena && contrasena.length < 6) {
@@ -461,7 +606,7 @@ async function editarUsuario(req, res) {
 
     // Verificar que el correo no lo tenga otro usuario
     const repetido = await pool.query(
-      'SELECT id FROM usuarios WHERE correo = $1 AND id <> $2',
+      'SELECT id FROM usuarios WHERE LOWER(correo) = $1 AND id <> $2',
       [correo, id]
     );
 
@@ -547,7 +692,7 @@ async function crearMatricula(req, res) {
 
     // El estudiante debe existir y estar activo (estudiante_id es estudiantes.id)
     const estudianteResult = await pool.query(
-      `SELECT e.id, e.estado, u.activo
+      `SELECT e.id, e.estado, e.usuario_id, u.activo
        FROM estudiantes e
        JOIN usuarios u ON e.usuario_id = u.id
        WHERE e.id = $1`,
@@ -564,7 +709,7 @@ async function crearMatricula(req, res) {
 
     // El salón debe existir, estar activo, y traemos el precio de su nivel
     const salonResult = await pool.query(
-      `SELECT s.id, s.anno, s.capacidad_max, n.precio::float8 AS precio,
+      `SELECT s.id, s.nombre, s.anno, s.capacidad_max, n.precio::float8 AS precio,
               (SELECT COUNT(*)::int FROM matriculas m
                WHERE m.salon_id = s.id
                AND m.estado IN ('pendiente', 'activa')) AS ocupados
@@ -605,6 +750,13 @@ async function crearMatricula(req, res) {
        RETURNING id, estado, valor_total::float8 AS valor_total, saldo_pendiente::float8 AS saldo_pendiente`,
       [estudiante_id, salon_id, id_secretaria, salon.precio, salon.anno]
     );
+
+    notificar([estudianteResult.rows[0].usuario_id], {
+      tipo: 'matricula',
+      titulo: 'Matrícula registrada',
+      mensaje: `Quedaste matriculado en "${salon.nombre}". La matrícula se activa al completar el pago.`,
+      enlace: '/alumnos/inicio.html'
+    });
 
     res.status(201).json({ mensaje: 'Matrícula creada. Queda pendiente hasta registrar el pago.', matricula: result.rows[0] });
 
@@ -647,6 +799,7 @@ async function eliminarUsuario(req, res) {
     await client.query('DELETE FROM usuarios WHERE id = $1', [id]);
 
     await client.query('COMMIT');
+    olvidarUsuario(id);
     res.json({ mensaje: 'Usuario eliminado correctamente.' });
 
   } catch (err) {

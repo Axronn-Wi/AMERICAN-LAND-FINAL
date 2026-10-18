@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const { validarId } = require('../middleware/validar.middleware');
+
+// Todo :id de estas rutas debe ser un entero positivo
+router.param('id', validarId);
 const { verificarToken, permitirRoles } = require('../middleware/auth.middleware');
 const { obtenerUsuarios, eliminarUsuario, actualizarMatricula, eliminarMatricula, cambiarEstadoUsuario, editarUsuario, obtenerEstudiantes, obtenerDocentes, obtenerHorariosTipo, obtenerNiveles, obtenerSalones, crearSalon, actualizarSalon, eliminarSalon, obtenerMatriculas, crearMatricula, cambiarEstadoMatricula, registrarPago, crearUsuario } = require('../controllers/admin.controller');
 

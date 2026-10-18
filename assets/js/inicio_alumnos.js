@@ -45,96 +45,132 @@ async function apiFetch(ruta) {
 }
 
 // ── 5. CARGAR DATOS DEL DASHBOARD ───────────────────────────
-async function cargarDashboard() {
 
-  // ── 5a. HORARIO (nombre del salón, docente, horario) ──────
-  const dataHorario = await apiFetch('/alumnos/horario');
+// Formatea la hora que manda el backend (1970-01-01T18:00:00.000Z) como "6:00 PM"
+function fmtHora(valor) {
+  if (!valor) return '';
+  const d = new Date(valor);
+  let h = d.getUTCHours();
+  const m = d.getUTCMinutes();
+  const suf = h >= 12 ? 'PM' : 'AM';
+  h = ((h + 11) % 12 + 1);
+  return h + ':' + String(m).padStart(2, '0') + ' ' + suf;
+}
+
+// Crea una fila <tr> con celdas de texto (sin innerHTML: el texto viene de la BD)
+function filaTabla(celdas) {
+  const tr = document.createElement('tr');
+  celdas.forEach(function (contenido) {
+    const td = document.createElement('td');
+    if (contenido instanceof Node) td.appendChild(contenido);
+    else td.textContent = contenido;
+    tr.appendChild(td);
+  });
+  return tr;
+}
+
+function filaVacia(tbody, texto) {
+  tbody.textContent = '';
+  const tr = document.createElement('tr');
+  const td = document.createElement('td');
+  td.colSpan = 2;
+  td.className = 'celda-vacia';
+  td.textContent = texto;
+  tr.appendChild(td);
+  tbody.appendChild(tr);
+}
+
+function badge(clase, texto) {
+  const span = document.createElement('span');
+  span.className = clase;
+  span.textContent = texto;
+  return span;
+}
+
+// La BD guarda 'entregada' y 'calificada' (igual que en tareas.js)
+const ESTADOS_TAREA = {
+  entregada:  { clase: 'badge badge-entregado', texto: 'Entregada' },
+  calificada: { clase: 'badge badge-revisado',  texto: 'Calificada' },
+  pendiente:  { clase: 'badge badge-pendiente', texto: 'Pendiente' }
+};
+
+async function cargarDashboard() {
+  const tbodyTareas = document.querySelector('.grid-inferior .card-seccion:nth-child(1) tbody');
+  const tbodyNotas  = document.querySelector('.grid-inferior .card-seccion:nth-child(2) tbody');
+
+  // Las tres consultas van en paralelo para que el panel cargue más rápido
+  const [dataHorario, dataNotas, dataTareas] = await Promise.all([
+    apiFetch('/alumnos/horario').catch(function () { return null; }),
+    apiFetch('/alumnos/notas').catch(function () { return null; }),
+    apiFetch('/alumnos/tareas').catch(function () { return null; })
+  ]);
+
+  // ── 5a. HORARIO (salón, nivel, docente) ───────────────────
+  const h1  = document.querySelector('.encabezado-info h1');
+  const sub = document.querySelector('.encabezado-info p');
+  const sidebarSalon = document.querySelector('.clase-item a');
+  const nivelEl = document.getElementById('nivel-valor');
+
   if (dataHorario && dataHorario.horario && dataHorario.horario.length > 0) {
     const salon = dataHorario.horario[0];
-
-    // Encabezado principal
-    const h1 = document.querySelector('.encabezado-info h1');
-    const sub = document.querySelector('.encabezado-info p');
     if (h1) h1.textContent = salon.salon || 'Mi Salón';
-        // Formatea hora UTC correctamente (SQL Server devuelve TIME como 1970-01-01T18:00:00.000Z)
-    function fmtHora(valor) {
-      if (!valor) return '';
-      const d = new Date(valor);
-      let h = d.getUTCHours(), m = d.getUTCMinutes();
-      const suf = h >= 12 ? 'PM' : 'AM';
-      h = ((h + 11) % 12 + 1);
-      return h + ':' + String(m).padStart(2, '0') + ' ' + suf;
-    }
-
     if (sub) sub.textContent =
       (salon.dias_semana || '') + ' · ' +
-      fmtHora(salon.hora_inicio) + ' - ' +
-      fmtHora(salon.hora_fin) + ' · ' +
-      'Prof. ' + (salon.docente || '');
-
-    // Sidebar: nombre del salón
-    const sidebarSalon = document.querySelector('.clase-item a');
+      fmtHora(salon.hora_inicio) + ' - ' + fmtHora(salon.hora_fin) +
+      (salon.docente ? ' · Prof. ' + salon.docente : '');
     if (sidebarSalon) sidebarSalon.textContent = salon.salon || 'Mi Salón';
+    if (nivelEl) nivelEl.textContent = salon.nivel || '—';
+  } else {
+    if (h1) h1.textContent = 'Aún no tienes un salón activo';
+    if (sub) sub.textContent = 'Cuando tu matrícula esté activa verás aquí tu horario y tu docente.';
+    if (sidebarSalon) sidebarSalon.textContent = 'Sin salón asignado';
   }
 
-  // ── 5b. NOTAS (promedio) ───────────────────────────────────
-  const dataNotas = await apiFetch('/alumnos/notas');
-  if (dataNotas && dataNotas.notas) {
-    const notas = dataNotas.notas;
+  // ── 5b. NOTAS (promedio y últimas notas) ──────────────────
+  const notas = (dataNotas && dataNotas.notas) || [];
+  const valores = notas
+    .map(function (n) { return parseFloat(n.promedio); })
+    .filter(function (v) { return !isNaN(v); });
 
-    // Calcular promedio general
-    const valores = notas
-      .map(function (n) { return parseFloat(n.promedio); })
-      .filter(function (v) { return !isNaN(v); });
-
-    const promedio = valores.length > 0
+  const promedioEl = document.getElementById('promedio-valor');
+  if (promedioEl) {
+    promedioEl.textContent = valores.length > 0
       ? (valores.reduce(function (a, b) { return a + b; }, 0) / valores.length).toFixed(1)
       : '—';
+  }
 
-    const promedioEl = document.getElementById('promedio-valor');
-    if (promedioEl) promedioEl.textContent = promedio;
-
-    // Tabla de notas recientes (últimas 2)
-    const tbodyNotas = document.querySelector('.grid-inferior .card-seccion:nth-child(2) tbody');
-    if (tbodyNotas && notas.length > 0) {
-      tbodyNotas.innerHTML = '';
-      notas.slice(0, 2).forEach(function (n) {
-        const tr = document.createElement('tr');
-        tr.innerHTML =
-          '<td>Ciclo ' + (n.numero_ciclo || '') + '</td>' +
-          '<td><span class="nota-badge">' + (n.promedio != null ? n.promedio : '—') + '</span></td>';
-        tbodyNotas.appendChild(tr);
+  if (tbodyNotas) {
+    if (notas.length === 0) {
+      filaVacia(tbodyNotas, dataNotas ? 'Todavía no tienes notas registradas.' : 'No se pudieron cargar las notas.');
+    } else {
+      tbodyNotas.textContent = '';
+      // Las más recientes primero (el backend las ordena por ciclo ascendente)
+      notas.slice(-3).reverse().forEach(function (n) {
+        const nota = n.promedio != null ? Number(n.promedio).toFixed(1) : '—';
+        tbodyNotas.appendChild(filaTabla(['Ciclo ' + (n.numero_ciclo || ''), badge('nota-badge', nota)]));
       });
     }
   }
 
-  // ── 5c. TAREAS (pendientes) ────────────────────────────────
-  const dataTareas = await apiFetch('/alumnos/tareas');
-  if (dataTareas && dataTareas.tareas) {
-    const tareas = dataTareas.tareas;
+  // ── 5c. TAREAS (pendientes / entregadas) ──────────────────
+  const tareas = (dataTareas && dataTareas.tareas) || [];
+  const pendientes = tareas.filter(function (t) { return !t.estado_entrega || t.estado_entrega === 'pendiente'; });
 
-    // Contar pendientes
-    const pendientes = tareas.filter(function (t) {
-      return t.estado_entrega === 'pendiente' || !t.estado_entrega;
-    }).length;
+  const tareasEl = document.getElementById('tareas-valor');
+  if (tareasEl) tareasEl.textContent = dataTareas ? pendientes.length : '—';
+  const entregadasEl = document.getElementById('entregadas-valor');
+  if (entregadasEl) entregadasEl.textContent = dataTareas ? tareas.length - pendientes.length : '—';
 
-    const tareasEl = document.getElementById('tareas-valor');
-    if (tareasEl) tareasEl.textContent = pendientes;
-
-    // Tabla de tareas recientes (últimas 2)
-    const tbodyTareas = document.querySelector('.grid-inferior .card-seccion:nth-child(1) tbody');
-    if (tbodyTareas && tareas.length > 0) {
-      tbodyTareas.innerHTML = '';
-      tareas.slice(0, 2).forEach(function (t) {
-        const estado  = t.estado_entrega || 'pendiente';
-        const entregada = estado === 'entregado' || estado === 'revisado';
-        const clase   = entregada ? 'badge-entregado' : 'badge-pendiente';
-        const texto   = entregada ? (estado === 'revisado' ? 'Revisado' : 'Entregado') : 'Pendiente';
-        const tr = document.createElement('tr');
-        tr.innerHTML =
-          '<td>' + (t.titulo || 'Tarea') + '</td>' +
-          '<td><span class="badge ' + clase + '">' + texto + '</span></td>';
-        tbodyTareas.appendChild(tr);
+  if (tbodyTareas) {
+    if (tareas.length === 0) {
+      filaVacia(tbodyTareas, dataTareas ? 'No tienes tareas asignadas.' : 'No se pudieron cargar las tareas.');
+    } else {
+      tbodyTareas.textContent = '';
+      // Primero las pendientes (las más urgentes), luego las demás
+      const ordenadas = pendientes.concat(tareas.filter(function (t) { return pendientes.indexOf(t) === -1; }));
+      ordenadas.slice(0, 3).forEach(function (t) {
+        const estado = ESTADOS_TAREA[t.estado_entrega] || ESTADOS_TAREA.pendiente;
+        tbodyTareas.appendChild(filaTabla([t.titulo || 'Tarea', badge(estado.clase, estado.texto)]));
       });
     }
   }

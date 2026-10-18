@@ -1,0 +1,56 @@
+/* ============================================================
+   portal_comun.css — Ajustes compartidos de los portales
+   Instituto American Land
+   Ubicación: assets/css/portal_comun.css
+   Se carga DESPUÉS del CSS propio de cada página (admin, alumnos,
+   docentes). Solo corrige detalles generales; no cambia el diseño.
+============================================================ */
+
+/* El contenido es un elemento flex: sin min-width: 0 una tabla o tarjeta
+   ancha lo estira y aparece scroll horizontal en toda la página */
+.layout > .contenido,
+.layout > main { min-width: 0; }
+
+html { scroll-behavior: smooth; }
+body { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+::selection { background: rgba(106, 13, 173, 0.18); }
+
+/* Foco visible solo al navegar con teclado (no al hacer clic) */
+a:focus-visible,
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--morado-claro, #6A0DAD);
+  outline-offset: 2px;
+}
+header a:focus-visible,
+header button:focus-visible { outline-color: #FFFFFF; }
+
+/* Barras de desplazamiento discretas en el menú lateral y los modales */
+.sidebar,
+.modal,
+.modal-contenido,
+.com-lista,
+.com-mensajes {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(75, 0, 130, 0.25) transparent;
+}
+
+/* Tablas: los números se alinean y no saltan al actualizarse */
+table td,
+table th { font-variant-numeric: tabular-nums; }
+
+/* Botones deshabilitados: que se note que no se pueden usar */
+button:disabled { cursor: not-allowed; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
