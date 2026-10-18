@@ -4,24 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nuestros Estudiantes — Instituto American Land</title>
-  <link rel="icon" type="image/png" href="../assets/img/Logo.png" />
+  <link rel="icon" type="image/png" href="../assets/img/logo_circulo.png" />
 
   <!-- CSS compartido del sitio (navbar, footer, botones, variables) -->
   <link rel="stylesheet" href="../assets/css/index.css" />
   <!-- CSS propio de esta página -->
   <link rel="stylesheet" href="../assets/css/estudiantes.css" />
+  <link rel="stylesheet" href="../assets/css/tema_j.css" />
+  <link rel="stylesheet" href="../assets/css/tema_publico.css" />
 </head>
 <body>
 
   <!-- ===== NAVBAR ===== -->
-  <header>
+  <header class="j-header">
     <nav>
 
       <a href="../index.html#inicio" class="nav-marca">
-        <img src="../assets/img/Logo.png" alt="Logo" class="nav-marca-logo" />
+        <img src="../assets/img/logo_circulo.png" alt="Logo" class="nav-marca-logo" />
         <div class="nav-marca-texto">
           <strong>American Land</strong>
-          <span>Since 2009</span>
+          <span>Instituto de inglés · Desde 2009</span>
         </div>
       </a>
 
@@ -29,14 +31,15 @@
 
       <ul class="nav-links" id="nav-links">
         <li><a href="../index.html#inicio">Inicio</a></li>
-        <li><a href="seleccion.html">Admisión</a></li>
+        <li><a href="niveles.html">Programas</a></li>
+        <li><a href="seleccion.html">Admisiones</a></li>
         <li><a href="estudiantes.html" class="activo">Estudiantes</a></li>
         <li><a href="../index.html#contacto">Contacto</a></li>
       </ul>
 
       <div class="nav-auth" id="nav-auth">
-        <a href="../auth/login.html" class="btn-login">Log In</a>
-        <a href="../auth/registro.html" class="btn-signup">Sign Up</a>
+        <a href="../auth/login.html" class="btn-login">Ingresar</a>
+        <a href="../auth/registro.html" class="btn-signup">Inscríbete</a>
       </div>
 
       <button class="btn-hamburguesa" id="btn-menu" aria-label="Abrir menú">&#9776;</button>
@@ -243,7 +246,7 @@
   </main>
 
   <!-- ===== FOOTER ===== -->
-  <footer id="contacto">
+  <footer class="j-footer" id="contacto">
     <div class="footer-grid">
 
       <div class="footer-col">
