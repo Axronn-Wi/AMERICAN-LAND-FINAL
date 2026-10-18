@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asistencia - Portal Docente - Instituto American Land</title>
+  <link rel="icon" type="image/png" href="../assets/img/Logo.png" />
+  <link rel="stylesheet" href="../assets/css/notas_docente.css" />
+  <link rel="stylesheet" href="../assets/css/asistencia.css" />
+  <link rel="stylesheet" href="../assets/css/menu_movil.css" />
+  <link rel="stylesheet" href="../assets/css/portal_comun.css" />
+  <link rel="stylesheet" href="../assets/css/comunicaciones.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">D</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Docente</span>
+          <span class="nav-rol">Docente</span>
+        </div>
+      </div>
+
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="notas.html">Notas</a></li>
+        <li><a href="asistencia.html" class="activo">Asistencia</a></li>
+        <li><a href="horario.html">Horario</a></li>
+        <li><a href="tareas.html">Tareas</a></li>
+      </ul>
+
+      <div class="nav-acciones">
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ===== LAYOUT ===== -->
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Mis Clases</h3>
+        <!-- Lo llena asistencia_docente.js con los salones reales -->
+        <ul id="lista-clases"></ul>
+      </section>
+      <section class="sidebar-seccion">
+        <h3>Accesos Rápidos</h3>
+        <ul>
+          <li><a href="asistencia.html" class="acceso-link"><span>&#9989;</span> Tomar Asistencia</a></li>
+          <li><a href="notas.html"   class="acceso-link"><span>&#128203;</span> Ingresar Notas</a></li>
+          <li><a href="tareas.html"  class="acceso-link"><span>&#128218;</span> Ver Tareas</a></li>
+          <li><a href="horario.html" class="acceso-link"><span>&#128197;</span> Mi Horario</a></li>
+        </ul>
+      </section>
+    </aside>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="contenido">
+
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Asistencia</h1>
+          <p id="salon-detalle">Cargando...</p>
+        </div>
+        <button class="btn-accion" id="btn-guardar" disabled>&#128190; Guardar asistencia</button>
+      </div>
+
+      <!-- Fecha de la clase -->
+      <div class="card-seccion asis-controles">
+        <div class="asis-fecha">
+          <button type="button" class="asis-flecha" id="btn-dia-anterior" aria-label="Día anterior">&#8249;</button>
+          <label class="asis-fecha-campo">
+            <span>Fecha de la clase</span>
+            <input type="date" id="input-fecha" />
+          </label>
+          <button type="button" class="asis-flecha" id="btn-dia-siguiente" aria-label="Día siguiente">&#8250;</button>
+          <button type="button" class="asis-hoy" id="btn-hoy">Hoy</button>
+        </div>
+        <div class="asis-rapido">
+          <span class="asis-estado-guardado" id="estado-guardado"></span>
+          <button type="button" class="asis-todos" id="btn-todos-presentes">&#10003; Todos presentes</button>
+        </div>
+      </div>
+
+      <div class="alerta" id="alerta" role="status"></div>
+
+      <!-- Resumen del día -->
+      <div class="asis-resumen-dia" id="resumen-dia" aria-live="polite"></div>
+
+      <!-- Lista -->
+      <div class="card-seccion">
+        <div class="card-header">
+          <div class="card-titulo-wrap">
+            <span class="card-icono">&#128101;</span>
+            <h2>Lista de clase</h2>
+          </div>
+          <span class="promedio-grupo asis-leyenda">
+            <span class="asis-chip presente">P</span> Presente
+            <span class="asis-chip ausente">A</span> Ausente
+            <span class="asis-chip tarde">T</span> Tarde
+            <span class="asis-chip excusa">E</span> Excusa
+          </span>
+        </div>
+        <div id="lista-asistencia" class="asis-lista">
+          <p class="asis-vacio">Cargando estudiantes...</p>
+        </div>
+      </div>
+
+      <!-- Acumulado del curso -->
+      <div class="card-seccion">
+        <div class="card-header">
+          <div class="card-titulo-wrap">
+            <span class="card-icono">&#128200;</span>
+            <h2>Asistencia acumulada</h2>
+          </div>
+          <span class="promedio-grupo" id="clases-registradas"></span>
+        </div>
+        <div class="tabla-wrap">
+          <table class="tabla-notas">
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                <th>Presente</th>
+                <th>Tarde</th>
+                <th>Ausente</th>
+                <th>Excusa</th>
+                <th>% Asistencia</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-acumulado"></tbody>
+          </table>
+        </div>
+        <p class="asis-nota">El porcentaje cuenta presente y tarde como asistencia. Las excusas no cuentan en contra.</p>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/asistencia_docente.js"></script>
+  <script src="../assets/js/comunicaciones.js"></script>
+  <script src="../assets/js/menu_movil.js"></script>
+</body>
+</html>

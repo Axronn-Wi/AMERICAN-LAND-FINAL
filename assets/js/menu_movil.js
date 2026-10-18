@@ -19,7 +19,7 @@
   // Orden en la barra. Solo se aplica si TODOS los enlaces de la página
   // están en esta lista (alumnos y docentes); si no, se respeta el orden
   // del menú original.
-  const ORDEN = ['inicio', 'horario', 'salon_virtual', 'tareas', 'notas'];
+  const ORDEN = ['inicio', 'horario', 'salon_virtual', 'asistencia', 'tareas', 'notas'];
 
   // Íconos de línea (24 x 24). Contenido fijo del programa, no datos del usuario.
   const ICONOS = {
@@ -32,6 +32,10 @@
     alumnos:       '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><path d="M16 4.7a3.5 3.5 0 0 1 0 6.6M18 14.8c1.9.7 3.1 2.4 3.5 5.2"/>',
     docentes:      '<circle cx="9.5" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 7-5.5s6.4 2.1 7 5.5"/><path d="m16.5 8.5 2 2 3.5-4"/>',
     salones:       '<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>',
+    asistencia:    '<rect x="4" y="4.5" width="16" height="16" rx="2.5"/><path d="M8 3v3M16 3v3M4 9.5h16M8.5 14.5l2.2 2.2 4.8-4.7"/>',
+    personal:      '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><path d="M15.5 11.5l1.8 1.8 4-4"/>',
+    anuncios:      '<path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>',
+    contactos:     '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/>',
     generico:      '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.5"/>'
   };
 
@@ -105,7 +109,21 @@
     document.body.appendChild(barra);
   }
 
+  // Menú lateral: cambia los emojis por los mismos íconos de línea de la barra,
+  // para que todo el portal tenga un estilo uniforme. Si no hay ícono para ese
+  // enlace, se deja el emoji original.
+  function iconosLaterales() {
+    document.querySelectorAll('.sidebar a[href]').forEach(function (a) {
+      const contenedor = a.closest('.menu-item');
+      const icono = contenedor ? contenedor.querySelector('.menu-icono') : a.querySelector('span:first-child');
+      const nombre = nombreDe(a.getAttribute('href'));
+      if (!icono || !ICONOS[nombre] || icono.querySelector('svg')) return;
+      icono.innerHTML = '<svg class="icono-linea" viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + ICONOS[nombre] + '</svg>';
+    });
+  }
+
   function iniciar() {
+    iconosLaterales();
     if (document.querySelector('.menu-movil')) return;   // ya existe
     const items = leerEnlaces();
     if (items.length === 0) return;                      // la página no tiene menú

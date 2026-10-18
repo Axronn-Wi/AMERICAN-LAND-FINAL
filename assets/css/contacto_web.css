@@ -1,0 +1,116 @@
+/* ============================================================
+   contacto_web.css — Formulario de contacto de la página principal
+   Instituto American Land
+   Ubicación: assets/css/contacto_web.css
+   Usa las variables de index.css.
+============================================================ */
+
+.contacto-web {
+  scroll-margin-top: 64px;
+  padding: 80px 24px;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(106, 13, 173, 0.08), transparent 45%),
+    radial-gradient(circle at 90% 80%, rgba(192, 57, 43, 0.06), transparent 40%),
+    #FBF9FE;
+}
+.contacto-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 48px;
+  align-items: center;
+}
+
+/* ── Columna de información ───────────────────────────────── */
+.contacto-etiqueta {
+  display: inline-block;
+  padding: 5px 14px;
+  border-radius: 50px;
+  background: rgba(106, 13, 173, 0.1);
+  color: var(--morado-claro);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.contacto-info h2 {
+  font-family: var(--font-titulo);
+  font-size: clamp(1.7rem, 3.5vw, 2.4rem);
+  line-height: 1.2;
+  color: var(--negro);
+  margin: 14px 0 12px;
+}
+.contacto-info > p { color: var(--gris-texto); line-height: 1.7; font-size: 0.98rem; }
+.contacto-medios { list-style: none; margin-top: 28px; display: flex; flex-direction: column; gap: 18px; }
+.contacto-medios li { display: flex; gap: 14px; align-items: center; }
+.contacto-medios div { display: flex; flex-direction: column; gap: 2px; font-size: 0.92rem; }
+.contacto-medios strong { font-size: 0.78rem; color: var(--gris-texto); font-weight: 600; }
+.contacto-medios a { color: var(--morado); font-weight: 600; }
+.contacto-medios a:hover { text-decoration: underline; }
+.contacto-icono {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--morado), var(--morado-claro));
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(75, 0, 130, 0.25);
+}
+.contacto-icono svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+/* ── Formulario ───────────────────────────────────────────── */
+.contacto-form {
+  background: #fff;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 20px 50px rgba(43, 10, 84, 0.12);
+  border: 1px solid rgba(106, 13, 173, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.contacto-fila { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.contacto-campo { display: flex; flex-direction: column; gap: 6px; font-size: 0.84rem; font-weight: 600; color: var(--negro); }
+.contacto-campo em { color: var(--rojo); font-style: normal; }
+.contacto-campo input,
+.contacto-campo textarea {
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid #E4DEEE;
+  background: #FCFBFE;
+  font: inherit;
+  font-weight: 400;
+  font-size: 0.92rem;
+  color: var(--negro);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+.contacto-campo textarea { resize: vertical; min-height: 110px; }
+.contacto-campo input:focus,
+.contacto-campo textarea:focus {
+  outline: none;
+  border-color: var(--morado-claro);
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(106, 13, 173, 0.1);
+}
+.contacto-campo input.invalido,
+.contacto-campo textarea.invalido { border-color: var(--rojo); }
+.contacto-trampa { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.contacto-enviar { align-self: flex-start; border: none; cursor: pointer; font-family: inherit; }
+.contacto-enviar:disabled { opacity: 0.7; cursor: wait; }
+.contacto-aviso { font-size: 0.86rem; font-weight: 600; min-height: 1.2em; }
+.contacto-aviso.ok { color: #1e8449; }
+.contacto-aviso.error { color: var(--rojo); }
+.contacto-legal { font-size: 0.75rem; color: var(--gris-texto); }
+
+@media (max-width: 860px) {
+  .contacto-grid { grid-template-columns: 1fr; gap: 32px; }
+}
+@media (max-width: 520px) {
+  .contacto-web { padding: 56px 16px; }
+  .contacto-form { padding: 22px; }
+  .contacto-fila { grid-template-columns: 1fr; }
+  .contacto-enviar { align-self: stretch; text-align: center; }
+}

@@ -6,6 +6,7 @@
   <title>Notas - Instituto American Land</title>
   <link rel="icon" type="image/png" href="../assets/img/Logo.png" />
   <link rel="stylesheet" href="../assets/css/notas.css" />
+  <link rel="stylesheet" href="../assets/css/asistencia.css" />
   <link rel="stylesheet" href="../assets/css/menu_movil.css">
   <link rel="stylesheet" href="../assets/css/portal_comun.css" />
   <link rel="stylesheet" href="../assets/css/comunicaciones.css" />
@@ -82,6 +83,25 @@
         <!-- Lo llena notas.js con los datos de la API -->
       </section>
 
+      <!-- MI ASISTENCIA (la llena asistencia_alumno.js) -->
+      <section class="card-seccion" id="mi-asistencia" aria-labelledby="titulo-asistencia">
+        <div class="card-header">
+          <h2 id="titulo-asistencia">Mi Asistencia</h2>
+          <span class="asis-alumno-codigo" id="asistencia-detalle"></span>
+        </div>
+        <div class="asis-alumno-resumen">
+          <div class="asis-anillo" id="asistencia-anillo" role="img" aria-label="Porcentaje de asistencia">
+            <div class="asis-anillo-centro">
+              <div><strong id="asistencia-porcentaje">—</strong><span>asistencia</span></div>
+            </div>
+          </div>
+          <div>
+            <div class="asis-resumen-dia" id="asistencia-contadores"></div>
+            <ul class="asis-historial" id="asistencia-historial"></ul>
+          </div>
+        </div>
+      </section>
+
       <!-- HISTORIAL COMPLETO -->
       <section class="card-seccion">
         <div class="card-header">
@@ -114,6 +134,7 @@
   </div>
 
   <script src="../assets/js/notas.js"></script>
+  <script src="../assets/js/asistencia_alumno.js"></script>
   <script src="../assets/js/comunicaciones.js"></script>
   <script src="../assets/js/menu_movil.js"></script>
 </body>

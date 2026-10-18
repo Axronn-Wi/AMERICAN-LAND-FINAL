@@ -273,6 +273,7 @@
 }
 .com-avatar.com-rol-docente { background: linear-gradient(135deg, #1E6FB8, var(--com-morado-2)); }
 .com-avatar.com-rol-admin { background: linear-gradient(135deg, #1B8A5A, #1E6FB8); }
+.com-avatar.com-rol-secretaria { background: linear-gradient(135deg, #D35400, #C0392B); }
 .com-contacto-info { flex: 1; min-width: 0; }
 .com-contacto-fila { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
 .com-contacto-nombre { font-size: 0.88rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

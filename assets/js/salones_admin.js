@@ -103,6 +103,7 @@ function fechaParaInput(valor) {
 // ── 6. ESTADO DE LA PÁGINA ──────────────────────────────────
 let salones = [];
 let matriculas = [];
+let asistenciaPorSalon = {};   // salon_id -> { porcentaje, clases }
 let niveles = [];
 let docentes = [];
 let horarios = [];
@@ -249,6 +250,9 @@ function crearTarjeta(s) {
   cuerpo.appendChild(crear('div', 'salon-tarjeta-horario', '\uD83D\uDD52 ' + textoHorario(s)));
   cuerpo.appendChild(crear('div', 'salon-tarjeta-horario', '\uD83D\uDC68\u200D\uD83C\uDFEB ' + (s.docente || 'Sin docente')));
   cuerpo.appendChild(crear('div', 'salon-tarjeta-horario', '\uD83D\uDD04 Ciclo actual: ' + (s.ciclo_actual === null || s.ciclo_actual === undefined ? '\u2014' : s.ciclo_actual)));
+  const asis = asistenciaPorSalon[s.id];
+  cuerpo.appendChild(crear('div', 'salon-tarjeta-horario', '✅ Asistencia: ' +
+    (asis && asis.porcentaje !== null ? asis.porcentaje + '% en ' + asis.clases + (asis.clases === 1 ? ' clase' : ' clases') : 'sin registros')));
 
   const cap = crear('div', 'salon-tarjeta-capacidad');
   const capTexto = crear('div', 'salon-tarjeta-capacidad-texto');
@@ -298,8 +302,15 @@ function pintarGrid() {
   lista.forEach(function (s) { grid.appendChild(crearTarjeta(s)); });
 }
 
+// Resumen de asistencia por salón (si falla, las tarjetas se muestran sin ese dato)
+async function cargarAsistencia() {
+  const lista = await cargarLista('/admin/asistencia', 'salones');
+  asistenciaPorSalon = {};
+  lista.forEach(function (a) { asistenciaPorSalon[a.salon_id] = a; });
+}
+
 async function recargar() {
-  await Promise.all([cargarSalones(), cargarLista('/admin/matriculas', 'matriculas').then(function (m) { matriculas = m; })]);
+  await Promise.all([cargarSalones(), cargarAsistencia(), cargarLista('/admin/matriculas', 'matriculas').then(function (m) { matriculas = m; })]);
   pintarStats();
   pintarGrid();
 }
@@ -548,7 +559,7 @@ porId('sb-nuevo-docente').addEventListener('click', function () {
 // ── 14. ARRANCAR ────────────────────────────────────────────
 async function iniciar() {
   try {
-    await Promise.all([cargarSalones(), cargarAuxiliares()]);
+    await Promise.all([cargarSalones(), cargarAuxiliares(), cargarAsistencia()]);
   } catch (err) {
     console.error('Error al cargar los datos:', err);
     mostrarAlerta('error', 'No se pudo conectar con el servidor.');

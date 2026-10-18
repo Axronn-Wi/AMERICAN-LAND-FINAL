@@ -21,6 +21,33 @@ async function obtenerIdPerfilAdmin(usuarioId) {
   return nuevo.rows[0].id;
 }
 
+// Perfil con el que se firma una matrícula o un pago: el admin usa su perfil de la
+// tabla admin (secretaria_id); la secretaria no tiene, así que solo queda registrado_por
+async function datosDeRegistro(usuario) {
+  const secretariaId = usuario.rol === 'admin' ? await obtenerIdPerfilAdmin(usuario.id_usuario) : null;
+  return { secretariaId, registradoPor: usuario.id_usuario };
+}
+
+// Rol (texto) de un usuario, o null si no existe
+async function rolDeUsuario(idUsuario) {
+  const r = await pool.query(
+    'SELECT r.nombre AS rol FROM usuarios u JOIN roles r ON u.rol_id = r.id WHERE u.id = $1',
+    [idUsuario]
+  );
+  return r.rows.length > 0 ? r.rows[0].rol : null;
+}
+
+async function totalAdminsActivos() {
+  const r = await pool.query(
+    `SELECT COUNT(*)::int AS total FROM usuarios u JOIN roles r ON u.rol_id = r.id
+     WHERE r.nombre = 'admin' AND u.activo = TRUE`
+  );
+  return r.rows[0].total;
+}
+
+// La secretaría solo administra estudiantes; el resto de cuentas son del admin
+const MENSAJE_SOLO_ESTUDIANTES = 'La secretaría solo puede gestionar cuentas de estudiantes.';
+
 async function obtenerUsuarios(req, res) {
   try {
     const result = await pool.query(
@@ -51,6 +78,17 @@ async function cambiarEstadoUsuario(req, res) {
 
     if (Number(id) === req.usuario.id_usuario && activo === false) {
       return res.status(400).json({ mensaje: 'No puedes desactivar tu propia cuenta.' });
+    }
+
+    const rolObjetivo = await rolDeUsuario(id);
+    if (rolObjetivo === null) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
+    }
+    if (req.usuario.rol === 'secretaria' && rolObjetivo !== 'estudiante') {
+      return res.status(403).json({ mensaje: MENSAJE_SOLO_ESTUDIANTES });
+    }
+    if (rolObjetivo === 'admin' && activo === false && (await totalAdminsActivos()) <= 1) {
+      return res.status(409).json({ mensaje: 'Debe quedar al menos un administrador activo.' });
     }
 
     const result = await pool.query(
@@ -280,13 +318,15 @@ async function obtenerMatriculas(req, res) {
               m.valor_total::float8 AS valor_total, m.descuento::float8 AS descuento,
               m.saldo_pendiente::float8 AS saldo_pendiente, m.anno,
               m.observaciones,
-              ue.nombre_completo AS estudiante, s.nombre AS salon, us.nombre_completo AS registrado_por
+              ue.nombre_completo AS estudiante, s.nombre AS salon,
+              COALESCE(ur.nombre_completo, us.nombre_completo) AS registrado_por
        FROM matriculas m
        JOIN estudiantes e ON m.estudiante_id = e.id
        JOIN usuarios ue ON e.usuario_id = ue.id
        JOIN salones s ON m.salon_id = s.id
        LEFT JOIN admin sec ON m.secretaria_id = sec.id
        LEFT JOIN usuarios us ON sec.usuario_id = us.id
+       LEFT JOIN usuarios ur ON m.registrado_por = ur.id
        ORDER BY m.fecha_matricula DESC`
     );
 
@@ -334,7 +374,6 @@ async function registrarPago(req, res) {
   try {
     const { matricula_id, metodo_pago, referencia_transaccion } = req.body;
     const monto = Number(req.body.monto);
-    const id_secretaria_usuario = req.usuario.id_usuario;
 
     if (!matricula_id || !metodo_pago || req.body.monto === undefined || req.body.monto === null || req.body.monto === '') {
       return res.status(400).json({ mensaje: 'matricula_id, monto y metodo_pago son obligatorios.' });
@@ -344,8 +383,8 @@ async function registrarPago(req, res) {
       return res.status(400).json({ mensaje: 'El monto debe ser un número mayor que 0.' });
     }
 
-    // Perfil admin del usuario logueado (se crea si todavia no existe)
-    const id_secretaria = await obtenerIdPerfilAdmin(id_secretaria_usuario);
+    // Quién registra: admin (con su perfil de la tabla admin) o secretaria
+    const { secretariaId, registradoPor } = await datosDeRegistro(req.usuario);
 
     // Todo en una transacción: FOR UPDATE bloquea la matrícula para que dos pagos
     // simultáneos no descuenten el mismo saldo dos veces
@@ -372,10 +411,10 @@ async function registrarPago(req, res) {
       }
 
       const pagoResult = await cliente.query(
-        `INSERT INTO pagos (matricula_id, secretaria_id, monto, metodo_pago, referencia_transaccion, estado)
-         VALUES ($1, $2, $3, $4, $5, 'exitoso')
+        `INSERT INTO pagos (matricula_id, secretaria_id, registrado_por, monto, metodo_pago, referencia_transaccion, estado)
+         VALUES ($1, $2, $3, $4, $5, $6, 'exitoso')
          RETURNING id`,
-        [matricula_id, id_secretaria, monto, metodo_pago, referencia_transaccion || null]
+        [matricula_id, secretariaId, registradoPor, monto, metodo_pago, referencia_transaccion || null]
       );
 
       // Descontar el pago; si el saldo queda en 0 la matrícula pendiente se activa
@@ -435,9 +474,12 @@ async function crearUsuario(req, res) {
       return res.status(400).json({ mensaje: 'El correo electrónico no es válido.' });
     }
 
-    const rolesValidos = ['estudiante', 'docente', 'admin'];
+    const rolesValidos = ['estudiante', 'docente', 'admin', 'secretaria'];
     if (!rolesValidos.includes(rol)) {
-      return res.status(400).json({ mensaje: 'Rol inválido. Usa: estudiante, docente o admin.' });
+      return res.status(400).json({ mensaje: 'Rol inválido. Usa: estudiante, docente, secretaria o admin.' });
+    }
+    if (req.usuario.rol === 'secretaria' && rol !== 'estudiante') {
+      return res.status(403).json({ mensaje: MENSAJE_SOLO_ESTUDIANTES });
     }
 
     if (contrasena.length < 6) {
@@ -498,6 +540,13 @@ async function crearUsuario(req, res) {
           `INSERT INTO admin (usuario_id, cargo, sede, activo)
            VALUES ($1, $2, $3, TRUE)`,
           [nuevoUsuarioId, datosPerfil?.cargo || null, datosPerfil?.sede || null]
+        );
+
+      } else if (rol === 'secretaria') {
+        await cliente.query(
+          `INSERT INTO secretarias (usuario_id, cargo, sede, activo)
+           VALUES ($1, $2, $3, TRUE)`,
+          [nuevoUsuarioId, datosPerfil?.cargo || 'Secretaria académica', datosPerfil?.sede || null]
         );
       }
 
@@ -604,6 +653,10 @@ async function editarUsuario(req, res) {
 
     const rol = usuarioResult.rows[0].rol;
 
+    if (req.usuario.rol === 'secretaria' && rol !== 'estudiante') {
+      return res.status(403).json({ mensaje: MENSAJE_SOLO_ESTUDIANTES });
+    }
+
     // Verificar que el correo no lo tenga otro usuario
     const repetido = await pool.query(
       'SELECT id FROM usuarios WHERE LOWER(correo) = $1 AND id <> $2',
@@ -646,6 +699,23 @@ async function editarUsuario(req, res) {
         );
       }
 
+      // Cargo y sede del personal administrativo
+      if ((rol === 'admin' || rol === 'secretaria') && datosPerfil) {
+        const tabla = rol === 'admin' ? 'admin' : 'secretarias';
+        const cargo = typeof datosPerfil.cargo === 'string' ? datosPerfil.cargo.trim() || null : null;
+        const sede = typeof datosPerfil.sede === 'string' ? datosPerfil.sede.trim() || null : null;
+        const actualizado = await cliente.query(
+          `UPDATE ${tabla} SET cargo = $1, sede = $2 WHERE usuario_id = $3`,
+          [cargo, sede, id]
+        );
+        if (actualizado.rowCount === 0) {
+          await cliente.query(
+            `INSERT INTO ${tabla} (usuario_id, cargo, sede, activo) VALUES ($1, $2, $3, TRUE)`,
+            [id, cargo, sede]
+          );
+        }
+      }
+
       await cliente.query('COMMIT');
 
     } catch (errTransaccion) {
@@ -684,7 +754,6 @@ async function obtenerEstudiantes(req, res) {
 async function crearMatricula(req, res) {
   try {
     const { estudiante_id, salon_id } = req.body;
-    const id_admin_usuario = req.usuario.id_usuario;
 
     if (!estudiante_id || !salon_id) {
       return res.status(400).json({ mensaje: 'estudiante_id y salon_id son obligatorios.' });
@@ -741,14 +810,14 @@ async function crearMatricula(req, res) {
       return res.status(409).json({ mensaje: 'Este estudiante ya tiene una matrícula pendiente o activa en este salón.' });
     }
 
-    // Quién registra: el perfil admin del usuario logueado (se crea si todavia no existe)
-    const id_secretaria = await obtenerIdPerfilAdmin(id_admin_usuario);
+    // Quién registra: admin (con su perfil de la tabla admin) o secretaria
+    const { secretariaId, registradoPor } = await datosDeRegistro(req.usuario);
 
     const result = await pool.query(
-      `INSERT INTO matriculas (estudiante_id, salon_id, secretaria_id, estado, valor_total, descuento, saldo_pendiente, anno)
-       VALUES ($1, $2, $3, 'pendiente', $4, 0, $4, $5)
+      `INSERT INTO matriculas (estudiante_id, salon_id, secretaria_id, registrado_por, estado, valor_total, descuento, saldo_pendiente, anno)
+       VALUES ($1, $2, $3, $6, 'pendiente', $4, 0, $4, $5)
        RETURNING id, estado, valor_total::float8 AS valor_total, saldo_pendiente::float8 AS saldo_pendiente`,
-      [estudiante_id, salon_id, id_secretaria, salon.precio, salon.anno]
+      [estudiante_id, salon_id, secretariaId, salon.precio, salon.anno, registradoPor]
     );
 
     notificar([estudianteResult.rows[0].usuario_id], {
@@ -789,13 +858,30 @@ async function eliminarUsuario(req, res) {
       return res.status(404).json({ mensaje: 'Usuario no encontrado.' });
     }
 
-    if (usuario.rows[0].rol === 'admin') {
+    const rolObjetivo = usuario.rows[0].rol;
+
+    if (req.usuario.rol === 'secretaria' && rolObjetivo !== 'estudiante') {
       await client.query('ROLLBACK');
-      return res.status(403).json({ mensaje: 'No se puede eliminar a un administrador.' });
+      return res.status(403).json({ mensaje: MENSAJE_SOLO_ESTUDIANTES });
+    }
+
+    if (rolObjetivo === 'admin') {
+      // Bloquea a los demás admins mientras se cuenta, para no quedarse sin ninguno
+      const otros = await client.query(
+        `SELECT u.id FROM usuarios u JOIN roles r ON u.rol_id = r.id
+         WHERE r.nombre = 'admin' AND u.activo = TRUE AND u.id <> $1 FOR UPDATE OF u`,
+        [id]
+      );
+      if (otros.rows.length === 0) {
+        await client.query('ROLLBACK');
+        return res.status(409).json({ mensaje: 'Debe quedar al menos un administrador activo.' });
+      }
     }
 
     await client.query('DELETE FROM estudiantes WHERE usuario_id = $1', [id]);
     await client.query('DELETE FROM docentes WHERE usuario_id = $1', [id]);
+    await client.query('DELETE FROM admin WHERE usuario_id = $1', [id]);
+    await client.query('DELETE FROM secretarias WHERE usuario_id = $1', [id]);
     await client.query('DELETE FROM usuarios WHERE id = $1', [id]);
 
     await client.query('COMMIT');
@@ -806,7 +892,7 @@ async function eliminarUsuario(req, res) {
     await client.query('ROLLBACK').catch(() => {});
     console.error(err);
     if (err.code === '23503') {
-      return res.status(409).json({ mensaje: 'No se puede eliminar: tiene matrículas, salones u otros datos asociados. Desactívalo en su lugar.' });
+      return res.status(409).json({ mensaje: 'No se puede eliminar: tiene matrículas, salones, pagos, anuncios u otros datos asociados. Desactívalo en su lugar.' });
     }
     res.status(500).json({ mensaje: 'Error al eliminar el usuario.' });
   } finally {
@@ -873,4 +959,25 @@ async function eliminarMatricula(req, res) {
     res.status(500).json({ mensaje: 'Error al eliminar la matrícula.' });
   }
 }
-module.exports = { obtenerUsuarios, cambiarEstadoUsuario, crearUsuario, editarUsuario, eliminarUsuario, obtenerEstudiantes, obtenerDocentes, obtenerHorariosTipo, obtenerNiveles, obtenerSalones, crearSalon, actualizarSalon, eliminarSalon, obtenerMatriculas, crearMatricula, actualizarMatricula, cambiarEstadoMatricula, eliminarMatricula, registrarPago };
+async function obtenerPersonal(req, res) {
+  try {
+    const result = await pool.query(
+      `SELECT u.id, u.nombre_completo, u.correo, u.telefono, u.activo, u.creado_en,
+              r.nombre AS rol,
+              COALESCE(a.cargo, s.cargo) AS cargo,
+              COALESCE(a.sede, s.sede) AS sede
+       FROM usuarios u
+       JOIN roles r ON u.rol_id = r.id
+       LEFT JOIN admin a ON a.usuario_id = u.id AND r.nombre = 'admin'
+       LEFT JOIN secretarias s ON s.usuario_id = u.id AND r.nombre = 'secretaria'
+       WHERE r.nombre IN ('admin', 'secretaria')
+       ORDER BY r.nombre ASC, u.nombre_completo ASC`
+    );
+    res.json({ personal: result.rows, yo: req.usuario.id_usuario });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al obtener el personal.' });
+  }
+}
+
+module.exports = { obtenerPersonal, obtenerUsuarios, cambiarEstadoUsuario, crearUsuario, editarUsuario, eliminarUsuario, obtenerEstudiantes, obtenerDocentes, obtenerHorariosTipo, obtenerNiveles, obtenerSalones, crearSalon, actualizarSalon, eliminarSalon, obtenerMatriculas, crearMatricula, actualizarMatricula, cambiarEstadoMatricula, eliminarMatricula, registrarPago };

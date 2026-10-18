@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contactos - Panel Admin - Instituto American Land</title>
+  <link rel="icon" type="image/png" href="../assets/img/Logo.png" />
+  <link rel="stylesheet" href="../assets/css/inicio_admin.css" />
+  <link rel="stylesheet" href="../assets/css/docentes_admin.css" />
+  <link rel="stylesheet" href="../assets/css/gestion_admin.css" />
+  <link rel="stylesheet" href="../assets/css/menu_movil.css" />
+  <link rel="stylesheet" href="../assets/css/portal_comun.css" />
+  <link rel="stylesheet" href="../assets/css/comunicaciones.css" />
+</head>
+<body>
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">A</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Administrador</span>
+          <span class="nav-rol">Admin</span>
+        </div>
+      </div>
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="docentes.html">Docentes</a></li>
+        <li><a href="alumnos.html">Alumnos</a></li>
+        <li><a href="salones.html">Salones</a></li>
+        <li><a href="matriculas.html">Matrículas</a></li>
+        <li><a href="personal.html" class="activo">Gestión</a></li>
+      </ul>
+      <div class="nav-acciones">
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <section class="sidebar-seccion">
+        <h3>Panel Admin</h3>
+        <ul>
+          <li class="menu-item"><span class="menu-icono">&#127968;</span><a href="inicio.html">Inicio</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128104;&#8205;&#127979;</span><a href="docentes.html">Docentes</a></li>
+          <li class="menu-item"><span class="menu-icono">&#127891;</span><a href="alumnos.html">Alumnos</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128198;</span><a href="salones.html">Salones</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128203;</span><a href="matriculas.html">Matrículas</a></li>
+        </ul>
+      </section>
+      <section class="sidebar-seccion">
+        <h3>Gestión</h3>
+        <ul>
+          <li class="menu-item solo-admin"><span class="menu-icono">&#128101;</span><a href="personal.html">Personal</a></li>
+          <li class="menu-item"><span class="menu-icono">&#128227;</span><a href="anuncios.html">Anuncios</a></li>
+          <li class="menu-item activo"><span class="menu-icono">&#9993;&#65039;</span><a href="contactos.html">Contactos</a></li>
+        </ul>
+      </section>
+      <div class="sidebar-footer">
+        <p>Instituto American Land</p>
+        <p>Pitalito, Huila &bull; Desde 2009</p>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main class="contenido">
+
+      <div class="gestion-tabs" role="navigation" aria-label="Secciones de gestión">
+        <a href="personal.html" class="gestion-tab solo-admin"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><path d="M17 11.5l1.6 1.6 3.4-3.6"/></svg>Personal</a>
+        <a href="anuncios.html" class="gestion-tab"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>Anuncios</a>
+        <a href="contactos.html" class="gestion-tab activo" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>Contactos<span class="tab-contador" id="tab-contador-contactos" hidden></span></a>
+      </div>
+
+      <div class="encabezado-pagina">
+        <div>
+          <h1>Mensajes de contacto</h1>
+          <p>Personas interesadas que escribieron desde la página web</p>
+        </div>
+
+      </div>
+
+      <div class="alerta" id="alerta" role="status"></div>
+
+      <div class="grid-stats tres">
+        <div class="stat-card stat-matriculas">
+          <div class="stat-icono">&#128233;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-nuevo">0</span>
+            <span class="stat-label">Nuevos</span>
+          </div>
+          <span class="stat-delta alerta">&#9679; Por atender</span>
+        </div>
+        <div class="stat-card stat-docentes">
+          <div class="stat-icono">&#9203;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-en_proceso">0</span>
+            <span class="stat-label">En proceso</span>
+          </div>
+          <span class="stat-delta neutro">&#8212; En seguimiento</span>
+        </div>
+        <div class="stat-card stat-salones">
+          <div class="stat-icono">&#9989;</div>
+          <div class="stat-info">
+            <span class="stat-numero" id="stat-atendido">0</span>
+            <span class="stat-label">Atendidos</span>
+          </div>
+          <span class="stat-delta positivo">&#10003; Cerrados</span>
+        </div>
+      </div>
+
+      <div class="card-seccion">
+        <div class="barra-filtros">
+          <div class="busqueda-wrapper">
+            <span class="busqueda-icono">&#128269;</span>
+            <input type="text" id="input-busqueda" class="input-busqueda" placeholder="Buscar por nombre, correo o mensaje..." />
+          </div>
+          <div class="filtros-grupo">
+            <select id="filtro-estado" class="filtro-select" aria-label="Filtrar por estado">
+              <option value="">Todos</option>
+              <option value="nuevo">Nuevos</option>
+              <option value="en_proceso">En proceso</option>
+              <option value="atendido">Atendidos</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-seccion">
+        <div class="card-header">
+          <h2>Bandeja de entrada</h2>
+          <span class="badge-conteo" id="badge-total">—</span>
+        </div>
+        <div class="lista-tarjetas" id="lista-contactos">
+          <p class="gris-texto" style="padding:24px;text-align:center;">Cargando mensajes...</p>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+
+
+  <!-- MODAL CONFIRMAR (genérico) -->
+  <div class="modal-overlay" id="modal-confirmar" role="dialog" aria-modal="true" style="display:none">
+    <div class="modal-box modal-box-sm">
+      <div class="modal-header">
+        <h2 class="modal-titulo">¿Confirmar?</h2>
+        <button class="btn-cerrar-modal" data-cancelar aria-label="Cerrar">&#10005;</button>
+      </div>
+      <p class="modal-aviso"></p>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancelar" data-cancelar>Cancelar</button>
+        <button type="button" class="btn-modal-eliminar" data-confirmar>Sí, continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/js/panel_roles.js"></script>
+  <script src="../assets/js/admin_comun.js"></script>
+  <script src="../assets/js/contactos_admin.js"></script>
+  <script src="../assets/js/comunicaciones.js"></script>
+  <script src="../assets/js/menu_movil.js"></script>
+</body>
+</html>
