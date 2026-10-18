@@ -1,0 +1,214 @@
+/* ============================================================
+   portal_lateral.css — Portales con menú lateral oscuro
+   Instituto American Land
+   Ubicación: assets/css/portal_lateral.css
+
+   Se carga después de tema_portal.css. Junto con portal_lateral.js
+   convierte la barra superior oscura en:
+     - un menú lateral oscuro de alto completo (marca + menú + clases),
+     - una barra superior clara con el título de la página y acciones.
+   En celular (≤ 768 px) el lateral se oculta y queda la barra inferior.
+============================================================ */
+
+:root { --sidebar-w: 256px; }
+
+/* ══════════════════════════════════════════
+   MENÚ LATERAL
+══════════════════════════════════════════ */
+@media (min-width: 769px) {
+  .sidebar {
+    top: 0;
+    width: var(--sidebar-w);
+    z-index: 110;
+    padding: 0 14px 18px;
+    gap: 6px;
+    border-right: 0;
+    color: #C9C1E3;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(126, 34, 206, 0.55), transparent 45%),
+      radial-gradient(circle at 100% 100%, rgba(192, 38, 211, 0.3), transparent 50%),
+      var(--j-fondo);
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  }
+  .sidebar::before {
+    content: '';
+    position: sticky;
+    top: 0;
+    display: block;
+    flex-shrink: 0;
+    height: 3px;
+    margin: 0 -14px;
+    background: repeating-linear-gradient(90deg, var(--j-rojo) 0 22px, #fff 22px 44px);
+    opacity: 0.75;
+  }
+
+  .contenido { margin-left: var(--sidebar-w); }
+}
+
+/* Marca arriba del lateral (la crea portal_lateral.js) */
+.lat-marca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 6px 16px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  text-decoration: none;
+}
+.lat-marca img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.75);
+}
+.lat-marca b { display: block; font-family: var(--j-titulo); font-size: 1.1rem; color: #fff; line-height: 1.15; }
+.lat-marca small { font-size: 0.62rem; letter-spacing: 1.2px; text-transform: uppercase; font-weight: 700; color: var(--j-dorado); }
+
+/* Sección "Menú" (docente y estudiante; la crea portal_lateral.js) */
+.lat-menu h3 {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #7D7499;
+  margin: 14px 10px 8px;
+}
+.lat-menu ul { list-style: none; display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; }
+.lat-menu .menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+.lat-menu .menu-item a { flex: 1; text-decoration: none; }
+.lat-menu .menu-icono { display: inline-flex; width: 20px; justify-content: center; }
+
+/* Secciones y enlaces en oscuro */
+.sidebar .sidebar-seccion { padding: 0; }
+.sidebar .sidebar-seccion[hidden] { display: none !important; }
+.sidebar .sidebar-seccion h3 { color: #7D7499; margin: 14px 8px 8px; padding: 0 2px; }
+.sidebar .menu-item,
+.sidebar .clase-item,
+.sidebar .acceso-link {
+  color: #C9C1E3;
+  border-radius: 11px;
+  transition: background 0.15s, color 0.15s;
+}
+.sidebar .menu-item a,
+.sidebar .clase-item a,
+.sidebar .acceso-link { color: inherit; }
+.sidebar .menu-item:hover,
+.sidebar .clase-item:hover,
+.sidebar .acceso-link:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+
+.sidebar .menu-item.activo,
+.sidebar .clase-item.activa {
+  background: linear-gradient(135deg, rgba(126, 34, 206, 0.6), rgba(192, 38, 211, 0.45));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+.sidebar .menu-item.activo::before,
+.sidebar .clase-item.activa::before { display: none; }
+.sidebar .menu-item.activo a,
+.sidebar .clase-item.activa a { color: #fff; font-weight: 700; }
+
+.sidebar .menu-item .menu-icono,
+.sidebar .acceso-link .icono-linea,
+.sidebar .acceso-link > span:first-child { color: var(--j-lila); }
+.sidebar .menu-item.activo .menu-icono { color: #fff; }
+
+/* Botones "+ Nuevo..." del admin */
+.sidebar .acceso-btn {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: #F0ABFC;
+}
+.sidebar .acceso-btn:hover { background: rgba(255, 255, 255, 0.09); border-color: rgba(240, 171, 252, 0.5); }
+
+.sidebar .sidebar-footer {
+  margin-top: auto;
+  padding: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #9E95BD;
+}
+
+/* ══════════════════════════════════════════
+   BARRA SUPERIOR CLARA
+══════════════════════════════════════════ */
+header {
+  background: rgba(247, 245, 251, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid #ECE6F5;
+  box-shadow: none;
+}
+header::after { display: none; }
+@media (min-width: 769px) {
+  header { left: var(--sidebar-w); }
+  header .nav-links { display: none; }
+}
+
+header nav { max-width: none; gap: 14px; }
+
+.portal-titulo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin-right: auto;
+  line-height: 1.15;
+}
+.portal-titulo small {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #A21CAF;
+}
+.portal-titulo strong {
+  font-family: var(--j-titulo);
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #1B1030;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Acciones y perfil a la derecha */
+header .nav-acciones { order: 2; }
+header .nav-perfil {
+  order: 3;
+  padding-left: 14px;
+  border-left: 1px solid #ECE6F5;
+}
+header .nav-nombre { color: #1B1030; }
+header .nav-rol { color: #A21CAF; opacity: 1; }
+
+header .btn-nav-icon,
+header .com-btn {
+  background: #fff;
+  border: 1px solid #E6DFF2;
+  color: #4B4060;
+}
+header .btn-nav-icon:hover,
+header .com-btn:hover { background: #F4EEFD; color: #7E22CE; border-color: #D9C8F3; }
+header .btn-cerrar:hover { background: #FDECEF; color: var(--j-rojo); border-color: #F7C4CF; }
+header .com-btn[aria-expanded="true"] { background: #F4EEFD; color: #7E22CE; }
+header .com-contador { box-shadow: 0 0 0 2px #F7F5FB; }
+
+/* El panel de notificaciones y el chat ya no quedan debajo de una barra oscura */
+.com-panel { right: 20px; }
+
+/* ── Celular ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .portal-titulo strong { font-size: 1.1rem; }
+  .portal-titulo small { display: none; }
+  header .nav-perfil { border-left: 0; padding-left: 0; }
+  header .nav-perfil .nav-info { display: none; }
+}
