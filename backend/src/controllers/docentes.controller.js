@@ -171,7 +171,7 @@ async function obtenerTareasSalon(req, res) {
     const tareasResult = await pool.query(
       `SELECT t.id, t.ciclo_id, c.numero_ciclo, t.titulo, t.descripcion,
               ${sqlFecha('t.fecha_limite')} AS fecha_limite,
-              t.valor_porcentaje::float8 AS valor_porcentaje, t.tipo,
+              t.valor_porcentaje::float8 AS valor_porcentaje, t.tipo, t.archivo_nombre,
               (SELECT COUNT(*)::int FROM matriculas m
                WHERE m.salon_id = t.salon_id AND m.estado = 'activa') AS total_estudiantes,
               (SELECT COUNT(*)::int FROM entregas_tareas et
@@ -431,7 +431,7 @@ async function eliminarTarea(req, res) {
 
     // La tarea debe pertenecer a un salón de este docente
     const tareaResult = await pool.query(
-      `SELECT t.id
+      `SELECT t.id, t.archivo_url
        FROM tareas t
        JOIN salones s ON t.salon_id = s.id
        WHERE t.id = $1 AND s.docente_id = $2`,
@@ -451,6 +451,9 @@ async function eliminarTarea(req, res) {
     }
 
     await pool.query('DELETE FROM tareas WHERE id = $1', [id_tarea]);
+    if (tareaResult.rows[0].archivo_url) {
+      borrarArchivo(path.join(CARPETA_MATERIAL, path.basename(tareaResult.rows[0].archivo_url)));
+    }
 
     res.json({ mensaje: 'Tarea eliminada correctamente.' });
 
@@ -728,4 +731,80 @@ async function eliminarMaterial(req, res) {
   }
 }
 
-module.exports = { obtenerMisSalones, obtenerEstudiantesSalon, obtenerNotasSalon, obtenerTareasSalon, registrarNota, crearTarea, editarTarea, eliminarTarea, obtenerEntregasTarea, calificarEntrega, crearMaterial, obtenerMaterialSalon, eliminarMaterial };
+// ---------------------------------------------------------------
+// POST /api/docentes/tareas/:id/archivo  (campo "archivo": guía o taller de la tarea)
+// Reemplaza el archivo anterior si ya tenía uno.
+// ---------------------------------------------------------------
+async function subirArchivoTarea(req, res) {
+  if (!req.file) {
+    return res.status(400).json({ mensaje: 'Selecciona un archivo.' });
+  }
+  const rutaNueva = req.file.path;
+  try {
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      borrarArchivo(rutaNueva);
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
+    }
+
+    const tareaResult = await pool.query(
+      `SELECT t.id, t.archivo_url
+       FROM tareas t
+       JOIN salones s ON t.salon_id = s.id
+       WHERE t.id = $1 AND s.docente_id = $2`,
+      [req.params.id, id_docente]
+    );
+    if (tareaResult.rows.length === 0) {
+      borrarArchivo(rutaNueva);
+      return res.status(404).json({ mensaje: 'Tarea no encontrada o no te pertenece.' });
+    }
+
+    // multer entrega el nombre original en latin1: se pasa a UTF-8 para conservar tildes y ñ
+    const nombreOriginal = Buffer.from(req.file.originalname, 'latin1').toString('utf8')
+      .replace(/[\\/:*?"<>|\r\n]+/g, '_').slice(-200);
+
+    await pool.query(
+      'UPDATE tareas SET archivo_url = $1, archivo_nombre = $2 WHERE id = $3',
+      [req.file.filename, nombreOriginal, req.params.id]
+    );
+    const anterior = tareaResult.rows[0].archivo_url;
+    if (anterior) borrarArchivo(path.join(CARPETA_MATERIAL, path.basename(anterior)));
+
+    res.json({ mensaje: 'Archivo adjuntado a la tarea.', archivo_nombre: nombreOriginal });
+  } catch (err) {
+    console.error(err);
+    borrarArchivo(rutaNueva);
+    res.status(500).json({ mensaje: 'Error al adjuntar el archivo.' });
+  }
+}
+
+// ---------------------------------------------------------------
+// DELETE /api/docentes/tareas/:id/archivo
+// ---------------------------------------------------------------
+async function quitarArchivoTarea(req, res) {
+  try {
+    const id_docente = await obtenerIdDocente(req.usuario.id_usuario);
+    if (id_docente === null) {
+      return res.status(404).json({ mensaje: MENSAJE_SIN_PERFIL });
+    }
+    const tareaResult = await pool.query(
+      `SELECT t.id, t.archivo_url
+       FROM tareas t
+       JOIN salones s ON t.salon_id = s.id
+       WHERE t.id = $1 AND s.docente_id = $2`,
+      [req.params.id, id_docente]
+    );
+    if (tareaResult.rows.length === 0) {
+      return res.status(404).json({ mensaje: 'Tarea no encontrada o no te pertenece.' });
+    }
+    await pool.query('UPDATE tareas SET archivo_url = NULL, archivo_nombre = NULL WHERE id = $1', [req.params.id]);
+    const anterior = tareaResult.rows[0].archivo_url;
+    if (anterior) borrarArchivo(path.join(CARPETA_MATERIAL, path.basename(anterior)));
+    res.json({ mensaje: 'Archivo quitado de la tarea.' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al quitar el archivo.' });
+  }
+}
+
+module.exports = { obtenerMisSalones, obtenerEstudiantesSalon, obtenerNotasSalon, obtenerTareasSalon, registrarNota, crearTarea, editarTarea, eliminarTarea, subirArchivoTarea, quitarArchivoTarea, obtenerEntregasTarea, calificarEntrega, crearMaterial, obtenerMaterialSalon, eliminarMaterial };

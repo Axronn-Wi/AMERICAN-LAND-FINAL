@@ -76,4 +76,57 @@ async function descargarMaterial(req, res) {
   }
 }
 
-module.exports = { descargarMaterial };
+// ---------------------------------------------------------------
+// GET /api/tareas/:id/archivo  (guía o taller adjunto a una tarea)
+// Lo descargan el docente del salón y los estudiantes con matrícula activa.
+// ---------------------------------------------------------------
+async function descargarArchivoTarea(req, res) {
+  try {
+    const r = await pool.query(
+      `SELECT t.archivo_url, t.archivo_nombre, t.salon_id, s.docente_id
+       FROM tareas t
+       JOIN salones s ON t.salon_id = s.id
+       WHERE t.id = $1`,
+      [req.params.id]
+    );
+    if (r.rows.length === 0) {
+      return res.status(404).json({ mensaje: 'Tarea no encontrada.' });
+    }
+    const tarea = r.rows[0];
+
+    const { id_usuario, rol } = req.usuario;
+    let autorizado = false;
+    if (rol === 'docente') {
+      const d = await pool.query('SELECT id FROM docentes WHERE usuario_id = $1', [id_usuario]);
+      autorizado = d.rows.length > 0 && d.rows[0].id === tarea.docente_id;
+    } else if (rol === 'estudiante') {
+      const m = await pool.query(
+        `SELECT m.id
+         FROM estudiantes e
+         JOIN matriculas m ON m.estudiante_id = e.id
+         WHERE e.usuario_id = $1 AND m.salon_id = $2 AND m.estado = 'activa'`,
+        [id_usuario, tarea.salon_id]
+      );
+      autorizado = m.rows.length > 0;
+    }
+    if (!autorizado) {
+      return res.status(403).json({ mensaje: 'No tienes permiso para descargar este archivo.' });
+    }
+
+    if (!tarea.archivo_url) {
+      return res.status(404).json({ mensaje: 'Esta tarea no tiene archivo adjunto.' });
+    }
+    const ruta = path.join(CARPETA, path.basename(tarea.archivo_url));
+    if (!fs.existsSync(ruta)) {
+      return res.status(404).json({ mensaje: 'El archivo ya no está en el servidor.' });
+    }
+
+    const extension = path.extname(tarea.archivo_url);
+    res.download(ruta, tarea.archivo_nombre || ('tarea-' + req.params.id + extension));
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: 'Error al descargar el archivo.' });
+  }
+}
+
+module.exports = { descargarMaterial, descargarArchivoTarea };

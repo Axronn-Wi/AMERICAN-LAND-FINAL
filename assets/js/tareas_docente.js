@@ -211,6 +211,15 @@ function crearTarjeta(t) {
 
   meta.appendChild(crear('span', 'meta-item',
     'Ciclo ' + t.numero_ciclo + ' \u00B7 ' + Number(t.valor_porcentaje) + '%'));
+  if (t.archivo_nombre) {
+    const adjunto = crear('button', 'meta-item adjunto', '\uD83D\uDCCE ' + t.archivo_nombre);
+    adjunto.type = 'button';
+    adjunto.title = 'Descargar ' + t.archivo_nombre;
+    adjunto.addEventListener('click', function () {
+      descargarArchivo('/tareas/' + t.id + '/archivo', t.archivo_nombre, adjunto);
+    });
+    meta.appendChild(adjunto);
+  }
   cuerpo.appendChild(meta);
 
   // Acciones: "Ver entregas" y "Editar" (abre el modal precargado)
@@ -347,8 +356,31 @@ const CAMPOS_ERROR = [
   ['m-ciclo', 'e-ciclo'],
   ['m-porcentaje', 'e-porcentaje'],
   ['m-fecha', 'e-fecha'],
-  ['m-descripcion', 'e-descripcion']
+  ['m-descripcion', 'e-descripcion'],
+  ['m-archivo', 'e-archivo']
 ];
+
+// Archivo ya adjunto a la tarea que se edita: true si el docente pidió quitarlo
+let quitarArchivo = false;
+
+function pintarArchivoActual(nombre) {
+  const caja = document.getElementById('m-archivo-actual');
+  quitarArchivo = false;
+  caja.classList.remove('quitado');
+  document.getElementById('m-archivo-quitar').textContent = 'Quitar';
+  document.getElementById('m-archivo').value = '';
+  caja.hidden = !nombre;
+  document.getElementById('m-archivo-nombre').textContent = nombre ? '\uD83D\uDCCE ' + nombre : '';
+  document.getElementById('m-archivo-ayuda').textContent = nombre
+    ? 'Si eliges otro archivo, reemplaza al actual. Máximo 20 MB.'
+    : 'PDF, Word, PowerPoint, Excel, JPG, PNG o MP3. Máximo 20 MB.';
+}
+
+document.getElementById('m-archivo-quitar').addEventListener('click', function () {
+  quitarArchivo = !quitarArchivo;
+  document.getElementById('m-archivo-actual').classList.toggle('quitado', quitarArchivo);
+  this.textContent = quitarArchivo ? 'Deshacer' : 'Quitar';
+});
 
 function ponerError(inputId, errorId, mensaje) {
   const input = document.getElementById(inputId);
@@ -462,6 +494,7 @@ async function abrirModalEditar(t) {
   selectTipo.value = tipoActual;
 
   document.getElementById('m-salon').value = String(t.salon_id);
+  pintarArchivoActual(t.archivo_nombre);
 
   modal.classList.remove('oculto');
   document.getElementById('m-titulo').focus();
@@ -481,6 +514,7 @@ function abrirModal() {
   document.getElementById('m-fecha').min = hoyISO();
   document.getElementById('m-tipo').value = 'tarea';
   document.getElementById('m-descripcion').value = '';
+  pintarArchivoActual(null);
 
   // Salón sugerido: el filtrado, o el único que tenga el docente
   let sugerido = '';
@@ -518,6 +552,18 @@ async function crearTarea() {
   if (!fecha) { ponerError('m-fecha', 'e-fecha', 'Selecciona la fecha de vencimiento.'); valido = false; }
   if (!descripcion) { ponerError('m-descripcion', 'e-descripcion', 'Escribe una descripción.'); valido = false; }
 
+  const archivo = document.getElementById('m-archivo').files[0] || null;
+  if (archivo) {
+    const ext = archivo.name.split('.').pop().toLowerCase();
+    if (EXT_MATERIAL.indexOf(ext) === -1) {
+      ponerError('m-archivo', 'e-archivo', 'Formato no permitido. Usa PDF, Word, PowerPoint, Excel, JPG, PNG o MP3.');
+      valido = false;
+    } else if (archivo.size > MAX_MATERIAL) {
+      ponerError('m-archivo', 'e-archivo', 'El archivo supera los 20 MB.');
+      valido = false;
+    }
+  }
+
   let porcentaje = null;
   if (textoPorc !== '') {
     porcentaje = Number(textoPorc);
@@ -552,11 +598,27 @@ async function crearTarea() {
       : await apiFetch('/docentes/tareas', { method: 'POST', body: cuerpo });
 
     if (res && res.ok) {
+      // La tarea ya quedó guardada; ahora se sube (o se quita) el archivo adjunto
+      const idTarea = editando ? editando.id : (res.datos && res.datos.tarea && res.datos.tarea.id);
+      let errorArchivo = null;
+      if (archivo && idTarea) {
+        btn.textContent = 'Subiendo archivo...';
+        errorArchivo = await subirArchivoTarea(idTarea, archivo);
+      } else if (editando && quitarArchivo) {
+        const r = await apiFetch('/docentes/tareas/' + idTarea + '/archivo', { method: 'DELETE' });
+        if (!r || !r.ok) errorArchivo = (r && r.datos && r.datos.mensaje) || 'No se pudo quitar el archivo.';
+      }
+
       cerrarModal();
       await cargarTareas();
       pintarLista();
       cargarRecientes();
-      mostrarAlerta('exito', editando ? 'Tarea actualizada correctamente.' : 'Tarea creada correctamente.');
+      if (errorArchivo) {
+        mostrarAlerta('error', (editando ? 'La tarea se actualizó' : 'La tarea se creó') +
+          ', pero hubo un problema con el archivo: ' + errorArchivo + ' Puedes intentarlo de nuevo con "Editar".');
+      } else {
+        mostrarAlerta('exito', editando ? 'Tarea actualizada correctamente.' : 'Tarea creada correctamente.');
+      }
     } else {
       const general = document.getElementById('e-general');
       general.textContent = (res && res.datos && res.datos.mensaje) || (editando ? 'No se pudo actualizar la tarea.' : 'No se pudo crear la tarea.');
@@ -571,6 +633,32 @@ async function crearTarea() {
 
   btn.disabled = false;
   btn.textContent = editando ? 'Guardar Cambios' : 'Crear Tarea';
+}
+
+// Sube la guía o taller de una tarea. Devuelve null si salió bien o el mensaje de error.
+async function subirArchivoTarea(idTarea, archivo) {
+  // multipart/form-data: NO se fija Content-Type, el navegador lo pone
+  const formulario = new FormData();
+  formulario.append('archivo', archivo);
+  try {
+    const respuesta = await fetch(API + '/docentes/tareas/' + idTarea + '/archivo', {
+      method: 'POST',
+      headers: { 'Authorization': 'Bearer ' + token },
+      body: formulario
+    });
+    if (respuesta.status === 401) {
+      sessionStorage.clear();
+      window.location.href = '../auth/login.html';
+      return 'Tu sesión expiró.';
+    }
+    if (respuesta.ok) return null;
+    let datos = null;
+    try { datos = await respuesta.json(); } catch (err) { /* sin cuerpo JSON */ }
+    return (datos && datos.mensaje) || 'No se pudo subir el archivo.';
+  } catch (err) {
+    console.error(err);
+    return 'No se pudo conectar con el servidor.';
+  }
 }
 
 document.getElementById('btn-nueva-tarea').addEventListener('click', abrirModal);
@@ -1021,13 +1109,17 @@ function pintarMaterial() {
 }
 
 // Igual que con las entregas: fetch con token -> blob -> enlace temporal
-async function descargarMaterial(m, btn) {
+function descargarMaterial(m, btn) {
+  return descargarArchivo('/material/' + m.id + '/archivo', 'material-' + m.id, btn);
+}
+
+async function descargarArchivo(ruta, nombrePorDefecto, btn) {
   const textoOriginal = btn.textContent;
   btn.disabled = true;
   btn.textContent = 'Descargando...';
 
   try {
-    const respuesta = await fetch(API + '/material/' + m.id + '/archivo', {
+    const respuesta = await fetch(API + ruta, {
       headers: { 'Authorization': 'Bearer ' + token }
     });
 
@@ -1047,10 +1139,12 @@ async function descargarMaterial(m, btn) {
       return;
     }
 
-    let nombreArchivo = 'material-' + m.id;
+    let nombreArchivo = nombrePorDefecto;
     const cabecera = respuesta.headers.get('Content-Disposition') || '';
+    const utf8 = /filename\*=UTF-8''([^;]+)/i.exec(cabecera);
     const coincide = /filename="?([^";]+)"?/i.exec(cabecera);
-    if (coincide) nombreArchivo = coincide[1];
+    if (utf8) nombreArchivo = decodeURIComponent(utf8[1]);
+    else if (coincide) nombreArchivo = coincide[1];
 
     const blob = await respuesta.blob();
     const url = URL.createObjectURL(blob);

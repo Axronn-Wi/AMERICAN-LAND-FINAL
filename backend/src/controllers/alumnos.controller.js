@@ -130,7 +130,7 @@ async function obtenerMisTareas(req, res) {
     const tareasResult = await pool.query(
       `SELECT t.id, t.titulo, t.descripcion,
               ${sqlFecha('t.fecha_limite')} AS fecha_limite,
-              t.tipo,
+              t.tipo, t.archivo_nombre,
               t.valor_porcentaje::float8 AS valor_porcentaje,
               e.id AS id_entrega, e.fecha_entrega, e.estado AS estado_entrega,
               e.calificacion::float8 AS calificacion
