@@ -232,6 +232,50 @@ header.j-header .btn-signup {
 }
 header.j-header .btn-signup:hover { transform: translateY(-2px); }
 
+/* Con sesión iniciada (assets/js/nav_sesion.js) */
+header.j-header .nav-usuario {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 14px 5px 5px;
+  border-radius: 999px;
+  border: 1px solid var(--j-borde);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--j-texto);
+  text-decoration: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+header.j-header .nav-usuario:hover { border-color: rgba(240, 171, 252, 0.5); background: rgba(255, 255, 255, 0.08); }
+header.j-header .nav-usuario-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--j-degradado) center / cover no-repeat;
+  box-shadow: 0 0 0 2px var(--j-fondo), 0 0 0 3.5px rgba(250, 204, 21, 0.75);
+}
+header.j-header .nav-usuario-avatar.con-foto { background-color: transparent; }
+header.j-header .nav-usuario-texto { display: flex; flex-direction: column; line-height: 1.15; }
+header.j-header .nav-usuario-texto strong { font-size: 0.88rem; white-space: nowrap; max-width: 130px; overflow: hidden; text-overflow: ellipsis; }
+header.j-header .nav-usuario-texto small { font-size: 0.7rem; color: var(--j-dorado); font-weight: 600; }
+header.j-header .btn-salir {
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--j-texto-2);
+  font: inherit;
+  font-weight: 600;
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+header.j-header .btn-salir:hover { color: var(--j-texto); background: rgba(255, 255, 255, 0.06); }
+
 header.j-header .btn-hamburguesa {
   display: none;
   width: 44px;
@@ -270,6 +314,7 @@ header.j-header .btn-hamburguesa {
   header.j-header nav.abierto .btn-login,
   header.j-header nav.abierto .btn-signup { justify-content: center; text-align: center; }
   header.j-header nav.abierto .btn-login { background: rgba(255, 255, 255, 0.06); }
+  header.j-header nav.abierto .nav-usuario, header.j-header nav.abierto .btn-salir { justify-content: center; }
 }
 @media (max-width: 600px) {
   .j-topbar .j-topbar-der a:last-child { display: none; }

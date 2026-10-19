@@ -59,4 +59,20 @@ function permitirRoles(...rolesPermitidos) {
   };
 }
 
-module.exports = { verificarToken, permitirRoles, olvidarUsuario };
+// Para rutas públicas que muestran algo extra a quien inició sesión
+// (por ejemplo, si ya le dio "me gusta" a una publicación). Nunca responde 401.
+function sesionOpcional(req, res, next) {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+  if (!token) return next();
+  jwt.verify(token, process.env.JWT_SECRET, async (err, usuario) => {
+    if (!err) {
+      try {
+        if (await usuarioSigueActivo(usuario.id_usuario)) req.usuario = usuario;
+      } catch (_) { /* sin base: se sigue como visitante */ }
+    }
+    next();
+  });
+}
+
+module.exports = { verificarToken, sesionOpcional, permitirRoles, olvidarUsuario };

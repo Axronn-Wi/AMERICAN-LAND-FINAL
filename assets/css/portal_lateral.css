@@ -212,3 +212,12 @@ header .com-contador { box-shadow: 0 0 0 2px #F7F5FB; }
   header .nav-perfil { border-left: 0; padding-left: 0; }
   header .nav-perfil .nav-info { display: none; }
 }
+
+/* ══════════════════════════════════════════
+   PERFIL EN LA BARRA (lleva a "Mi perfil")
+══════════════════════════════════════════ */
+header .nav-perfil { cursor: pointer; border-radius: 14px; transition: background 0.15s; padding-top: 4px; padding-bottom: 4px; padding-right: 8px; }
+header .nav-perfil:hover { background: #F4EEFD; }
+.nav-avatar.con-foto { background-size: cover; background-position: center; color: transparent; }
+.lat-cuenta { margin-top: auto; padding-top: 6px; }
+.sidebar .sidebar-footer { margin-top: 10px; }

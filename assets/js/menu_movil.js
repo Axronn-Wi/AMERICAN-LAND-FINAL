@@ -33,9 +33,11 @@
     docentes:      '<circle cx="9.5" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 7-5.5s6.4 2.1 7 5.5"/><path d="m16.5 8.5 2 2 3.5-4"/>',
     salones:       '<rect x="3.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"/>',
     asistencia:    '<rect x="4" y="4.5" width="16" height="16" rx="2.5"/><path d="M8 3v3M16 3v3M4 9.5h16M8.5 14.5l2.2 2.2 4.8-4.7"/>',
+    perfil:        '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/>',
     personal:      '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.4 3.2-5.5 6.5-5.5s5.9 2.1 6.5 5.5"/><path d="M15.5 11.5l1.8 1.8 4-4"/>',
     anuncios:      '<path d="M4 10v4a1 1 0 0 0 1 1h2l5 4V5L7 9H5a1 1 0 0 0-1 1Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/>',
     contactos:     '<rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/>',
+    index:         '<rect x="3.5" y="4.5" width="17" height="15" rx="3"/><circle cx="9" cy="10" r="1.8"/><path d="m20.5 16-4.5-4.5-8 8"/>', // muro de la comunidad (index.html#muro)
     generico:      '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="1.5"/>'
   };
 
