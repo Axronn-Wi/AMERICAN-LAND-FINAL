@@ -79,6 +79,15 @@
     });
   }
 
+  // ── 2b. "Mi cuenta → Mi perfil" al final del lateral ──
+  const enPerfil = archivo(window.location.pathname) === 'perfil.html';
+  const cuenta = document.createElement('section');
+  cuenta.className = 'lat-menu lat-cuenta';
+  cuenta.innerHTML = '<h3>Mi cuenta</h3><ul><li class="menu-item' + (enPerfil ? ' activo' : '') +
+    '"><span class="menu-icono"></span><a href="perfil.html">Mi perfil</a></li></ul>';
+  const pie = sidebar.querySelector('.sidebar-footer');
+  if (pie) sidebar.insertBefore(cuenta, pie); else sidebar.appendChild(cuenta);
+
   // Todo el renglón del menú es clicable, no solo el texto
   sidebar.addEventListener('click', function (e) {
     const item = e.target.closest('.menu-item, .clase-item');
@@ -98,4 +107,46 @@
   cabecera.querySelector('small').textContent = NOMBRES[rol] || 'Portal';
   cabecera.querySelector('strong').textContent = texto;
   nav.insertBefore(cabecera, nav.firstChild);
+
+  // ── 4. Perfil en la barra: lleva a "Mi perfil" y muestra la foto ──
+  const perfilBarra = nav.querySelector('.nav-perfil');
+  if (perfilBarra) {
+    perfilBarra.setAttribute('role', 'link');
+    perfilBarra.setAttribute('tabindex', '0');
+    perfilBarra.title = 'Ver mi perfil';
+    const irAlPerfil = function () { window.location.href = 'perfil.html'; };
+    perfilBarra.addEventListener('click', irAlPerfil);
+    perfilBarra.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); irAlPerfil(); }
+    });
+  }
+
+  function ponerFoto(url) {
+    const avatar = document.getElementById('nav-avatar');
+    if (!avatar || !url) return;
+    avatar.textContent = '';
+    avatar.style.backgroundImage = 'url("' + url + '")';
+    avatar.classList.add('con-foto');
+  }
+
+  // La foto se guarda en la sesión; si aún no se conoce, se pide una vez
+  const token = sessionStorage.getItem('token');
+  const fotoGuardada = sessionStorage.getItem('foto');
+  if (fotoGuardada !== null) {
+    ponerFoto(fotoGuardada);
+  } else if (token && !enPerfil) {
+    const API = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:4000/api'
+      : 'https://american-land-backend.onrender.com/api';
+    fetch(API + '/perfil', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (datos) {
+        if (!datos) return;
+        const f = datos.perfil.foto;
+        const url = f ? API + f.url + '?v=' + encodeURIComponent(f.version) : '';
+        sessionStorage.setItem('foto', url);
+        ponerFoto(url);
+      })
+      .catch(function () { /* sin foto: se quedan las iniciales */ });
+  }
 })();

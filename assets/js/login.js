@@ -111,6 +111,8 @@ form.addEventListener('submit', async function (e) {
     }
 
     // Guardar token y datos reales del usuario
+    // La foto del perfil se vuelve a pedir para el usuario nuevo
+    sessionStorage.removeItem('foto');
     sessionStorage.setItem('token',  datos.token);
     sessionStorage.setItem('rol',    datos.usuario.rol);
     sessionStorage.setItem('nombre', datos.usuario.nombre_completo);

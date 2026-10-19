@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mi perfil - Instituto American Land</title>
+  <link rel="icon" type="image/png" href="../assets/img/logo_circulo.png" />
+  <link rel="stylesheet" href="../assets/css/inicio_alumnos.css" />
+  <link rel="stylesheet" href="../assets/css/menu_movil.css" />
+  <link rel="stylesheet" href="../assets/css/portal_comun.css" />
+  <link rel="stylesheet" href="../assets/css/comunicaciones.css" />
+  <link rel="stylesheet" href="../assets/css/tema_portal.css" />
+  <link rel="stylesheet" href="../assets/css/portal_lateral.css" />
+  <link rel="stylesheet" href="../assets/css/perfil.css" />
+</head>
+<body data-roles="estudiante">
+
+  <!-- ===== NAVBAR ===== -->
+  <header>
+    <nav>
+
+      <!-- Perfil -->
+      <div class="nav-perfil">
+        <div class="nav-avatar" id="nav-avatar">A</div>
+        <div class="nav-info">
+          <span class="nav-nombre" id="nav-nombre">Estudiante</span>
+          <span class="nav-rol">Estudiante</span>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <ul class="nav-links">
+        <li><a href="inicio.html">Inicio</a></li>
+        <li><a href="salon_virtual.html">Salón Virtual</a></li>
+        <li><a href="horario.html">Horario</a></li>
+        <li><a href="tareas.html">Tareas</a></li>
+        <li><a href="notas.html">Notas</a></li>
+      </ul>
+
+      <!-- Acciones -->
+      <div class="nav-acciones">
+        <a href="../auth/login.html" class="btn-nav-icon btn-cerrar" title="Cerrar sesión">&#8594;&#124;</a>
+      </div>
+
+    </nav>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar"></aside>
+    <main class="contenido">
+      <div class="pf" id="pf">
+
+        <!-- Portada -->
+        <section class="pf-portada">
+          <div class="pf-banda"><img class="pf-banda-sello" src="../assets/img/logo_circulo.png" alt="" /></div>
+          <div class="pf-cabecera">
+            <div class="pf-avatar" id="pf-avatar">
+              <div class="pf-avatar-in" id="pf-avatar-in"></div>
+              <label class="pf-camara" title="Cambiar foto">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+                <input type="file" id="pf-foto" accept="image/jpeg,image/png,image/webp" aria-label="Cambiar foto de perfil" />
+              </label>
+            </div>
+            <div class="pf-identidad">
+              <h1 id="pf-nombre">Mi perfil</h1>
+              <p class="pf-titular" id="pf-titular"></p>
+              <div class="pf-meta" id="pf-meta"></div>
+            </div>
+            <div class="pf-acciones">
+              <button type="button" class="pf-btn peligro" id="pf-quitar-foto" hidden>Quitar foto</button>
+              <button type="button" class="pf-btn prim" id="pf-editar">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4Z"/><path d="m13.5 6.5 4 4"/></svg>
+                Editar perfil
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Cifras según el rol -->
+        <section class="pf-stats" id="pf-stats" aria-label="Resumen"></section>
+
+        <div class="pf-grid">
+          <div class="pf-col">
+            <form id="pf-form-datos" novalidate onsubmit="return false">
+
+              <section class="pf-card">
+                <h2><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/></svg>Sobre mí</h2>
+                <p class="pf-sobre pf-lectura" id="pf-sobre"></p>
+                <div class="pf-form">
+                  <label class="pf-campo ancho">Titular
+                    <input name="titular" maxlength="120" placeholder="Ej: Docente de inglés · Apasionado por la conversación" />
+                    <span class="contador" data-contador="titular"></span>
+                  </label>
+                  <label class="pf-campo ancho">Descripción
+                    <textarea name="descripcion" maxlength="1000" placeholder="Cuéntanos quién eres, qué te gusta y qué te motiva a aprender o enseñar inglés."></textarea>
+                    <span class="contador" data-contador="descripcion"></span>
+                  </label>
+                </div>
+              </section>
+
+              <section class="pf-card" style="margin-top:20px">
+                <h2><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.4-1.6 1.6-2.5 3-2.5s2.6.9 3 2.5M14.5 10h4M14.5 13.5h3"/></svg>Información personal</h2>
+                <div class="pf-datos pf-lectura" id="pf-datos"></div>
+                <div class="pf-form">
+                  <label class="pf-campo">Teléfono<input name="telefono" type="tel" maxlength="20" placeholder="Ej: 3001234567" /></label>
+                  <label class="pf-campo">Fecha de nacimiento<input name="fecha_nacimiento" type="date" /></label>
+                  <label class="pf-campo">Ciudad<input name="ciudad" maxlength="100" placeholder="Ej: Pitalito" /></label>
+                  <label class="pf-campo">País<input name="pais" maxlength="100" placeholder="Ej: Colombia" /></label>
+
+                </div>
+              </section>
+            </form>
+
+            <div class="pf-barra-guardar">
+              <span>Estás editando tu perfil</span>
+              <span style="display:flex;gap:8px">
+                <button type="button" class="pf-btn sec" id="pf-cancelar">Cancelar</button>
+                <button type="button" class="pf-btn prim" id="pf-guardar">Guardar cambios</button>
+              </span>
+            </div>
+          </div>
+
+          <div class="pf-col">
+            <section class="pf-card">
+              <h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8Z"/></svg>Perfil completo</h2>
+              <div class="pf-progreso">
+                <div class="pf-anillo" id="pf-anillo"><b id="pf-pct">0%</b></div>
+                <p id="pf-progreso-texto"></p>
+              </div>
+              <ul class="pf-pendientes" id="pf-pendientes"></ul>
+            </section>
+
+            <section class="pf-card">
+              <h2><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="m4 7 8 6 8-6"/></svg>Cuenta</h2>
+              <ul class="pf-lista" id="pf-cuenta"></ul>
+            </section>
+
+            <section class="pf-card">
+              <h2><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>Seguridad</h2>
+              <form class="pf-seguridad" id="pf-form-clave" novalidate>
+                <label class="pf-campo">Contraseña actual<input name="actual" type="password" autocomplete="current-password" /></label>
+                <label class="pf-campo">Nueva contraseña<input name="nueva" type="password" minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres" /></label>
+                <label class="pf-campo">Confirmar nueva contraseña<input name="confirmar" type="password" autocomplete="new-password" /></label>
+                <p class="pf-mensaje" id="pf-clave-msg" role="status"></p>
+                <button type="submit" class="pf-btn sec">Cambiar contraseña</button>
+              </form>
+            </section>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="pf-toast" id="pf-toast" role="status" aria-live="polite"></div>
+
+  <script src="../assets/js/perfil.js"></script>
+  <script src="../assets/js/comunicaciones.js"></script>
+  <script src="../assets/js/portal_lateral.js"></script>
+  <script src="../assets/js/menu_movil.js"></script>
+</body>
+</html>
