@@ -16,11 +16,14 @@ const API_URL = window.location.hostname === 'localhost' || window.location.host
 // ── VOLVER A LA INSCRIPCIÓN ────────────────────────────────
 // inscripcion.html manda a login.html?volver=inscripcion. Solo se aceptan
 // destinos de esta lista (así nadie puede redirigir a un sitio externo).
-const DESTINOS_VOLVER = { inscripcion: '../admisiones/inscripcion.html' };
+const DESTINOS_VOLVER = {
+  inscripcion: '../admisiones/inscripcion.html',
+  muro: '../index.html#muro' // el muro de la comunidad (cualquier rol)
+};
 const volver = new URLSearchParams(window.location.search).get('volver');
 const volverValido = Object.prototype.hasOwnProperty.call(DESTINOS_VOLVER, volver);
 
-if (volverValido) {
+if (volverValido && volver === 'inscripcion') {
   // Quien viene a inscribirse es estudiante: dejamos el rol ya elegido
   document.getElementById('rol').value = 'estudiante';
   // Si aún no tiene cuenta, el enlace a registro conserva el "volver"
@@ -133,6 +136,8 @@ form.addEventListener('submit', async function (e) {
       let destino = destinos[rol.value] || '../index.html';
       // Si venía de la inscripción, el estudiante regresa a continuar
       if (volverValido && rol.value === 'estudiante') destino = DESTINOS_VOLVER[volver];
+      // Si venía del muro, cualquier rol vuelve a publicar
+      if (volver === 'muro') destino = DESTINOS_VOLVER.muro;
       redirigir(destino);
     }, 1500);
 

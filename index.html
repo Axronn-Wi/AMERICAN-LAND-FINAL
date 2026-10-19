@@ -13,6 +13,7 @@
   <link rel="icon" type="image/png" href="assets/img/logo_circulo.png" />
   <link rel="stylesheet" href="assets/css/tema_j.css" />
   <link rel="stylesheet" href="assets/css/landing.css" />
+  <link rel="stylesheet" href="assets/css/muro.css" />
 </head>
 <body class="j-fondo-aurora">
 
@@ -43,6 +44,7 @@
         <li><a href="#programas">Programas</a></li>
         <li><a href="admisiones/seleccion.html">Admisiones</a></li>
         <li><a href="admisiones/estudiantes.html">Estudiantes</a></li>
+        <li><a href="#muro">Comunidad</a></li>
         <li><a href="#contacto">Contacto</a></li>
       </ul>
 
@@ -131,6 +133,70 @@
         <div><strong class="j-degradado-texto">3</strong><span>jornadas al día</span></div>
       </div>
     </section>
+
+    <!-- ===== MURO DE LA COMUNIDAD (assets/js/muro.js) ===== -->
+    <section class="seccion contenedor muro" id="muro" aria-labelledby="muro-titulo">
+      <div class="encabezado">
+        <small>COMUNIDAD AMERICAN LAND</small>
+        <h2 id="muro-titulo">Así se vive la <i class="j-degradado-texto">academia</i></h2>
+        <p class="muro-sub">Fotos y momentos compartidos por nuestros estudiantes, docentes y equipo administrativo.</p>
+      </div>
+
+      <!-- Barra para publicar (con sesión) o invitación (visitantes) -->
+      <div class="muro-barra" id="muro-barra"></div>
+
+      <div class="muro-grid" id="muro-grid" aria-live="polite"></div>
+      <p class="muro-vacio" id="muro-vacio" hidden></p>
+      <div class="muro-pie"><button type="button" class="j-btn j-btn-vidrio" id="muro-mas" hidden>Ver más publicaciones</button></div>
+    </section>
+
+    <!-- Detalle de una publicación -->
+    <dialog class="muro-modal muro-detalle" id="muro-detalle" aria-label="Publicación">
+      <button type="button" class="muro-cerrar" data-cerrar aria-label="Cerrar">&times;</button>
+      <div class="detalle-cuerpo">
+        <div class="detalle-foto" id="detalle-foto"><img alt="" id="detalle-img" /><span class="corazon-pop" aria-hidden="true"></span></div>
+        <div class="detalle-panel">
+          <header class="detalle-autor" id="detalle-autor"></header>
+          <div class="detalle-comentarios" id="detalle-comentarios"></div>
+          <div class="detalle-acciones">
+            <button type="button" class="accion-like" id="detalle-like" aria-pressed="false" aria-label="Me gusta"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.2-9.4C1.6 7.6 3.9 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.8 1.2-1.7 2.8-2.8 4.8-2.8 3.3 0 5.6 3.1 4.4 6.6-1.7 4.8-9.2 9.4-9.2 9.4Z"/></svg></button>
+            <button type="button" class="accion-comentar" id="detalle-ir-comentar" aria-label="Comentar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 11.5a8.5 8.5 0 0 1-12.4 7.6L3.5 20.5l1.4-4.4A8.5 8.5 0 1 1 20.5 11.5Z"/></svg></button>
+            <button type="button" class="accion-borrar" id="detalle-borrar" hidden>Eliminar publicación</button>
+            <div class="detalle-meta"><strong id="detalle-likes"></strong><time id="detalle-fecha"></time></div>
+          </div>
+          <form class="detalle-form" id="detalle-form" autocomplete="off">
+            <input type="text" id="detalle-input" maxlength="500" placeholder="Agrega un comentario…" aria-label="Escribe un comentario" />
+            <button type="submit" id="detalle-enviar" disabled>Publicar</button>
+          </form>
+          <p class="detalle-invitar" id="detalle-invitar" hidden><a href="auth/login.html?volver=muro">Inicia sesión</a> para comentar y dar me gusta.</p>
+        </div>
+      </div>
+    </dialog>
+
+    <!-- Nueva publicación -->
+    <dialog class="muro-modal muro-nueva" id="muro-nueva" aria-labelledby="nueva-titulo">
+      <form id="form-nueva" novalidate>
+        <header class="nueva-cabecera">
+          <button type="button" class="muro-cerrar" data-cerrar aria-label="Cerrar">&times;</button>
+          <h3 id="nueva-titulo">Nueva publicación</h3>
+          <button type="submit" class="nueva-compartir" id="nueva-compartir" disabled>Compartir</button>
+        </header>
+        <label class="nueva-zona" id="nueva-zona">
+          <input type="file" id="nueva-archivo" accept="image/jpeg,image/png,image/webp" />
+          <span class="nueva-indicacion" id="nueva-indicacion">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="15" rx="3"/><circle cx="8.5" cy="10" r="1.8"/><path d="m21 16-5-5-8.5 8.5"/></svg>
+            <strong>Arrastra una foto aquí</strong>
+            <span>o haz clic para elegirla (JPG, PNG o WEBP)</span>
+          </span>
+          <img id="nueva-vista" alt="Vista previa de la foto" hidden />
+        </label>
+        <div class="nueva-texto">
+          <textarea id="nueva-descripcion" maxlength="2200" rows="3" placeholder="Escribe una descripción… ¿qué pasó hoy en American Land?"></textarea>
+          <span class="nueva-contador" id="nueva-contador">0 / 2200</span>
+        </div>
+        <p class="nueva-aviso" id="nueva-aviso" role="status" aria-live="polite"></p>
+      </form>
+    </dialog>
 
     <!-- ===== CONTACTO (formulario: assets/js/contacto_web.js) ===== -->
     <section class="contacto-web contenedor" id="contacto" aria-labelledby="contacto-titulo">
@@ -237,5 +303,7 @@
 
   <script src="assets/js/sitio_publico.js"></script>
   <script src="assets/js/contacto_web.js"></script>
+  <script src="assets/js/muro.js"></script>
+  <script src="assets/js/nav_sesion.js"></script>
 </body>
 </html>

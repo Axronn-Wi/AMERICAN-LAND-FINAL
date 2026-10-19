@@ -79,12 +79,13 @@
     });
   }
 
-  // ── 2b. "Mi cuenta → Mi perfil" al final del lateral ──
+  // ── 2b. "Mi cuenta → Mi perfil y Muro" al final del lateral ──
   const enPerfil = archivo(window.location.pathname) === 'perfil.html';
   const cuenta = document.createElement('section');
   cuenta.className = 'lat-menu lat-cuenta';
   cuenta.innerHTML = '<h3>Mi cuenta</h3><ul><li class="menu-item' + (enPerfil ? ' activo' : '') +
-    '"><span class="menu-icono"></span><a href="perfil.html">Mi perfil</a></li></ul>';
+    '"><span class="menu-icono"></span><a href="perfil.html">Mi perfil</a></li>' +
+    '<li class="menu-item"><span class="menu-icono"></span><a href="../index.html#muro">Muro de la comunidad</a></li></ul>';
   const pie = sidebar.querySelector('.sidebar-footer');
   if (pie) sidebar.insertBefore(cuenta, pie); else sidebar.appendChild(cuenta);
 

@@ -24,6 +24,7 @@ const comunicacionesRoutes = require('./src/routes/comunicaciones.routes');
 const anunciosRoutes = require('./src/routes/anuncios.routes');
 const contactoRoutes = require('./src/routes/contacto.routes');
 const perfilRoutes = require('./src/routes/perfil.routes');
+const muroRoutes = require('./src/routes/muro.routes');
 
 const app = express();
 
@@ -71,6 +72,7 @@ app.use('/api/comunicaciones', comunicacionesRoutes);
 app.use('/api/anuncios', anunciosRoutes);
 app.use('/api/contacto', contactoRoutes);
 app.use('/api/perfil', perfilRoutes);
+app.use('/api/muro', muroRoutes);
 
 // Estado del servidor y de la base de datos
 app.get('/api/status', async (req, res) => {
