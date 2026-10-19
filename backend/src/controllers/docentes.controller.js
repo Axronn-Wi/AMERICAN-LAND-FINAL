@@ -1,10 +1,10 @@
-const fs = require('fs');
 const path = require('path');
 const db = require('../config/db');
 const pool = db.pool || db;
 const { sqlHora, sqlFecha } = require('../utils/sql');
 const { CARPETA_MATERIAL } = require('../config/uploads');
 const { notificar, usuariosDelSalon } = require('../utils/notificar');
+const { eliminarArchivo } = require('../utils/archivos');
 
 // Avisa a todos los estudiantes activos del salón (sin bloquear la respuesta)
 function notificarSalon(idSalon, datos) {
@@ -572,12 +572,9 @@ async function calificarEntrega(req, res) {
   }
 }
 
-// Borra un archivo del disco sin romper nada si ya no existe
+// Borra un archivo subido (base de datos o disco antiguo) sin romper nada si ya no existe
 function borrarArchivo(ruta) {
-  if (!ruta) return;
-  fs.unlink(ruta, function (err) {
-    if (err) console.error('No se pudo borrar el archivo:', err.message);
-  });
+  eliminarArchivo(ruta, CARPETA_MATERIAL);
 }
 
 async function crearMaterial(req, res) {

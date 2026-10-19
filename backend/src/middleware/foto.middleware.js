@@ -1,21 +1,15 @@
 const multer = require('multer');
+const { almacenEnBD } = require('../utils/archivos');
 const path = require('path');
 const crypto = require('crypto');
 
-// Carpeta de las fotos de perfil (se define en src/config/uploads.js)
-const CARPETA = require('../config/uploads').CARPETA_PERFILES;
-
 const TIPOS = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, CARPETA);
-  },
-  filename: function (req, file, cb) {
-    // Nombre aleatorio con el id del usuario: nunca se usa el nombre original
-    const nombre = 'u' + req.usuario.id_usuario + '-' + Date.now() + '-' + crypto.randomBytes(6).toString('hex') + TIPOS[file.mimetype];
-    cb(null, nombre);
-  }
+// Se guarda en la base de datos (ver src/utils/archivos.js), no en el disco
+const storage = almacenEnBD(function (req, file) {
+  // Nombre aleatorio con el id del usuario: nunca se usa el nombre original
+  const nombre = 'u' + req.usuario.id_usuario + '-' + Date.now() + '-' + crypto.randomBytes(6).toString('hex') + TIPOS[file.mimetype];
+  return nombre;
 });
 
 function filtroFoto(req, file, cb) {

@@ -1,8 +1,9 @@
-const fs = require('fs');
 const db = require('../config/db');
 const pool = db.pool || db;
 const { sqlHora, sqlFecha } = require('../utils/sql');
 const { notificar } = require('../utils/notificar');
+const { eliminarArchivo } = require('../utils/archivos');
+const { CARPETA_ENTREGAS } = require('../config/uploads');
 
 const MENSAJE_SIN_PERFIL = 'No se encontró un perfil de estudiante para este usuario.';
 
@@ -217,12 +218,9 @@ async function obtenerSalonVirtual(req, res) {
   }
 }
 
-// Borra un archivo del disco sin romper nada si ya no existe
+// Borra un archivo subido (base de datos o disco antiguo) sin romper nada si ya no existe
 function borrarArchivo(ruta) {
-  if (!ruta) return;
-  fs.unlink(ruta, function (err) {
-    if (err) console.error('No se pudo borrar el archivo:', err.message);
-  });
+  eliminarArchivo(ruta, CARPETA_ENTREGAS);
 }
 
 // ---------------------------------------------------------------

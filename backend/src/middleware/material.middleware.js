@@ -1,26 +1,19 @@
 const multer = require('multer');
+const { almacenEnBD } = require('../utils/archivos');
 const path = require('path');
-const fs = require('fs');
 const crypto = require('crypto');
-
-// Carpeta donde se guarda el material de apoyo (se define en src/config/uploads.js)
-const CARPETA = require('../config/uploads').CARPETA_MATERIAL;
 
 const EXTENSIONES = [
   '.pdf', '.doc', '.docx', '.ppt', '.pptx',
   '.xls', '.xlsx', '.jpg', '.jpeg', '.png', '.mp3'
 ];
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, CARPETA);
-  },
-  filename: function (req, file, cb) {
-    // Nombre único y aleatorio: nunca se usa el nombre que manda el docente
-    const ext = path.extname(file.originalname).toLowerCase();
-    const nombre = Date.now() + '-' + crypto.randomBytes(8).toString('hex') + ext;
-    cb(null, nombre);
-  }
+// Se guarda en la base de datos (ver src/utils/archivos.js), no en el disco
+const storage = almacenEnBD(function (req, file) {
+  // Nombre único y aleatorio: nunca se usa el nombre que manda el docente
+  const ext = path.extname(file.originalname).toLowerCase();
+  const nombre = Date.now() + '-' + crypto.randomBytes(8).toString('hex') + ext;
+  return nombre;
 });
 
 function filtroArchivo(req, file, cb) {

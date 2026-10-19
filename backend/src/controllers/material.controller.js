@@ -1,6 +1,6 @@
 const path = require('path');
-const fs = require('fs');
 const db = require('../config/db');
+const { enviarArchivo } = require('../utils/archivos');
 const pool = db.pool || db;
 
 // Misma carpeta que usa material.middleware.js (se define en src/config/uploads.js)
@@ -55,20 +55,20 @@ async function descargarMaterial(req, res) {
       return res.status(403).json({ mensaje: 'No tienes permiso para descargar este archivo.' });
     }
 
-    // 3. ¿Hay archivo y existe en el disco?
+    // 3. ¿Hay archivo?
     if (!material.archivo_url) {
       return res.status(404).json({ mensaje: 'Este material no tiene archivo.' });
     }
-    const nombreEnDisco = path.basename(material.archivo_url);
-    const ruta = path.join(CARPETA, nombreEnDisco);
-
-    if (!fs.existsSync(ruta)) {
-      return res.status(404).json({ mensaje: 'El archivo ya no está en el servidor.' });
-    }
 
     // 4. Enviar con un nombre legible
-    const extension = path.extname(nombreEnDisco);
-    res.download(ruta, 'material-' + id_material + extension);
+    const extension = path.extname(material.archivo_url);
+    const enviado = await enviarArchivo(res, material.archivo_url, {
+      descarga: 'material-' + id_material + extension,
+      carpetaAntigua: CARPETA
+    });
+    if (!enviado) {
+      return res.status(404).json({ mensaje: 'El archivo ya no está en el servidor.' });
+    }
 
   } catch (err) {
     console.error(err);
@@ -116,13 +116,14 @@ async function descargarArchivoTarea(req, res) {
     if (!tarea.archivo_url) {
       return res.status(404).json({ mensaje: 'Esta tarea no tiene archivo adjunto.' });
     }
-    const ruta = path.join(CARPETA, path.basename(tarea.archivo_url));
-    if (!fs.existsSync(ruta)) {
+    const extension = path.extname(tarea.archivo_url);
+    const enviado = await enviarArchivo(res, tarea.archivo_url, {
+      descarga: tarea.archivo_nombre || ('tarea-' + req.params.id + extension),
+      carpetaAntigua: CARPETA
+    });
+    if (!enviado) {
       return res.status(404).json({ mensaje: 'El archivo ya no está en el servidor.' });
     }
-
-    const extension = path.extname(tarea.archivo_url);
-    res.download(ruta, tarea.archivo_nombre || ('tarea-' + req.params.id + extension));
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al descargar el archivo.' });
