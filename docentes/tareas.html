@@ -227,9 +227,14 @@
         </div>
 
         <div class="campo-modal">
-          <label for="m-archivo">Adjuntar material (opcional)</label>
-          <input type="file" id="m-archivo" accept=".pdf,.doc,.docx,.pptx" disabled />
-          <small class="texto-ayuda">Próximamente: la subida de archivos aún no está disponible.</small>
+          <label for="m-archivo">Adjuntar guía o taller (opcional)</label>
+          <div class="archivo-actual" id="m-archivo-actual" hidden>
+            <span class="archivo-actual-nombre" id="m-archivo-nombre"></span>
+            <button type="button" class="archivo-quitar" id="m-archivo-quitar">Quitar</button>
+          </div>
+          <input type="file" id="m-archivo" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.mp3" />
+          <small class="texto-ayuda" id="m-archivo-ayuda">PDF, Word, PowerPoint, Excel, JPG, PNG o MP3. Máximo 20 MB.</small>
+          <span class="m-error" id="e-archivo"></span>
         </div>
 
         <span class="m-error" id="e-general"></span>

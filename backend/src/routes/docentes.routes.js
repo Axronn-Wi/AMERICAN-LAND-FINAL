@@ -4,7 +4,7 @@ const { validarId } = require('../middleware/validar.middleware');
 
 // Todo :id de estas rutas debe ser un entero positivo
 router.param('id', validarId);
-const { obtenerMisSalones, obtenerEstudiantesSalon, obtenerEntregasTarea, calificarEntrega, obtenerNotasSalon, obtenerTareasSalon, registrarNota, crearTarea, editarTarea, eliminarTarea, crearMaterial, obtenerMaterialSalon, eliminarMaterial } = require('../controllers/docentes.controller');
+const { obtenerMisSalones, obtenerEstudiantesSalon, obtenerEntregasTarea, calificarEntrega, obtenerNotasSalon, obtenerTareasSalon, registrarNota, crearTarea, editarTarea, eliminarTarea, subirArchivoTarea, quitarArchivoTarea, crearMaterial, obtenerMaterialSalon, eliminarMaterial } = require('../controllers/docentes.controller');
 const { verificarToken, permitirRoles } = require('../middleware/auth.middleware');
 const { recibirMaterial } = require('../middleware/material.middleware');
 const { obtenerListaAsistencia, guardarAsistencia } = require('../controllers/asistencia.controller');
@@ -22,6 +22,8 @@ router.post('/notas', verificarToken, permitirRoles('docente'), registrarNota);
 router.post('/tareas', verificarToken, permitirRoles('docente'), crearTarea);
 router.put('/tareas/:id', verificarToken, permitirRoles('docente'), editarTarea);
 router.delete('/tareas/:id', verificarToken, permitirRoles('docente'), eliminarTarea);
+router.post('/tareas/:id/archivo', verificarToken, permitirRoles('docente'), recibirMaterial, subirArchivoTarea);
+router.delete('/tareas/:id/archivo', verificarToken, permitirRoles('docente'), quitarArchivoTarea);
 router.post('/material', verificarToken, permitirRoles('docente'), recibirMaterial, crearMaterial);
 router.delete('/material/:id', verificarToken, permitirRoles('docente'), eliminarMaterial);
 

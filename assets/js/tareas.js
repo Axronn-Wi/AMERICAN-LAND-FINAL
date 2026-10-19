@@ -165,6 +165,14 @@ function tarjeta(t) {
     desc.style.marginTop = '4px';
     detalle.appendChild(desc);
   }
+  // Guía o taller que adjuntó el docente
+  if (t.archivo_nombre) {
+    const adjunto = crear('button', 'tarea-adjunto', '\uD83D\uDCCE ' + t.archivo_nombre);
+    adjunto.type = 'button';
+    adjunto.title = 'Descargar ' + t.archivo_nombre;
+    adjunto.addEventListener('click', function () { descargarAdjuntoTarea(t, adjunto); });
+    detalle.appendChild(adjunto);
+  }
   info.appendChild(detalle);
   card.appendChild(info);
 
@@ -389,6 +397,11 @@ function pintarMaterial(materialLista) {
   });
 }
 
+// Guía o taller de una tarea: misma descarga protegida que el material
+function descargarAdjuntoTarea(t, btn) {
+  return descargarMaterial({ id: t.id, titulo: t.archivo_nombre, ruta: '/tareas/' + t.id + '/archivo' }, btn);
+}
+
 // Descarga protegida: un <a href> normal no puede enviar el token,
 // así que se pide el archivo con fetch + Authorization y se arma un
 // enlace temporal con el blob recibido.
@@ -400,7 +413,7 @@ async function descargarMaterial(material, btn) {
   }
 
   try {
-    const respuesta = await fetch(API + '/material/' + material.id + '/archivo', {
+    const respuesta = await fetch(API + (material.ruta || '/material/' + material.id + '/archivo'), {
       headers: { 'Authorization': 'Bearer ' + token }
     });
 
@@ -425,8 +438,10 @@ async function descargarMaterial(material, btn) {
     let nombreArchivo = (material.titulo || 'material') + (material.tipo ? '.' + material.tipo : '');
     const disposicion = respuesta.headers.get('Content-Disposition');
     if (disposicion) {
-      const match = disposicion.match(/filename="?([^"]+)"?/);
-      if (match && match[1]) nombreArchivo = match[1];
+      const utf8 = disposicion.match(/filename\*=UTF-8''([^;]+)/i);
+      const match = disposicion.match(/filename="?([^";]+)"?/);
+      if (utf8 && utf8[1]) nombreArchivo = decodeURIComponent(utf8[1]);
+      else if (match && match[1]) nombreArchivo = match[1];
     }
 
     const url = URL.createObjectURL(blob);
@@ -444,7 +459,7 @@ async function descargarMaterial(material, btn) {
     if (btn) {
       btn.disabled = false;
       btn.classList.remove('descargando');
-      btn.textContent = 'Descargar';
+      btn.textContent = material.ruta ? '\uD83D\uDCCE ' + material.titulo : 'Descargar';
     }
   }
 }
