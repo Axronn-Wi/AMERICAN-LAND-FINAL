@@ -1,6 +1,6 @@
 const path = require('path');
-const fs = require('fs');
 const db = require('../config/db');
+const { enviarArchivo } = require('../utils/archivos');
 const pool = db.pool || db;
 
 // Misma carpeta que usa upload.middleware.js (se define en src/config/uploads.js)
@@ -44,20 +44,20 @@ async function descargarEntrega(req, res) {
       return res.status(403).json({ mensaje: 'No tienes permiso para descargar este archivo.' });
     }
 
-    // 3. ¿Hay archivo y existe en el disco?
+    // 3. ¿Hay archivo?
     if (!entrega.archivo_url) {
       return res.status(404).json({ mensaje: 'Esta entrega no tiene archivo.' });
     }
-    const nombreEnDisco = path.basename(entrega.archivo_url);
-    const ruta = path.join(CARPETA, nombreEnDisco);
-
-    if (!fs.existsSync(ruta)) {
-      return res.status(404).json({ mensaje: 'El archivo ya no está en el servidor.' });
-    }
 
     // 4. Enviar con un nombre legible
-    const extension = path.extname(nombreEnDisco);
-    res.download(ruta, 'entrega-' + id_entrega + extension);
+    const extension = path.extname(entrega.archivo_url);
+    const enviado = await enviarArchivo(res, entrega.archivo_url, {
+      descarga: 'entrega-' + id_entrega + extension,
+      carpetaAntigua: CARPETA
+    });
+    if (!enviado) {
+      return res.status(404).json({ mensaje: 'El archivo ya no está en el servidor.' });
+    }
 
   } catch (err) {
     console.error(err);

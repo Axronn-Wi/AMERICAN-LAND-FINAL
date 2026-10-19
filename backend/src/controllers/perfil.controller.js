@@ -1,4 +1,3 @@
-const fs = require('fs');
 const path = require('path');
 const bcrypt = require('bcrypt');
 const db = require('../config/db');
@@ -6,14 +5,12 @@ const pool = db.pool || db;
 const { sqlFecha } = require('../utils/sql');
 const { CARPETA_PERFILES } = require('../config/uploads');
 const { olvidarUsuario } = require('../middleware/auth.middleware');
+const { eliminarArchivo, enviarArchivo } = require('../utils/archivos');
 
 const REGEX_TELEFONO = /^[0-9+()\s-]{7,20}$/;
 
 function borrarArchivo(nombre) {
-  if (!nombre) return;
-  fs.unlink(path.join(CARPETA_PERFILES, path.basename(nombre)), function (err) {
-    if (err && err.code !== 'ENOENT') console.error('No se pudo borrar la foto anterior:', err.message);
-  });
+  eliminarArchivo(nombre, CARPETA_PERFILES);
 }
 
 // Texto opcional: recortado, vacío -> null; devuelve { error } si supera el máximo
@@ -211,13 +208,13 @@ async function verFoto(req, res) {
     const nombre = r.rows[0] && r.rows[0].foto_url;
     if (!nombre) return res.status(404).json({ mensaje: 'Este usuario no tiene foto.' });
 
-    const ruta = path.join(CARPETA_PERFILES, path.basename(nombre));
-    if (!fs.existsSync(ruta)) return res.status(404).json({ mensaje: 'La foto ya no está en el servidor.' });
-
     // El frontend vive en otro dominio (Vercel): hay que permitir que muestre la imagen
     res.set('Cross-Origin-Resource-Policy', 'cross-origin');
-    res.set('Cache-Control', 'public, max-age=604800');
-    res.sendFile(ruta);
+    const enviada = await enviarArchivo(res, nombre, {
+      cache: 'public, max-age=604800',
+      carpetaAntigua: CARPETA_PERFILES
+    });
+    if (!enviada) return res.status(404).json({ mensaje: 'La foto ya no está en el servidor.' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al obtener la foto.' });

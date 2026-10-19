@@ -1,19 +1,16 @@
-const fs = require('fs');
 const path = require('path');
 const db = require('../config/db');
 const pool = db.pool || db;
 const { CARPETA_MURO } = require('../config/uploads');
 const { notificar } = require('../utils/notificar');
+const { eliminarArchivo, enviarArchivo } = require('../utils/archivos');
 
 const MODERADORES = ['admin', 'secretaria'];
 const MAX_TEXTO = 2200;
 const MAX_COMENTARIO = 500;
 
 function borrarImagen(nombre) {
-  if (!nombre) return;
-  fs.unlink(path.join(CARPETA_MURO, path.basename(nombre)), function (err) {
-    if (err && err.code !== 'ENOENT') console.error('No se pudo borrar la imagen del muro:', err.message);
-  });
+  eliminarArchivo(nombre, CARPETA_MURO);
 }
 
 // A los visitantes sin sesión solo se les muestra "Nombre A." (cuida la privacidad
@@ -152,12 +149,13 @@ async function verImagen(req, res) {
   try {
     const r = await pool.query('SELECT imagen_url FROM publicaciones WHERE id = $1', [req.params.id]);
     if (r.rows.length === 0) return res.status(404).json({ mensaje: 'Imagen no encontrada.' });
-    const ruta = path.join(CARPETA_MURO, path.basename(r.rows[0].imagen_url));
-    if (!fs.existsSync(ruta)) return res.status(404).json({ mensaje: 'La imagen ya no está en el servidor.' });
     // El frontend vive en otro dominio (Vercel): hay que permitir que muestre la imagen
     res.set('Cross-Origin-Resource-Policy', 'cross-origin');
-    res.set('Cache-Control', 'public, max-age=2592000, immutable');
-    res.sendFile(ruta);
+    const enviada = await enviarArchivo(res, r.rows[0].imagen_url, {
+      cache: 'public, max-age=2592000, immutable',
+      carpetaAntigua: CARPETA_MURO
+    });
+    if (!enviada) return res.status(404).json({ mensaje: 'La imagen ya no está en el servidor.' });
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al obtener la imagen.' });
