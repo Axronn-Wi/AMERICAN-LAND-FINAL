@@ -240,9 +240,6 @@ const archivoLabel = document.getElementById('archivo-nombre');
 const comentario   = document.getElementById('comentario');
 const btnConfirmar = document.getElementById('btn-confirmar');
 
-// La BD no guarda comentario del alumno: queda como "Próximamente"
-comentario.disabled = true;
-comentario.placeholder = 'Comentario para el profesor: Próximamente';
 
 function mensajeArchivo(texto, esError) {
   archivoLabel.textContent = texto;
@@ -253,6 +250,7 @@ function abrirModal(tarea) {
   tareaActual = tarea;
   archivoElegido = null;
   inputArchivo.value = '';
+  comentario.value = '';
   mensajeArchivo('', false);
   modalTitulo.textContent = 'Entregar: ' + (tarea.titulo || 'Tarea');
   overlay.classList.add('abierto');
@@ -317,7 +315,9 @@ btnConfirmar.addEventListener('click', async function () {
   }
 
   const formulario = new FormData();
-  formulario.append('archivo', archivoElegido); // el servidor espera el campo "archivo"
+  // El comentario (opcional) va antes que el archivo; el servidor espera el archivo en "archivo"
+  if (comentario.value.trim()) formulario.append('comentario', comentario.value.trim());
+  formulario.append('archivo', archivoElegido);
 
   btnConfirmar.classList.add('cargando');
   btnConfirmar.disabled = true;

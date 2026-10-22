@@ -296,6 +296,33 @@ main {
 /* ── PASO 2: CONFIRMACIÓN ── */
 .paso-oculto { display: none; }
 
+/* Código de 6 dígitos: grande y espaciado para leerlo y escribirlo fácil */
+.input-codigo {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.45em;
+  text-align: center;
+}
+
+/* Acción secundaria con aspecto de enlace */
+.btn-texto {
+  display: block;
+  margin: 12px auto 0;
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  color: var(--morado);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#paso-2 > .exito-texto,
+#paso-2 > .exito-nota { text-align: center; }
+#paso-2 > .exito-nota { margin-bottom: 18px; }
+
 .exito-bloque { text-align: center; padding: 4px 0 18px; }
 
 .exito-icono {

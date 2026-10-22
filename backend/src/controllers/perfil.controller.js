@@ -7,19 +7,10 @@ const { CARPETA_PERFILES } = require('../config/uploads');
 const { olvidarUsuario } = require('../middleware/auth.middleware');
 const { eliminarArchivo, enviarArchivo } = require('../utils/archivos');
 const { firmarToken } = require('../utils/sesion');
-
-const REGEX_TELEFONO = /^[0-9+()\s-]{7,20}$/;
+const { LARGO, REGEX_TELEFONO, textoOpcional, errorContrasena } = require('../utils/textos');
 
 function borrarArchivo(nombre) {
   eliminarArchivo(nombre, CARPETA_PERFILES);
-}
-
-// Texto opcional: recortado, vacío -> null; devuelve { error } si supera el máximo
-function textoOpcional(valor, maximo, nombreCampo) {
-  if (valor === undefined || valor === null) return { valor: null };
-  const limpio = String(valor).trim();
-  if (limpio.length > maximo) return { error: `${nombreCampo} no puede superar los ${maximo} caracteres.` };
-  return { valor: limpio || null };
 }
 
 // ---------------------------------------------------------------
@@ -115,9 +106,9 @@ async function actualizarMiPerfil(req, res) {
     for (const [clave, maximo, nombre] of [
       ['titular', 120, 'El titular'],
       ['descripcion', 1000, 'La descripción'],
-      ['ciudad', 100, 'La ciudad'],
-      ['pais', 100, 'El país'],
-      ['telefono', 20, 'El teléfono']
+      ['ciudad', LARGO.ciudad, 'La ciudad'],
+      ['pais', LARGO.pais, 'El país'],
+      ['telefono', LARGO.telefono, 'El teléfono']
     ]) {
       const t = textoOpcional(body[clave], maximo, nombre);
       if (t.error) return res.status(400).json({ mensaje: t.error });
@@ -147,7 +138,7 @@ async function actualizarMiPerfil(req, res) {
     );
 
     if (rol === 'docente' && body.especialidad !== undefined) {
-      const esp = textoOpcional(body.especialidad, 100, 'La especialidad');
+      const esp = textoOpcional(body.especialidad, LARGO.especialidad, 'La especialidad');
       if (esp.error) return res.status(400).json({ mensaje: esp.error });
       await pool.query('UPDATE docentes SET especialidad = $1 WHERE usuario_id = $2', [esp.valor, id_usuario]);
     }
@@ -231,8 +222,9 @@ async function cambiarMiContrasena(req, res) {
     if (typeof actual !== 'string' || typeof nueva !== 'string' || !actual) {
       return res.status(400).json({ mensaje: 'Escribe tu contraseña actual y la nueva.' });
     }
-    if (nueva.length < 6) {
-      return res.status(400).json({ mensaje: 'La nueva contraseña debe tener al menos 6 caracteres.' });
+    const errorClave = errorContrasena(nueva);
+    if (errorClave) {
+      return res.status(400).json({ mensaje: errorClave.replace('La contraseña', 'La nueva contraseña') });
     }
     if (nueva === actual) {
       return res.status(400).json({ mensaje: 'La nueva contraseña debe ser diferente a la actual.' });
