@@ -6,6 +6,7 @@ const { sqlFecha } = require('../utils/sql');
 const { CARPETA_PERFILES } = require('../config/uploads');
 const { olvidarUsuario } = require('../middleware/auth.middleware');
 const { eliminarArchivo, enviarArchivo } = require('../utils/archivos');
+const { firmarToken } = require('../utils/sesion');
 
 const REGEX_TELEFONO = /^[0-9+()\s-]{7,20}$/;
 
@@ -242,13 +243,24 @@ async function cambiarMiContrasena(req, res) {
       return res.status(400).json({ mensaje: 'La contraseña actual no es correcta.' });
     }
 
+    // Subir sesion_version cierra las sesiones abiertas en otros dispositivos;
+    // a esta pestaña se le entrega un token nuevo para que siga conectada
     const hash = await bcrypt.hash(nueva, 10);
-    await pool.query(
-      'UPDATE usuarios SET contrasena_hash = $1, actualizado_en = CURRENT_TIMESTAMP WHERE id = $2',
+    const actualizado = await pool.query(
+      `UPDATE usuarios
+       SET contrasena_hash = $1, sesion_version = sesion_version + 1, actualizado_en = CURRENT_TIMESTAMP
+       WHERE id = $2
+       RETURNING correo, sesion_version`,
       [hash, req.usuario.id_usuario]
     );
     olvidarUsuario(req.usuario.id_usuario);
-    res.json({ mensaje: 'Tu contraseña se actualizó.' });
+    const token = firmarToken({
+      id: req.usuario.id_usuario,
+      rol: req.usuario.rol,
+      correo: actualizado.rows[0].correo,
+      sesion_version: actualizado.rows[0].sesion_version
+    });
+    res.json({ mensaje: 'Tu contraseña se actualizó. Se cerraron tus sesiones en otros dispositivos.', token });
   } catch (err) {
     console.error(err);
     res.status(500).json({ mensaje: 'Error al cambiar la contraseña.' });

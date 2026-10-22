@@ -16,7 +16,8 @@
     : 'https://american-land-backend.onrender.com/api';
 
   // ── Sesión ───────────────────────────────────────────────
-  const token = sessionStorage.getItem('token');
+  // "let": al cambiar la contraseña el backend entrega un token nuevo
+  let token = sessionStorage.getItem('token');
   const rol = sessionStorage.getItem('rol');
   const permitidos = (document.body.dataset.roles || '').split(',');
   if (!token || permitidos.indexOf(rol) === -1) {
@@ -411,6 +412,11 @@
     boton.disabled = true;
     try {
       const r = await api('/perfil/contrasena', { method: 'PUT', body: { actual: f.actual.value, nueva: f.nueva.value } });
+      // El token anterior quedó invalidado: se guarda el nuevo para seguir conectado
+      if (r.token) {
+        token = r.token;
+        sessionStorage.setItem('token', r.token);
+      }
       f.reset();
       msg.textContent = '✓ ' + r.mensaje;
       msg.classList.add('ok');

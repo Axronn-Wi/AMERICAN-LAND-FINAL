@@ -50,10 +50,10 @@ async function obtenerSalonesPorNivel(req, res) {
 
 async function crearMatricula(req, res) {
   try {
-    const { salon_id } = req.body;
+    const salon_id = Number(req.body.salon_id);
     const id_usuario = req.usuario.id_usuario;
 
-    if (!salon_id) {
+    if (!Number.isInteger(salon_id) || salon_id < 1) {
       return res.status(400).json({ mensaje: 'salon_id es obligatorio.' });
     }
 
@@ -68,50 +68,97 @@ async function crearMatricula(req, res) {
 
     const id_estudiante = estudianteResult.rows[0].id;
 
-    // El salón debe existir, estar activo, y traemos el precio de su nivel
-    const salonResult = await pool.query(
-      `SELECT s.id, s.anno, s.capacidad_max, n.precio,
-              (SELECT COUNT(*) FROM matriculas m
-               WHERE m.salon_id = s.id
-               AND m.estado IN ('pendiente', 'activa'))::int AS ocupados
-       FROM salones s
-       JOIN niveles n ON s.nivel_id = n.id
-       WHERE s.id = $1 AND s.estado = 'activo'`,
-      [salon_id]
-    );
+    // Todo en una transacción con candados (mismo orden que en admin: estudiante y luego salón):
+    // dos clics o dos estudiantes al mismo tiempo ya no pueden duplicar ni pasarse del cupo
+    const resultado = await transaccion(async (cliente) => {
+      await cliente.query('SELECT id FROM estudiantes WHERE id = $1 FOR UPDATE', [id_estudiante]);
 
-    if (salonResult.rows.length === 0) {
-      return res.status(404).json({ mensaje: 'Salón no encontrado o no disponible.' });
-    }
+      // El salón debe existir, estar activo, y traemos el precio de su nivel
+      const salonResult = await cliente.query(
+        `SELECT s.id, s.anno, s.capacidad_max, n.precio
+         FROM salones s
+         JOIN niveles n ON s.nivel_id = n.id
+         WHERE s.id = $1 AND s.estado = 'activo'
+         FOR UPDATE OF s`,
+        [salon_id]
+      );
+      if (salonResult.rows.length === 0) {
+        return { status: 404, cuerpo: { mensaje: 'Salón no encontrado o no disponible.' } };
+      }
+      const salon = salonResult.rows[0];
 
-    const salon = salonResult.rows[0];
+      // Matrículas vigentes del estudiante (bloqueadas: un pago en curso no se cruza con esto)
+      const propias = await cliente.query(
+        `SELECT m.id, m.salon_id, m.estado,
+                (m.registrado_por IS NULL AND m.secretaria_id IS NULL
+                 AND NOT EXISTS (SELECT 1 FROM pagos p WHERE p.matricula_id = m.id)) AS en_linea_sin_pagos
+         FROM matriculas m
+         WHERE m.estudiante_id = $1 AND m.estado IN ('pendiente', 'activa')
+         FOR UPDATE OF m`,
+        [id_estudiante]
+      );
 
-    if (salon.ocupados >= salon.capacidad_max) {
-      return res.status(409).json({ mensaje: 'Este salón ya no tiene cupos disponibles.' });
-    }
+      const enEsteSalon = propias.rows.find((m) => m.salon_id === salon.id);
+      if (enEsteSalon && enEsteSalon.estado === 'activa') {
+        return { status: 409, cuerpo: { mensaje: 'Ya estás matriculado en este salón.' } };
+      }
+      if (enEsteSalon) {
+        // Ya la había creado (por ejemplo, en otro navegador): se continúa con el pago de esa
+        const actual = await cliente.query(
+          `SELECT id, estado, valor_total::float8 AS valor_total, saldo_pendiente::float8 AS saldo_pendiente
+           FROM matriculas WHERE id = $1`,
+          [enEsteSalon.id]
+        );
+        return { status: 200, cuerpo: { mensaje: 'Ya tenías esta matrícula pendiente. Falta realizar el pago.', matricula: actual.rows[0] } };
+      }
 
-    // No permitir matrículas duplicadas en el mismo salón
-    const existente = await pool.query(
-      `SELECT id FROM matriculas
-       WHERE estudiante_id = $1 AND salon_id = $2
-       AND estado IN ('pendiente', 'activa')`,
-      [id_estudiante, salon_id]
-    );
+      // Una sola matrícula pendiente por estudiante. Si la otra la creó él en línea y no
+      // tiene pagos, cambió de salón: se cancela y libera ese cupo. Si la registró la
+      // secretaría o ya tiene abonos, la cambia la administración.
+      const otraPendiente = propias.rows.find((m) => m.estado === 'pendiente');
+      if (otraPendiente && !otraPendiente.en_linea_sin_pagos) {
+        return {
+          status: 409,
+          cuerpo: { mensaje: 'Ya tienes una matrícula pendiente registrada por la secretaría. Comunícate con la administración para cambiar de salón.' }
+        };
+      }
+      if (otraPendiente) {
+        await cliente.query(
+          `UPDATE matriculas
+           SET estado = 'cancelada',
+               observaciones = COALESCE(observaciones, 'El estudiante eligió otro salón en la inscripción en línea.')
+           WHERE id = $1`,
+          [otraPendiente.id]
+        );
+      }
 
-    if (existente.rows.length > 0) {
-      return res.status(409).json({ mensaje: 'Ya tienes una matrícula pendiente o activa en este salón.' });
-    }
+      // Con el salón bloqueado, este conteo no cambia hasta terminar la transacción
+      const ocupados = await cliente.query(
+        `SELECT COUNT(*)::int AS total FROM matriculas
+         WHERE salon_id = $1 AND estado IN ('pendiente', 'activa')`,
+        [salon.id]
+      );
+      if (ocupados.rows[0].total >= salon.capacidad_max) {
+        // Se revierte también la cancelación de la otra pendiente
+        throw Object.assign(new Error('SIN_CUPOS'), { sinCupos: true });
+      }
 
-    const result = await pool.query(
-      `INSERT INTO matriculas (estudiante_id, salon_id, estado, valor_total, descuento, saldo_pendiente, anno)
-       VALUES ($1, $2, 'pendiente', $3, 0, $3, $4)
-       RETURNING id, estado, valor_total::float8 AS valor_total, saldo_pendiente::float8 AS saldo_pendiente`,
-      [id_estudiante, salon_id, salon.precio, salon.anno]
-    );
+      const result = await cliente.query(
+        `INSERT INTO matriculas (estudiante_id, salon_id, estado, valor_total, descuento, saldo_pendiente, anno)
+         VALUES ($1, $2, 'pendiente', $3, 0, $3, $4)
+         RETURNING id, estado, valor_total::float8 AS valor_total, saldo_pendiente::float8 AS saldo_pendiente`,
+        [id_estudiante, salon.id, salon.precio, salon.anno]
+      );
 
-    res.status(201).json({ mensaje: 'Matrícula creada. Falta realizar el pago.', matricula: result.rows[0] });
+      return { status: 201, cuerpo: { mensaje: 'Matrícula creada. Falta realizar el pago.', matricula: result.rows[0] } };
+    });
+
+    res.status(resultado.status).json(resultado.cuerpo);
 
   } catch (err) {
+    if (err.sinCupos) {
+      return res.status(409).json({ mensaje: 'Este salón ya no tiene cupos disponibles.' });
+    }
     console.error(err);
     res.status(500).json({ mensaje: 'Error al crear la matrícula.' });
   }

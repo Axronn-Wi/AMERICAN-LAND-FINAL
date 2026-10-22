@@ -43,15 +43,6 @@ app.use(cors(origenesPermitidos ? { origin: origenesPermitidos } : undefined));
 
 app.use(express.json({ limit: '100kb' }));
 
-// Máximo 20 intentos de login/registro cada 15 minutos por IP (frena ataques de fuerza bruta)
-const limiteAuth = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  limit: 20,
-  standardHeaders: 'draft-7',
-  legacyHeaders: false,
-  message: { mensaje: 'Demasiados intentos. Espera unos minutos y vuelve a intentarlo.' }
-});
-
 // Límite general de la API: 600 peticiones cada 5 minutos por IP
 const limiteApi = rateLimit({
   windowMs: 5 * 60 * 1000,
@@ -62,7 +53,8 @@ const limiteApi = rateLimit({
 });
 app.use('/api', limiteApi);
 
-app.use('/api/auth', limiteAuth, authRoutes);
+// Los límites de login y registro están en auth.routes.js
+app.use('/api/auth', authRoutes);
 app.use('/api/alumnos', alumnosRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/docentes', docentesRoutes);
@@ -92,13 +84,17 @@ app.use('/api', (req, res) => {
   res.status(404).json({ mensaje: 'Ruta no encontrada.' });
 });
 
-// Bloquea el acceso público al código y a los archivos subidos del backend
-app.use('/backend', (req, res) => {
-  res.status(404).json({ mensaje: 'No encontrado.' });
+// Sirve solo las carpetas del frontend (HTML, CSS, JS). Nunca la raíz del proyecto:
+// ahí están backend/ (código y archivos subidos) y package.json. Un bloqueo por
+// prefijo no basta: "/%62ackend/server.js" se decodifica a "backend/server.js"
+const RAIZ_FRONTEND = path.join(__dirname, '..');
+const CARPETAS_PUBLICAS = ['admin', 'admisiones', 'alumnos', 'assets', 'auth', 'docentes'];
+CARPETAS_PUBLICAS.forEach((carpeta) => {
+  app.use('/' + carpeta, express.static(path.join(RAIZ_FRONTEND, carpeta), { dotfiles: 'deny' }));
 });
-
-// Sirve el frontend (HTML, CSS, JS) desde la carpeta raíz del proyecto
-app.use(express.static(path.join(__dirname, '..'), { dotfiles: 'deny' }));
+app.get(['/', '/index.html'], (req, res) => {
+  res.sendFile(path.join(RAIZ_FRONTEND, 'index.html'));
+});
 
 // Manejador final de errores: nunca expone detalles internos al cliente
 app.use((err, req, res, next) => {

@@ -1,10 +1,11 @@
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 const pool = db.pool || db;
 const { transaccion, normalizarCorreo, REGEX_CORREO } = require('../utils/sql');
 const { enviarCorreo } = require('../utils/correo');
+const { firmarToken } = require('../utils/sesion');
+const { olvidarUsuario } = require('../middleware/auth.middleware');
 
 const MENSAJE_CREDENCIALES = 'Correo, contraseña o rol incorrectos.';
 
@@ -84,7 +85,8 @@ async function login(req, res) {
     }
 
     const result = await pool.query(
-      `SELECT u.id, u.nombre_completo, u.correo, u.contrasena_hash, u.activo, r.nombre AS nombre_rol
+      `SELECT u.id, u.nombre_completo, u.correo, u.contrasena_hash, u.activo, u.sesion_version,
+              r.nombre AS nombre_rol
        FROM usuarios u
        JOIN roles r ON u.rol_id = r.id
        WHERE LOWER(u.correo) = $1`,
@@ -107,11 +109,12 @@ async function login(req, res) {
       return res.status(403).json({ mensaje: 'Este usuario se encuentra inactivo. Comunícate con la administración.' });
     }
 
-    const token = jwt.sign(
-      { id_usuario: usuario.id, rol: usuario.nombre_rol, correo: usuario.correo },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || '8h' }
-    );
+    const token = firmarToken({
+      id: usuario.id,
+      rol: usuario.nombre_rol,
+      correo: usuario.correo,
+      sesion_version: usuario.sesion_version
+    });
 
     res.json({
       mensaje: 'Inicio de sesión exitoso.',
@@ -216,7 +219,7 @@ async function restablecer(req, res) {
 
     const contrasena_hash = await bcrypt.hash(contrasena, 10);
 
-    const cambiada = await transaccion(async (cliente) => {
+    const usuarioId = await transaccion(async (cliente) => {
       // Marcar el token como usado en la misma consulta evita que dos peticiones lo usen a la vez
       const resToken = await cliente.query(
         `UPDATE tokens_recuperacion SET usado_en = NOW()
@@ -224,24 +227,27 @@ async function restablecer(req, res) {
          RETURNING usuario_id`,
         [hashToken(token)]
       );
-      if (resToken.rows.length === 0) return false;
+      if (resToken.rows.length === 0) return null;
 
-      const usuarioId = resToken.rows[0].usuario_id;
+      const id = resToken.rows[0].usuario_id;
+      // Subir sesion_version cierra las sesiones abiertas (por si alguien más tenía acceso)
       await cliente.query(
-        'UPDATE usuarios SET contrasena_hash = $1, actualizado_en = NOW() WHERE id = $2',
-        [contrasena_hash, usuarioId]
+        `UPDATE usuarios SET contrasena_hash = $1, sesion_version = sesion_version + 1, actualizado_en = NOW()
+         WHERE id = $2`,
+        [contrasena_hash, id]
       );
       // Cualquier otro enlace pendiente de este usuario deja de servir
       await cliente.query(
         'UPDATE tokens_recuperacion SET usado_en = NOW() WHERE usuario_id = $1 AND usado_en IS NULL',
-        [usuarioId]
+        [id]
       );
-      return true;
+      return id;
     });
 
-    if (!cambiada) {
+    if (usuarioId === null) {
       return res.status(400).json({ mensaje: 'El enlace no es válido o ya venció. Solicita uno nuevo.' });
     }
+    olvidarUsuario(usuarioId);
 
     return res.json({ mensaje: 'Tu contraseña se actualizó correctamente. Ya puedes iniciar sesión.' });
   } catch (err) {

@@ -55,7 +55,8 @@
     const respuesta = await fetch(BASE + ruta, {
       method: op.method || 'GET',
       headers: Object.assign(
-        { 'Authorization': 'Bearer ' + token },
+        // Se lee en cada petición: el perfil cambia el token al cambiar la contraseña
+        { 'Authorization': 'Bearer ' + (sessionStorage.getItem('token') || token) },
         op.body ? { 'Content-Type': 'application/json' } : {}
       ),
       body: op.body ? JSON.stringify(op.body) : undefined
