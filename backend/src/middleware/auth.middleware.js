@@ -2,18 +2,28 @@ const jwt = require('jsonwebtoken');
 const db = require('../config/db');
 require('dotenv').config();
 
-// Recuerda por 30 s si un usuario sigue activo, para no consultar la base en cada petición
+// Recuerda por 30 s si un usuario sigue activo y su versión de sesión,
+// para no consultar la base en cada petición
 const CACHE_MS = 30 * 1000;
 const cacheActivos = new Map();
 
-async function usuarioSigueActivo(idUsuario) {
+async function estadoUsuario(idUsuario) {
   const guardado = cacheActivos.get(idUsuario);
-  if (guardado && guardado.expira > Date.now()) return guardado.activo;
+  if (guardado && guardado.expira > Date.now()) return guardado;
 
-  const r = await db.query('SELECT activo FROM usuarios WHERE id = $1', [idUsuario]);
-  const activo = r.rows.length > 0 && r.rows[0].activo === true;
-  cacheActivos.set(idUsuario, { activo, expira: Date.now() + CACHE_MS });
-  return activo;
+  const r = await db.query('SELECT activo, sesion_version FROM usuarios WHERE id = $1', [idUsuario]);
+  const estado = {
+    activo: r.rows.length > 0 && r.rows[0].activo === true,
+    version: r.rows.length > 0 ? r.rows[0].sesion_version : 0,
+    expira: Date.now() + CACHE_MS
+  };
+  cacheActivos.set(idUsuario, estado);
+  return estado;
+}
+
+// Los tokens firmados antes de existir sesion_version no la traen: cuentan como 0
+function versionDelToken(usuario) {
+  return Number.isInteger(usuario.sesion_version) ? usuario.sesion_version : 0;
 }
 
 function verificarToken(req, res, next) {
@@ -32,8 +42,13 @@ function verificarToken(req, res, next) {
 
     try {
       // Un usuario desactivado o eliminado pierde el acceso aunque su token no haya vencido
-      if (!(await usuarioSigueActivo(usuario.id_usuario))) {
+      const estado = await estadoUsuario(usuario.id_usuario);
+      if (!estado.activo) {
         return res.status(401).json({ mensaje: 'Tu cuenta está inactiva. Comunícate con la administración.' });
+      }
+      // Si la contraseña cambió después de iniciar sesión, este token ya no sirve
+      if (versionDelToken(usuario) !== estado.version) {
+        return res.status(401).json({ mensaje: 'Tu contraseña cambió. Inicia sesión de nuevo.' });
       }
     } catch (errDb) {
       console.error('Error al verificar el usuario:', errDb.message);
@@ -45,7 +60,7 @@ function verificarToken(req, res, next) {
   });
 }
 
-// El admin llama a esto al activar, desactivar o eliminar un usuario
+// Se llama al activar, desactivar o eliminar un usuario y al cambiar su contraseña
 function olvidarUsuario(idUsuario) {
   cacheActivos.delete(Number(idUsuario));
 }
@@ -68,7 +83,8 @@ function sesionOpcional(req, res, next) {
   jwt.verify(token, process.env.JWT_SECRET, async (err, usuario) => {
     if (!err) {
       try {
-        if (await usuarioSigueActivo(usuario.id_usuario)) req.usuario = usuario;
+        const estado = await estadoUsuario(usuario.id_usuario);
+        if (estado.activo && versionDelToken(usuario) === estado.version) req.usuario = usuario;
       } catch (_) { /* sin base: se sigue como visitante */ }
     }
     next();
