@@ -4,6 +4,44 @@ const { sqlHora, sqlFecha, transaccion, normalizarCorreo, REGEX_CORREO } = requi
 const bcrypt = require('bcrypt');
 const { notificar } = require('../utils/notificar');
 const { olvidarUsuario } = require('../middleware/auth.middleware');
+const {
+  LARGO, textoOpcional, textoObligatorio, telefonoOpcional, fechaNacimientoOpcional, errorContrasena
+} = require('../utils/textos');
+
+// Métodos de pago que ofrece el panel (pagos.metodo_pago)
+const METODOS_PAGO = ['pse', 'tarjeta', 'transferencia'];
+
+// Valida los datos de un usuario del panel con los largos de la base de datos.
+// Devuelve { error } o { datos } con los textos ya limpios
+function leerDatosUsuario(body, contrasenaObligatoria) {
+  const correo = normalizarCorreo(body.correo);
+  if (!body.nombre_completo || !correo) {
+    return { error: 'nombre_completo y correo son obligatorios.' };
+  }
+  if (!REGEX_CORREO.test(correo) || correo.length > LARGO.correo) {
+    return { error: 'El correo electrónico no es válido.' };
+  }
+  const perfil = body.datosPerfil || {};
+  const campos = {
+    nombre: textoObligatorio(body.nombre_completo, LARGO.nombre, 'El nombre'),
+    telefono: telefonoOpcional(body.telefono),
+    pais: textoOpcional(body.pais, LARGO.pais, 'El país'),
+    ciudad: textoOpcional(body.ciudad, LARGO.ciudad, 'La ciudad'),
+    fecha: fechaNacimientoOpcional(body.fecha_nacimiento),
+    especialidad: textoOpcional(perfil.especialidad, LARGO.especialidad, 'La especialidad'),
+    cargo: textoOpcional(perfil.cargo, LARGO.cargo, 'El cargo'),
+    sede: textoOpcional(perfil.sede, LARGO.sede, 'La sede')
+  };
+  const conError = Object.values(campos).find((c) => c.error);
+  if (conError) return { error: conError.error };
+  if (contrasenaObligatoria || body.contrasena) {
+    const errorClave = errorContrasena(body.contrasena);
+    if (errorClave) return { error: errorClave };
+  }
+  const datos = { correo, contrasena: body.contrasena || null };
+  Object.keys(campos).forEach((clave) => { datos[clave] = campos[clave].valor; });
+  return { datos };
+}
 
 // Devuelve el id del perfil en la tabla admin del usuario logueado.
 // Si el usuario tiene rol admin pero aun no tiene perfil, se crea en el momento.
@@ -145,6 +183,10 @@ async function crearSalon(req, res) {
     if (!docente_id || !nivel_id || !horario_tipo_id || !nombre || !anno) {
       return res.status(400).json({ mensaje: 'docente_id, nivel_id, horario_tipo_id, nombre y anno son obligatorios.' });
     }
+    const nombreSalon = textoObligatorio(nombre, LARGO.salon, 'El nombre del salón');
+    if (nombreSalon.error) {
+      return res.status(400).json({ mensaje: nombreSalon.error });
+    }
 
     const capacidad = capacidad_max === undefined || capacidad_max === null || capacidad_max === '' ? 20 : Number(capacidad_max);
     if (!Number.isInteger(capacidad) || capacidad < 1 || capacidad > 100) {
@@ -169,7 +211,7 @@ async function crearSalon(req, res) {
         `INSERT INTO salones (docente_id, nivel_id, horario_tipo_id, nombre, capacidad_max, anno, fecha_inicio, fecha_fin)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING id`,
-        [docente_id, nivel_id, horario_tipo_id, String(nombre).trim(), capacidad, anno, fecha_inicio || null, fecha_fin || null]
+        [docente_id, nivel_id, horario_tipo_id, nombreSalon.valor, capacidad, anno, fecha_inicio || null, fecha_fin || null]
       );
       const idSalon = salon.rows[0].id;
       const totalCiclos = Math.max(1, nivel.rows[0].ciclos_totales || 1);
@@ -193,7 +235,7 @@ async function crearSalon(req, res) {
       notificar([resultado.usuarioDocente], {
         tipo: 'salon',
         titulo: 'Nuevo salón asignado',
-        mensaje: `Se te asignó el salón "${String(nombre).trim()}".`,
+        mensaje: `Se te asignó el salón "${nombreSalon.valor}".`,
         enlace: '/docentes/inicio.html'
       });
     }
@@ -216,14 +258,17 @@ async function actualizarSalon(req, res) {
     const capacidad = Number(req.body.capacidad_max);
     const ciclo = Number(req.body.ciclo_actual);
 
-    if (!nombre || !String(nombre).trim()) {
-      return res.status(400).json({ mensaje: 'El nombre del salón es obligatorio.' });
+    const nombreSalon = textoObligatorio(nombre, LARGO.salon, 'El nombre del salón');
+    if (nombreSalon.error) {
+      return res.status(400).json({ mensaje: nombreSalon.error });
     }
     if (!Number.isInteger(capacidad) || capacidad < 1 || capacidad > 100) {
       return res.status(400).json({ mensaje: 'La capacidad debe ser un número entero entre 1 y 100.' });
     }
-    if (!estado) {
-      return res.status(400).json({ mensaje: 'El estado del salón es obligatorio.' });
+    // salones.estado es VARCHAR(20)
+    const estadoSalon = textoObligatorio(estado, 20, 'El estado del salón');
+    if (estadoSalon.error) {
+      return res.status(400).json({ mensaje: estadoSalon.error });
     }
     if (fecha_inicio && fecha_fin && fecha_fin < fecha_inicio) {
       return res.status(400).json({ mensaje: 'La fecha de fin no puede ser anterior a la fecha de inicio.' });
@@ -259,7 +304,7 @@ async function actualizarSalon(req, res) {
                    ciclo_actual, anno,
                    ${sqlFecha('fecha_inicio')} AS fecha_inicio,
                    ${sqlFecha('fecha_fin')} AS fecha_fin`,
-        [String(nombre).trim(), capacidad, estado, ciclo, fecha_inicio || null, fecha_fin || null, id]
+        [nombreSalon.valor, capacidad, estadoSalon.valor, ciclo, fecha_inicio || null, fecha_fin || null, id]
       );
 
       // Los ciclos acompañan al ciclo actual: anteriores finalizados, el actual en curso
@@ -382,6 +427,13 @@ async function registrarPago(req, res) {
     if (!Number.isFinite(monto) || monto <= 0) {
       return res.status(400).json({ mensaje: 'El monto debe ser un número mayor que 0.' });
     }
+    if (!METODOS_PAGO.includes(metodo_pago)) {
+      return res.status(400).json({ mensaje: 'Método de pago inválido. Usa: PSE, tarjeta o transferencia.' });
+    }
+    const referencia = textoOpcional(referencia_transaccion, LARGO.referenciaPago, 'La referencia');
+    if (referencia.error) {
+      return res.status(400).json({ mensaje: referencia.error });
+    }
 
     // Quién registra: admin (con su perfil de la tabla admin) o secretaria
     const { secretariaId, registradoPor } = await datosDeRegistro(req.usuario);
@@ -414,15 +466,16 @@ async function registrarPago(req, res) {
         `INSERT INTO pagos (matricula_id, secretaria_id, registrado_por, monto, metodo_pago, referencia_transaccion, estado)
          VALUES ($1, $2, $3, $4, $5, $6, 'exitoso')
          RETURNING id`,
-        [matricula_id, secretariaId, registradoPor, monto, metodo_pago, referencia_transaccion || null]
+        [matricula_id, secretariaId, registradoPor, monto, metodo_pago, referencia.valor]
       );
 
       // Descontar el pago; si el saldo queda en 0 la matrícula pendiente se activa
       const nuevoSaldo = Math.round((matricula.saldo_pendiente - monto) * 100) / 100;
       const actualizada = await cliente.query(
         `UPDATE matriculas
-         SET saldo_pendiente = $1,
-             estado = CASE WHEN $1 = 0 AND estado = 'pendiente' THEN 'activa' ELSE estado END
+         SET saldo_pendiente = $1::numeric,
+             -- Con cast: sin él PostgreSQL ve $1 como numeric y como integer y falla
+             estado = CASE WHEN $1::numeric = 0 AND estado = 'pendiente' THEN 'activa' ELSE estado END
          WHERE id = $2
          RETURNING estado`,
         [nuevoSaldo, matricula_id]
@@ -463,16 +516,18 @@ async function registrarPago(req, res) {
 
 async function crearUsuario(req, res) {
   try {
-    const { nombre_completo, contrasena, rol, telefono, fecha_nacimiento, pais, ciudad, datosPerfil } = req.body;
-    const correo = normalizarCorreo(req.body.correo);
+    const { rol } = req.body;
 
-    if (!nombre_completo || !correo || !contrasena || !rol) {
+    if (!req.body.nombre_completo || !req.body.correo || !req.body.contrasena || !rol) {
       return res.status(400).json({ mensaje: 'nombre_completo, correo, contrasena y rol son obligatorios.' });
     }
 
-    if (!REGEX_CORREO.test(correo)) {
-      return res.status(400).json({ mensaje: 'El correo electrónico no es válido.' });
+    const leido = leerDatosUsuario(req.body, true);
+    if (leido.error) {
+      return res.status(400).json({ mensaje: leido.error });
     }
+    const datos = leido.datos;
+    const correo = datos.correo;
 
     const rolesValidos = ['estudiante', 'docente', 'admin', 'secretaria'];
     if (!rolesValidos.includes(rol)) {
@@ -480,10 +535,6 @@ async function crearUsuario(req, res) {
     }
     if (req.usuario.rol === 'secretaria' && rol !== 'estudiante') {
       return res.status(403).json({ mensaje: MENSAJE_SOLO_ESTUDIANTES });
-    }
-
-    if (contrasena.length < 6) {
-      return res.status(400).json({ mensaje: 'La contraseña debe tener al menos 6 caracteres.' });
     }
 
     // Verificar que el correo no esté repetido
@@ -501,7 +552,7 @@ async function crearUsuario(req, res) {
     }
 
     const id_rol = rolResult.rows[0].id;
-    const contrasena_hash = await bcrypt.hash(contrasena, 10);
+    const contrasena_hash = await bcrypt.hash(datos.contrasena, 10);
 
     // Transacción: usuario + perfil se guardan juntos o no se guarda nada
     const cliente = await pool.connect();
@@ -514,7 +565,7 @@ async function crearUsuario(req, res) {
         `INSERT INTO usuarios (rol_id, nombre_completo, correo, contrasena_hash, telefono, fecha_nacimiento, pais, ciudad)
          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING id`,
-        [id_rol, nombre_completo, correo, contrasena_hash, telefono || null, fecha_nacimiento || null, pais || null, ciudad || null]
+        [id_rol, datos.nombre, correo, contrasena_hash, datos.telefono, datos.fecha, datos.pais, datos.ciudad]
       );
 
       nuevoUsuarioId = resultadoUsuario.rows[0].id;
@@ -532,21 +583,21 @@ async function crearUsuario(req, res) {
         await cliente.query(
           `INSERT INTO docentes (usuario_id, especialidad, activo, fecha_ingreso)
            VALUES ($1, $2, TRUE, CURRENT_DATE)`,
-          [nuevoUsuarioId, datosPerfil?.especialidad || null]
+          [nuevoUsuarioId, datos.especialidad]
         );
 
       } else if (rol === 'admin') {
         await cliente.query(
           `INSERT INTO admin (usuario_id, cargo, sede, activo)
            VALUES ($1, $2, $3, TRUE)`,
-          [nuevoUsuarioId, datosPerfil?.cargo || null, datosPerfil?.sede || null]
+          [nuevoUsuarioId, datos.cargo, datos.sede]
         );
 
       } else if (rol === 'secretaria') {
         await cliente.query(
           `INSERT INTO secretarias (usuario_id, cargo, sede, activo)
            VALUES ($1, $2, $3, TRUE)`,
-          [nuevoUsuarioId, datosPerfil?.cargo || 'Secretaria académica', datosPerfil?.sede || null]
+          [nuevoUsuarioId, datos.cargo || 'Secretaria académica', datos.sede]
         );
       }
 
@@ -623,20 +674,14 @@ async function obtenerNiveles(req, res) {
 async function editarUsuario(req, res) {
   try {
     const { id } = req.params;
-    const { nombre_completo, telefono, fecha_nacimiento, pais, ciudad, contrasena, datosPerfil } = req.body;
-    const correo = normalizarCorreo(req.body.correo);
+    const { datosPerfil } = req.body;
 
-    if (!nombre_completo || !correo) {
-      return res.status(400).json({ mensaje: 'nombre_completo y correo son obligatorios.' });
+    const leido = leerDatosUsuario(req.body, false);
+    if (leido.error) {
+      return res.status(400).json({ mensaje: leido.error });
     }
-
-    if (!REGEX_CORREO.test(correo)) {
-      return res.status(400).json({ mensaje: 'El correo electrónico no es válido.' });
-    }
-
-    if (contrasena && contrasena.length < 6) {
-      return res.status(400).json({ mensaje: 'La contraseña debe tener al menos 6 caracteres.' });
-    }
+    const datos = leido.datos;
+    const correo = datos.correo;
 
     // Verificar que el usuario exista y traer su rol (el rol no se puede cambiar)
     const usuarioResult = await pool.query(
@@ -668,7 +713,7 @@ async function editarUsuario(req, res) {
     }
 
     // Si no llega contraseña, se deja la actual
-    const contrasena_hash = contrasena ? await bcrypt.hash(contrasena, 10) : null;
+    const contrasena_hash = datos.contrasena ? await bcrypt.hash(datos.contrasena, 10) : null;
 
     const cliente = await pool.connect();
     let usuarioActualizado;
@@ -689,7 +734,7 @@ async function editarUsuario(req, res) {
              actualizado_en = CURRENT_TIMESTAMP
          WHERE id = $8
          RETURNING id, nombre_completo, correo`,
-        [nombre_completo, correo, telefono || null, fecha_nacimiento || null, pais || null, ciudad || null, contrasena_hash, id]
+        [datos.nombre, correo, datos.telefono, datos.fecha, datos.pais, datos.ciudad, contrasena_hash, id]
       );
 
       usuarioActualizado = resultadoUsuario.rows[0];
@@ -697,15 +742,15 @@ async function editarUsuario(req, res) {
       if (rol === 'docente' && datosPerfil && typeof datosPerfil.especialidad === 'string') {
         await cliente.query(
           'UPDATE docentes SET especialidad = $1 WHERE usuario_id = $2',
-          [datosPerfil.especialidad || null, id]
+          [datos.especialidad, id]
         );
       }
 
       // Cargo y sede del personal administrativo
       if ((rol === 'admin' || rol === 'secretaria') && datosPerfil) {
         const tabla = rol === 'admin' ? 'admin' : 'secretarias';
-        const cargo = typeof datosPerfil.cargo === 'string' ? datosPerfil.cargo.trim() || null : null;
-        const sede = typeof datosPerfil.sede === 'string' ? datosPerfil.sede.trim() || null : null;
+        const cargo = datos.cargo;
+        const sede = datos.sede;
         const actualizado = await cliente.query(
           `UPDATE ${tabla} SET cargo = $1, sede = $2 WHERE usuario_id = $3`,
           [cargo, sede, id]
@@ -740,9 +785,20 @@ async function obtenerEstudiantes(req, res) {
   try {
     const result = await pool.query(
       `SELECT e.id, e.usuario_id, e.codigo_estudiante, e.estado,
-              u.nombre_completo, u.correo, u.telefono, u.activo
+              u.nombre_completo, u.correo, u.telefono, u.activo,
+              mat.nivel, mat.salon, mat.estado_matricula
        FROM estudiantes e
        JOIN usuarios u ON e.usuario_id = u.id
+       -- Matrícula vigente: la activa primero y, si no hay, la pendiente más reciente
+       LEFT JOIN LATERAL (
+         SELECT n.nombre AS nivel, s.nombre AS salon, m.estado AS estado_matricula
+         FROM matriculas m
+         JOIN salones s ON s.id = m.salon_id
+         JOIN niveles n ON n.id = s.nivel_id
+         WHERE m.estudiante_id = e.id AND m.estado IN ('activa', 'pendiente')
+         ORDER BY (m.estado = 'activa') DESC, m.id DESC
+         LIMIT 1
+       ) mat ON TRUE
        ORDER BY u.nombre_completo ASC`
     );
 
@@ -924,11 +980,15 @@ async function actualizarMatricula(req, res) {
   try {
     const { id } = req.params;
     const descuento = Number(req.body.descuento);
-    const observaciones = req.body.observaciones ? String(req.body.observaciones).trim() : null;
+    const obs = textoOpcional(req.body.observaciones, LARGO.observaciones, 'Las observaciones');
 
     if (Number.isNaN(descuento) || descuento < 0) {
       return res.status(400).json({ mensaje: 'El descuento debe ser un número mayor o igual a 0.' });
     }
+    if (obs.error) {
+      return res.status(400).json({ mensaje: obs.error });
+    }
+    const observaciones = obs.valor;
 
     const result = await pool.query(
       `UPDATE matriculas

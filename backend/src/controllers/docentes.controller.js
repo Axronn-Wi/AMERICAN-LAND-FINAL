@@ -5,6 +5,17 @@ const { sqlHora, sqlFecha } = require('../utils/sql');
 const { CARPETA_MATERIAL } = require('../config/uploads');
 const { notificar, usuariosDelSalon } = require('../utils/notificar');
 const { eliminarArchivo } = require('../utils/archivos');
+const { LARGO, textoOpcional, textoObligatorio } = require('../utils/textos');
+
+// Título, descripción y tipo de una tarea con los largos de la base de datos
+function leerTextosTarea(body) {
+  const titulo = textoObligatorio(body.titulo, LARGO.titulo, 'El título');
+  const descripcion = textoOpcional(body.descripcion, LARGO.descripcionTarea, 'La descripción');
+  const tipo = textoOpcional(body.tipo, LARGO.tipoTarea, 'El tipo');
+  const conError = [titulo, descripcion, tipo].find((c) => c.error);
+  if (conError) return { error: conError.error };
+  return { titulo: titulo.valor, descripcion: descripcion.valor, tipo: tipo.valor };
+}
 
 // Avisa a todos los estudiantes activos del salón (sin bloquear la respuesta)
 function notificarSalon(idSalon, datos) {
@@ -304,11 +315,16 @@ async function registrarNota(req, res) {
 
 async function crearTarea(req, res) {
   try {
-    const { salon_id, ciclo_id, titulo, descripcion, fecha_limite, valor_porcentaje, tipo } = req.body;
+    const { salon_id, ciclo_id, fecha_limite, valor_porcentaje } = req.body;
 
-    if (!salon_id || !ciclo_id || !titulo || !fecha_limite) {
+    if (!salon_id || !ciclo_id || !req.body.titulo || !fecha_limite) {
       return res.status(400).json({ mensaje: 'salon_id, ciclo_id, titulo y fecha_limite son obligatorios.' });
     }
+    const textos = leerTextosTarea(req.body);
+    if (textos.error) {
+      return res.status(400).json({ mensaje: textos.error });
+    }
+    const { titulo, descripcion, tipo } = textos;
 
     if (isNaN(Date.parse(fecha_limite))) {
       return res.status(400).json({ mensaje: 'fecha_limite no es una fecha válida (usa el formato AAAA-MM-DD).' });
@@ -366,11 +382,16 @@ async function crearTarea(req, res) {
 async function editarTarea(req, res) {
   try {
     const { id } = req.params;
-    const { titulo, descripcion, fecha_limite, valor_porcentaje, tipo } = req.body;
+    const { fecha_limite, valor_porcentaje } = req.body;
 
-    if (!titulo || !fecha_limite) {
+    if (!req.body.titulo || !fecha_limite) {
       return res.status(400).json({ mensaje: 'titulo y fecha_limite son obligatorios.' });
     }
+    const textos = leerTextosTarea(req.body);
+    if (textos.error) {
+      return res.status(400).json({ mensaje: textos.error });
+    }
+    const { titulo, descripcion, tipo } = textos;
 
     if (isNaN(Date.parse(fecha_limite))) {
       return res.status(400).json({ mensaje: 'fecha_limite no es una fecha válida (usa el formato AAAA-MM-DD).' });
@@ -491,7 +512,8 @@ async function obtenerEntregasTarea(req, res) {
     const entregasResult = await pool.query(
       `SELECT e.id AS id_estudiante, e.codigo_estudiante, u.nombre_completo,
               et.id AS id_entrega, et.fecha_entrega, et.estado AS estado_entrega,
-              et.calificacion::float8 AS calificacion, et.retroalimentacion, et.archivo_url
+              et.calificacion::float8 AS calificacion, et.retroalimentacion, et.archivo_url,
+              et.comentario
        FROM matriculas m
        JOIN estudiantes e ON m.estudiante_id = e.id
        JOIN usuarios u ON e.usuario_id = u.id
@@ -524,6 +546,10 @@ async function calificarEntrega(req, res) {
 
     if (hayNota && (isNaN(nota) || nota < 0 || nota > 5)) {
       return res.status(400).json({ mensaje: 'La calificación debe ser un número entre 0 y 5.' });
+    }
+    if (retroalimentacion !== undefined && retroalimentacion !== null &&
+        String(retroalimentacion).length > LARGO.retroalimentacion) {
+      return res.status(400).json({ mensaje: `La retroalimentación no puede superar los ${LARGO.retroalimentacion} caracteres.` });
     }
 
     const id_docente = await obtenerIdDocente(req.usuario.id_usuario);

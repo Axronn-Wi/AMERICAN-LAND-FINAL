@@ -4,6 +4,7 @@ const { sqlHora, sqlFecha } = require('../utils/sql');
 const { notificar } = require('../utils/notificar');
 const { eliminarArchivo } = require('../utils/archivos');
 const { CARPETA_ENTREGAS } = require('../config/uploads');
+const { LARGO, textoOpcional } = require('../utils/textos');
 
 const MENSAJE_SIN_PERFIL = 'No se encontró un perfil de estudiante para este usuario.';
 
@@ -242,6 +243,13 @@ async function entregarTarea(req, res) {
       return res.status(400).json({ mensaje: 'Id de tarea inválido.' });
     }
 
+    // Comentario opcional para el profesor (llega como campo de texto del formulario)
+    const comentario = textoOpcional(req.body && req.body.comentario, LARGO.comentarioEntrega, 'El comentario');
+    if (comentario.error) {
+      borrarArchivo(rutaArchivo);
+      return res.status(400).json({ mensaje: comentario.error });
+    }
+
     // 3. Perfil de estudiante
     const id_estudiante = await obtenerIdEstudiante(req.usuario.id_usuario);
 
@@ -291,10 +299,10 @@ async function entregarTarea(req, res) {
 
     // 7. Guardar la entrega
     const insertResult = await pool.query(
-      `INSERT INTO entregas_tareas (tarea_id, estudiante_id, fecha_entrega, estado, archivo_url)
-       VALUES ($1, $2, CURRENT_TIMESTAMP, 'entregada', $3)
+      `INSERT INTO entregas_tareas (tarea_id, estudiante_id, fecha_entrega, estado, archivo_url, comentario)
+       VALUES ($1, $2, CURRENT_TIMESTAMP, 'entregada', $3, $4)
        RETURNING id`,
-      [id_tarea, id_estudiante, req.file.filename]
+      [id_tarea, id_estudiante, req.file.filename, comentario.valor]
     );
 
     notificar([tarea.usuario_docente], {

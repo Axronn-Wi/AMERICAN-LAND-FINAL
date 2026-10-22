@@ -64,17 +64,11 @@
         </ul>
       </section>
 
-      <!-- El nivel del alumno no viene en la API de usuarios: filtros desactivados -->
+      <!-- Los niveles salen de las matrículas de los alumnos (alumnos_admin.js) -->
       <section class="sidebar-seccion">
-        <h3>Filtrar por Nivel &middot; Próximamente</h3>
+        <h3>Filtrar por Nivel</h3>
         <ul class="filtros-sidebar" id="filtros-nivel">
           <li><button class="filtro-sb activo" data-nivel="todos">Todos los niveles</button></li>
-          <li><button class="filtro-sb" data-nivel="A1" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">A1 — Principiante</button></li>
-          <li><button class="filtro-sb" data-nivel="A2" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">A2 — Básico</button></li>
-          <li><button class="filtro-sb" data-nivel="B1" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">B1 — Intermedio</button></li>
-          <li><button class="filtro-sb" data-nivel="B2" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">B2 — Interm. Alto</button></li>
-          <li><button class="filtro-sb" data-nivel="C1" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">C1 — Avanzado</button></li>
-          <li><button class="filtro-sb" data-nivel="C2" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">C2 — Maestría</button></li>
         </ul>
       </section>
 
@@ -84,7 +78,7 @@
           <li><button class="filtro-sb-estado activo" data-estado="todos">Todos</button></li>
           <li><button class="filtro-sb-estado" data-estado="activo">Activos</button></li>
           <li><button class="filtro-sb-estado" data-estado="inactivo">Inactivos</button></li>
-          <li><button class="filtro-sb-estado" data-estado="pendiente" disabled title="Próximamente" style="opacity:.45;cursor:not-allowed;">Pendientes</button></li>
+          <li><button class="filtro-sb-estado" data-estado="pendiente" title="Con matrícula pendiente de pago">Pendientes</button></li>
         </ul>
       </section>
 
@@ -122,7 +116,7 @@
           <span class="stat-mini-label">Inactivos</span>
         </div>
         <div class="stat-mini stat-pendientes">
-          <span class="stat-mini-num" id="sm-pendientes" title="Próximamente">—</span>
+          <span class="stat-mini-num" id="sm-pendientes" title="Con matrícula pendiente de pago">0</span>
           <span class="stat-mini-label">Pendientes</span>
         </div>
         <div class="stat-mini stat-total">
@@ -193,12 +187,12 @@
         <div class="grid-modal-2">
           <div class="campo-modal">
             <label for="m-nombre">Nombre completo <span class="oblig">*</span></label>
-            <input type="text" id="m-nombre" placeholder="Ej. Laura Gómez" />
+            <input type="text" id="m-nombre" maxlength="150" placeholder="Ej. Laura Gómez" />
             <span class="m-error" id="e-nombre"></span>
           </div>
           <div class="campo-modal">
             <label for="m-correo">Correo electrónico <span class="oblig">*</span></label>
-            <input type="email" id="m-correo" placeholder="correo@ejemplo.com" />
+            <input type="email" id="m-correo" maxlength="150" placeholder="correo@ejemplo.com" />
             <span class="m-error" id="e-correo"></span>
           </div>
         </div>
@@ -206,12 +200,12 @@
         <div class="grid-modal-2">
           <div class="campo-modal">
             <label for="m-contrasena">Contraseña <span class="oblig" id="m-contrasena-oblig">*</span></label>
-            <input type="password" id="m-contrasena" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
+            <input type="password" id="m-contrasena" maxlength="72" placeholder="Mínimo 6 caracteres" autocomplete="new-password" />
             <span class="m-error" id="e-contrasena"></span>
           </div>
           <div class="campo-modal">
             <label for="m-telefono">Teléfono</label>
-            <input type="tel" id="m-telefono" placeholder="Ej. 3001234567" />
+            <input type="tel" id="m-telefono" maxlength="20" placeholder="Ej. 3001234567" />
             <span class="m-error" id="e-telefono"></span>
           </div>
         </div>
@@ -224,14 +218,14 @@
           </div>
           <div class="campo-modal">
             <label for="m-pais">País</label>
-            <input type="text" id="m-pais" placeholder="Ej. Colombia" />
+            <input type="text" id="m-pais" maxlength="50" placeholder="Ej. Colombia" />
           </div>
         </div>
 
         <div class="grid-modal-2">
           <div class="campo-modal">
             <label for="m-ciudad">Ciudad</label>
-            <input type="text" id="m-ciudad" placeholder="Ej. Pitalito" />
+            <input type="text" id="m-ciudad" maxlength="50" placeholder="Ej. Pitalito" />
           </div>
           <div class="campo-modal">
             <small class="texto-ayuda">El nivel y el salón se asignan al matricular al alumno (módulo Matrículas).</small>

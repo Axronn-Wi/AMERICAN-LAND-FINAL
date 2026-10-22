@@ -90,9 +90,9 @@ function fmtFecha(valor) {
   return d.getUTCDate() + ' ' + MESES[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
 }
 
-// Texto gris para lo que la base de datos aún no entrega
-function proximamente() {
-  const s = crear('span', '', 'Próximamente');
+// Texto gris pequeño (ej. "Sin matrícula" o "pago pendiente")
+function textoSuave(texto) {
+  const s = crear('span', '', texto);
   s.style.color = 'var(--gris-texto)';
   s.style.fontSize = '0.78rem';
   s.style.fontStyle = 'italic';
@@ -126,16 +126,23 @@ function ocultarAlerta() {
 
 // ── 6. ESTADO DE LA PÁGINA ──────────────────────────────────
 let alumnos = [];                 // usuarios con rol "estudiante"
-let filtroEstado = 'todos';       // todos | activo | inactivo
+let filtroEstado = 'todos';       // todos | activo | inactivo | pendiente
+let filtroNivel = 'todos';        // todos | nombre del nivel | sin (sin matrícula)
 let orden = { col: 'nombre', dir: 'asc' };
 let vista = 'tabla';              // tabla | cards
 let alumnoADesactivar = null;
 let alumnoABorrar = null;
 let alumnoEditando = null;        // null = agregar; objeto = editar
 let codigos = {};                 // usuario_id -> codigo_estudiante
+let matriculaDe = {};             // usuario_id -> { nivel, salon, estado } de su matrícula vigente
 
 function estadoDe(a) {
   return a.activo ? 'activo' : 'inactivo';
+}
+
+// Matrícula activa (o, si no hay, la pendiente más reciente); null si no tiene
+function matricula(a) {
+  return matriculaDe[a.id] || null;
 }
 
 // ── 7. CARGA DE DATOS ───────────────────────────────────────
@@ -150,17 +157,54 @@ async function cargarAlumnos() {
   return false;
 }
 
-// El código de estudiante viene de GET /admin/estudiantes (se cruza por usuario_id)
+// Código, nivel y salón vienen de GET /admin/estudiantes (se cruzan por usuario_id)
 async function cargarCodigos() {
   try {
     const res = await apiFetch('/admin/estudiantes');
     codigos = {};
+    matriculaDe = {};
     if (res && res.ok && res.datos && Array.isArray(res.datos.estudiantes)) {
-      res.datos.estudiantes.forEach(function (e) { codigos[e.usuario_id] = e.codigo_estudiante; });
+      res.datos.estudiantes.forEach(function (e) {
+        codigos[e.usuario_id] = e.codigo_estudiante;
+        if (e.estado_matricula) {
+          matriculaDe[e.usuario_id] = { nivel: e.nivel, salon: e.salon, estado: e.estado_matricula };
+        }
+      });
     }
   } catch (err) {
-    console.error('Error al cargar los códigos de estudiante:', err);
+    console.error('Error al cargar los datos de los estudiantes:', err);
   }
+  pintarFiltrosNivel();
+}
+
+// Botones del filtro por nivel: los niveles que tienen alumnos matriculados + "Sin matrícula"
+function pintarFiltrosNivel() {
+  const niveles = [];
+  Object.keys(matriculaDe).forEach(function (id) {
+    const n = matriculaDe[id].nivel;
+    if (n && niveles.indexOf(n) === -1) niveles.push(n);
+  });
+  niveles.sort(function (a, b) { return a.localeCompare(b, 'es'); });
+  if (filtroNivel !== 'todos' && filtroNivel !== 'sin' && niveles.indexOf(filtroNivel) === -1) filtroNivel = 'todos';
+
+  const lista = porId('filtros-nivel');
+  lista.innerHTML = '';
+  [['todos', 'Todos los niveles']]
+    .concat(niveles.map(function (n) { return [n, n]; }))
+    .concat([['sin', 'Sin matrícula']])
+    .forEach(function (op) {
+      const li = crear('li');
+      const btn = crear('button', 'filtro-sb' + (filtroNivel === op[0] ? ' activo' : ''), op[1]);
+      btn.type = 'button';
+      btn.dataset.nivel = op[0];
+      btn.addEventListener('click', function () {
+        filtroNivel = op[0];
+        lista.querySelectorAll('.filtro-sb').forEach(function (b) { b.classList.toggle('activo', b === btn); });
+        pintarLista();
+      });
+      li.appendChild(btn);
+      lista.appendChild(li);
+    });
 }
 
 // ── 8. FILTRAR Y ORDENAR ────────────────────────────────────
@@ -168,9 +212,17 @@ function filtrar() {
   const texto = porId('input-busqueda').value.trim().toLowerCase();
 
   const lista = alumnos.filter(function (a) {
-    if (filtroEstado !== 'todos' && estadoDe(a) !== filtroEstado) return false;
+    const m = matricula(a);
+    if (filtroEstado === 'pendiente') {
+      if (!m || m.estado !== 'pendiente') return false;
+    } else if (filtroEstado !== 'todos' && estadoDe(a) !== filtroEstado) {
+      return false;
+    }
+    if (filtroNivel === 'sin' && m) return false;
+    if (filtroNivel !== 'todos' && filtroNivel !== 'sin' && (!m || m.nivel !== filtroNivel)) return false;
     if (texto) {
-      const paja = (String(a.nombre_completo) + ' ' + String(a.correo) + ' ' + String(codigos[a.id] || '')).toLowerCase();
+      const paja = (String(a.nombre_completo) + ' ' + String(a.correo) + ' ' + String(codigos[a.id] || '') + ' ' +
+        (m ? String(m.nivel) + ' ' + String(m.salon) : '')).toLowerCase();
       if (paja.indexOf(texto) === -1) return false;
     }
     return true;
@@ -190,8 +242,10 @@ function filtrar() {
 // ── 9. PINTAR STATS ─────────────────────────────────────────
 function pintarStats() {
   const activos = alumnos.filter(function (a) { return a.activo; }).length;
+  const pendientes = alumnos.filter(function (a) { const m = matricula(a); return m && m.estado === 'pendiente'; }).length;
   setTexto('sm-activos', activos);
   setTexto('sm-inactivos', alumnos.length - activos);
+  setTexto('sm-pendientes', pendientes);
   setTexto('sm-total', alumnos.length);
   setTexto('texto-conteo', plural(alumnos.length, 'alumno registrado', 'alumnos registrados') +
     ' \u00B7 ' + plural(activos, 'activo', 'activos'));
@@ -240,16 +294,21 @@ function crearFila(a) {
   tdAlumno.appendChild(info);
   tr.appendChild(tdAlumno);
 
-  // Nivel y salón: ninguna API admin los trae por alumno todavía (la matrícula sí viene de /admin/estudiantes)
   const tdMat = crear('td', 'td-matricula', codigos[a.id] || '—');
   tr.appendChild(tdMat);
 
+  // Nivel y salón de la matrícula vigente (activa o pendiente de pago)
+  const m = matricula(a);
   const tdNivel = crear('td');
-  tdNivel.appendChild(proximamente());
+  if (m) tdNivel.textContent = m.nivel;
+  else tdNivel.appendChild(textoSuave('Sin matrícula'));
   tr.appendChild(tdNivel);
 
-  const tdSalon = crear('td');
-  tdSalon.appendChild(proximamente());
+  const tdSalon = crear('td', '', m ? m.salon : '—');
+  if (m && m.estado === 'pendiente') {
+    tdSalon.appendChild(crear('br'));
+    tdSalon.appendChild(textoSuave('pago pendiente'));
+  }
   tr.appendChild(tdSalon);
 
   tr.appendChild(crear('td', '', a.telefono || '—'));
@@ -289,7 +348,10 @@ function crearCard(a) {
   card.appendChild(cabecera);
 
   const datos = crear('div', 'card-data');
+  const m = matricula(a);
   datos.appendChild(crearLineaCard('Matrícula', codigos[a.id] || '—'));
+  datos.appendChild(crearLineaCard('Nivel', m ? m.nivel : 'Sin matrícula'));
+  datos.appendChild(crearLineaCard('Salón', m ? m.salon + (m.estado === 'pendiente' ? ' (pago pendiente)' : '') : '—'));
   datos.appendChild(crearLineaCard('Teléfono', a.telefono || '—'));
   datos.appendChild(crearLineaCard('Ingreso', fmtFecha(a.creado_en)));
   card.appendChild(datos);
@@ -548,8 +610,12 @@ async function guardarAlumno() {
 function limpiarBusqueda() {
   porId('input-busqueda').value = '';
   filtroEstado = 'todos';
+  filtroNivel = 'todos';
   document.querySelectorAll('.filtro-sb-estado').forEach(function (b) {
     b.classList.toggle('activo', b.dataset.estado === 'todos');
+  });
+  document.querySelectorAll('#filtros-nivel .filtro-sb').forEach(function (b) {
+    b.classList.toggle('activo', b.dataset.nivel === 'todos');
   });
   pintarLista();
 }
@@ -558,7 +624,7 @@ porId('input-busqueda').addEventListener('input', pintarLista);
 porId('btn-limpiar').addEventListener('click', limpiarBusqueda);
 porId('btn-reset').addEventListener('click', limpiarBusqueda);
 
-// Filtro lateral por estado (los demás botones están desactivados en el HTML)
+// Filtro lateral por estado (el de nivel se arma en pintarFiltrosNivel)
 document.querySelectorAll('.filtro-sb-estado').forEach(function (btn) {
   btn.addEventListener('click', function () {
     if (btn.disabled) return;

@@ -104,8 +104,8 @@
                 <div class="pf-form">
                   <label class="pf-campo">Teléfono<input name="telefono" type="tel" maxlength="20" placeholder="Ej: 3001234567" /></label>
                   <label class="pf-campo">Fecha de nacimiento<input name="fecha_nacimiento" type="date" /></label>
-                  <label class="pf-campo">Ciudad<input name="ciudad" maxlength="100" placeholder="Ej: Pitalito" /></label>
-                  <label class="pf-campo">País<input name="pais" maxlength="100" placeholder="Ej: Colombia" /></label>
+                  <label class="pf-campo">Ciudad<input name="ciudad" maxlength="50" placeholder="Ej: Pitalito" /></label>
+                  <label class="pf-campo">País<input name="pais" maxlength="50" placeholder="Ej: Colombia" /></label>
 
                 </div>
               </section>
@@ -139,8 +139,8 @@
               <h2><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>Seguridad</h2>
               <form class="pf-seguridad" id="pf-form-clave" novalidate>
                 <label class="pf-campo">Contraseña actual<input name="actual" type="password" autocomplete="current-password" /></label>
-                <label class="pf-campo">Nueva contraseña<input name="nueva" type="password" minlength="6" autocomplete="new-password" placeholder="Mínimo 6 caracteres" /></label>
-                <label class="pf-campo">Confirmar nueva contraseña<input name="confirmar" type="password" autocomplete="new-password" /></label>
+                <label class="pf-campo">Nueva contraseña<input name="nueva" type="password" minlength="6" maxlength="72" autocomplete="new-password" placeholder="Mínimo 6 caracteres" /></label>
+                <label class="pf-campo">Confirmar nueva contraseña<input name="confirmar" type="password" maxlength="72" autocomplete="new-password" /></label>
                 <p class="pf-mensaje" id="pf-clave-msg" role="status"></p>
                 <button type="submit" class="pf-btn sec">Cambiar contraseña</button>
               </form>

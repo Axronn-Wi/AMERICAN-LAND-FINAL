@@ -764,7 +764,19 @@ async function descargarArchivo(e, btn) {
 
 function crearFilaEntrega(e) {
   const tr = crear('tr');
-  tr.appendChild(crearCeldaEstudiante(e.nombre_completo));
+  const tdEstudiante = crearCeldaEstudiante(e.nombre_completo);
+  // Comentario que el estudiante dejó al entregar
+  if (e.comentario) {
+    const nota = crear('div', '', '“' + e.comentario + '”');
+    nota.style.fontSize = '0.76rem';
+    nota.style.color = 'var(--gris-texto)';
+    nota.style.fontStyle = 'italic';
+    nota.style.marginTop = '4px';
+    nota.style.maxWidth = '260px';
+    nota.title = 'Comentario del estudiante';
+    tdEstudiante.appendChild(nota);
+  }
+  tr.appendChild(tdEstudiante);
 
   const tdFecha = crear('td', '', e.id_entrega ? fmtFecha(e.fecha_entrega) : '\u2014');
   tr.appendChild(tdFecha);

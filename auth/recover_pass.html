@@ -36,12 +36,12 @@
 
       <!-- Título -->
       <h1 class="login-titulo">Recuperar Contraseña</h1>
-      <p class="login-subtitulo">Ingresa tu correo y te enviaremos un enlace para restablecer tu contraseña</p>
+      <p class="login-subtitulo" id="subtitulo">Ingresa tu correo y te enviaremos un código de 6 dígitos para crear una nueva contraseña</p>
 
       <!-- Alerta global -->
-      <div class="alerta" id="alerta-global"></div>
+      <div class="alerta" id="alerta-global" role="alert" aria-live="polite"></div>
 
-      <!-- PASO 1: formulario -->
+      <!-- PASO 1: pedir el código -->
       <div id="paso-1">
         <form id="form-recuperar" action="#" method="POST" novalidate>
 
@@ -57,6 +57,7 @@
                 name="correo"
                 placeholder="correo@ejemplo.com"
                 required
+                maxlength="150"
                 autocomplete="email"
               />
             </div>
@@ -64,28 +65,86 @@
           </div>
 
           <button type="submit" class="btn-submit" id="btn-enviar">
-            Enviar enlace de recuperación
+            Enviar código
           </button>
 
         </form>
       </div>
 
-      <!-- PASO 2: confirmación -->
+      <!-- PASO 2: escribir el código y la nueva contraseña -->
       <div id="paso-2" class="paso-oculto">
-        <div class="exito-bloque">
-          <div class="exito-icono">&#10003;</div>
-          <h2 class="exito-titulo">¡Correo enviado!</h2>
-          <p class="exito-texto">
-            Revisa tu bandeja en <strong id="correo-enviado"></strong>.<br/>
-            El enlace expira en <strong>1 hora</strong>.
-          </p>
-          <p class="exito-nota">¿No lo ves? Revisa la carpeta de spam.</p>
-        </div>
+        <p class="exito-texto">
+          Te enviamos un código de 6 dígitos a <strong id="correo-enviado"></strong>.
+          Vence en <strong>15 minutos</strong>.
+        </p>
+        <p class="exito-nota">¿No lo ves? Revisa la carpeta de spam.</p>
 
-        <button class="btn-submit btn-reenviar" id="btn-reenviar" type="button">
-          Reenviar correo
+        <form id="form-codigo" action="#" method="POST" novalidate>
+
+          <div class="campo">
+            <label for="codigo">
+              <span class="star">&#9733;</span> Código de verificación
+            </label>
+            <div class="input-wrapper">
+              <span class="icono-campo">&#128273;</span>
+              <input type="text" id="codigo" name="codigo" class="input-codigo"
+                     inputmode="numeric" pattern="[0-9]{6}" maxlength="6"
+                     placeholder="000000" required autocomplete="one-time-code" />
+            </div>
+            <span class="msg-error" id="error-codigo"></span>
+          </div>
+
+          <div class="campo">
+            <label for="contrasena">
+              <span class="star">&#9733;</span> Nueva contraseña
+            </label>
+            <div class="input-wrapper">
+              <span class="icono-campo">&#128274;</span>
+              <input type="password" id="contrasena" name="contrasena"
+                     placeholder="Mínimo 6 caracteres" required minlength="6" maxlength="72"
+                     autocomplete="new-password" />
+            </div>
+            <span class="msg-error" id="error-contrasena"></span>
+          </div>
+
+          <div class="campo">
+            <label for="confirmar">
+              <span class="star">&#9733;</span> Confirmar contraseña
+            </label>
+            <div class="input-wrapper">
+              <span class="icono-campo">&#128274;</span>
+              <input type="password" id="confirmar" name="confirmar"
+                     placeholder="Repite la contraseña" required maxlength="72"
+                     autocomplete="new-password" />
+            </div>
+            <span class="msg-error" id="error-confirmar"></span>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btn-cambiar">
+            Cambiar contraseña
+          </button>
+
+        </form>
+
+        <button class="btn-texto btn-reenviar" id="btn-reenviar" type="button">
+          ¿No te llegó? Reenviar código
         </button>
         <span id="contador-reenvio"></span>
+        <button class="btn-texto" id="btn-otro-correo" type="button">
+          ¿Te equivocaste de correo? Usar otro
+        </button>
+      </div>
+
+      <!-- PASO 3: listo -->
+      <div id="paso-3" class="paso-oculto">
+        <div class="exito-bloque">
+          <div class="exito-icono">&#10003;</div>
+          <h2 class="exito-titulo">¡Contraseña actualizada!</h2>
+          <p class="exito-texto">Ya puedes iniciar sesión con tu nueva contraseña.</p>
+        </div>
+        <a href="login.html" class="btn-submit" style="display:block;text-align:center;text-decoration:none">
+          Ir a iniciar sesión
+        </a>
       </div>
 
       <!-- Enlaces inferiores -->
